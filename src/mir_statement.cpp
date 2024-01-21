@@ -394,8 +394,8 @@ std::string mir_statement::convert_value(const std::string &value) {
 
 
 bool mir_statement::line_is_function(const std::string &line) {
-    if (utils::trim(line).starts_with("fn")) {
-        if (!utils::trim(line).starts_with("fn entrypoint(")) {
+    if (line.starts_with("fn")) {
+        if (!line.starts_with("fn entrypoint(")) {
             return true;
         }
     }

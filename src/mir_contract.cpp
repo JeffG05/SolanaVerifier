@@ -3,6 +3,7 @@
 #include <ranges>
 #include <string>
 #include <list>
+#include <regex>
 #include <cmrc/cmrc.hpp>
 #include "mir_contract.h"
 #include "mir_statement.h"
@@ -49,7 +50,8 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) const {
     std::string line;
     auto current_statement_lines = std::list<std::string>();
     while (getline(file, line)) {
-        if (mir_statement::line_is_statement_start(line)) {
+        std::string trimmed_line = trim_line(line);
+        if (mir_statement::line_is_statement_start(trimmed_line)) {
             if (!current_statement_lines.empty()) {
                 if (std::optional<mir_statement> statement = mir_statement::parse_lines(current_statement_lines); statement.has_value()) {
                     root.add_child(statement.value());
@@ -58,7 +60,7 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) const {
             }
         }
 
-        current_statement_lines.push_back(utils::trim(line));
+        current_statement_lines.push_back(trimmed_line);
     }
     if (!current_statement_lines.empty()) {
         if (const std::optional<mir_statement> statement = mir_statement::parse_lines(current_statement_lines);
@@ -275,5 +277,11 @@ void mir_contract::export_library_file(const std::filesystem::path &target) {
     file.close();
 }
 
-
-
+std::string mir_contract::trim_line(const std::string &line) {
+    std::string trimmed = utils::trim(line);
+    const std::regex comment_regex (R"(^(.*?[;{])?(?:\s*\/\/.*)$)");
+    if (std::smatch match; std::regex_match(trimmed, match, comment_regex)) {
+        return match[1].str();
+    }
+    return trimmed;
+}
