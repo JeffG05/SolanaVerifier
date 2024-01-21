@@ -23,7 +23,7 @@ std::string mir_contract::get_path() const {
     return _path;
 }
 
-void mir_contract::convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) const {
+c_program mir_contract::convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) const {
     // Open file in read mode
     std::fstream file;
     file.open(_path, std::ios::in);
@@ -36,10 +36,12 @@ void mir_contract::convert_to_c(const std::filesystem::path& target, const std::
     file.close();
 
     // Export AST tree as C program
-    export_c_program(target, ast_tree, target_funtion);
+    const std::filesystem::path c_file_path = export_c_program(target, ast_tree, target_funtion);
 
     // Export library file
     export_library_file(target);
+
+    return c_program(c_file_path);
 
 }
 
@@ -73,7 +75,7 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) const {
     return root;
 }
 
-void mir_contract::export_c_program(const std::filesystem::path &target, mir_statement ast_tree, const std::string& target_function) {
+std::filesystem::path mir_contract::export_c_program(const std::filesystem::path &target, mir_statement ast_tree, const std::string& target_function) {
     nlohmann::json contract_data = ast_tree.get_ast_data();
     const std::string contract_name = contract_data.at("contract").get<std::string>();
 
@@ -244,6 +246,7 @@ void mir_contract::export_c_program(const std::filesystem::path &target, mir_sta
     file << "}" << std::endl;
 
     file.close();
+    return out;
 }
 
 std::string mir_contract::ast_variable_to_c(const std::string &type, const std::string &name) {
@@ -262,7 +265,7 @@ std::string mir_contract::ast_variable_to_c(const std::string &type) {
     return type;
 }
 
-void mir_contract::export_library_file(const std::filesystem::path &target) {
+std::filesystem::path mir_contract::export_library_file(const std::filesystem::path &target) {
     const std::filesystem::path out = target / "solana.c";
     std::fstream file;
     file.open(out, std::ios::out);
@@ -275,6 +278,7 @@ void mir_contract::export_library_file(const std::filesystem::path &target) {
 
     file << std::string(lib_file.begin(), lib_file.end()) << std::endl;
     file.close();
+    return out;
 }
 
 std::string mir_contract::trim_line(const std::string &line) {

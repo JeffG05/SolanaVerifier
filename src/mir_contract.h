@@ -4,6 +4,7 @@
 #include <string>
 #include <filesystem>
 #include "mir_statement.h"
+#include "c_program.h"
 
 class mir_contract {
 public:
@@ -12,10 +13,10 @@ public:
 
     [[nodiscard]] std::string get_path() const;
 
-    void convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) const;
+    [[nodiscard]] c_program convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) const;
 
-    static void export_c_program(const std::filesystem::path& target, mir_statement ast_tree, const std::string& target_function);
-    static void export_library_file(const std::filesystem::path& target);
+    static std::filesystem::path export_c_program(const std::filesystem::path& target, mir_statement ast_tree, const std::string& target_function);
+    static std::filesystem::path export_library_file(const std::filesystem::path& target);
 
     mir_statement create_ast_tree(std::istream& file) const;
     [[nodiscard]] static std::string ast_variable_to_c(const std::string& type);

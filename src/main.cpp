@@ -49,8 +49,8 @@ int main(const int argc, char* argv[])
     std::cout << "MIR generated: " << mir.get_path() << std::endl;
 
     // Convert MIR to C Program
-    mir.convert_to_c(temp_dir, target_function);
-    std::cout << "C program generated" << std::endl;
+    c_program solana_c = mir.convert_to_c(temp_dir, target_function);
+    std::cout << "C program generated: " << solana_c.get_path() << std::endl;
 
     return 0;
 }
