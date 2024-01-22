@@ -13,7 +13,7 @@ u64 nondet_u64() {
 }
 
 typedef unsigned long long int u32;
-u32 MAX_U32 = 4294967296uLL;
+u32 MAX_U32 = 4294967295uLL;
 u32 nondet_u32() {
     u32 x;
     __ESBMC_assume(x <= MAX_U32);
