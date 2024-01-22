@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(json)
 include(CMakeRC.cmake)
 cmrc_add_resource_library(SolanaVerifierAssets assets/solana.c)
 
-find_package(Boost 1.83 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(SolanaVerifier main.cpp solana_contract.cpp mir_contract.cpp solana_contract.h mir_contract.h
