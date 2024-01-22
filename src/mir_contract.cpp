@@ -157,13 +157,18 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
         // Create function header
         file << function_return << " " << function_name << "(";
+        unsigned int i = 0;
         for (const auto& parameter_statement: function_parameters) {
             nlohmann::json parameter_data = parameter_statement.get_ast_data();
             const std::string parameter_name = parameter_data.at("variable").get<std::string>();
             const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-            file << ast_variable_to_c(parameter_type, parameter_name) << ", ";
+            file << ast_variable_to_c(parameter_type, parameter_name);
+            if (i < function_parameters.size() - 1) {
+                file << ", ";
+            }
+            i++;
         }
-        file << "\b\b) {" << std::endl;
+        file << ") {" << std::endl;
 
         // Init function state
         file << "\t" << function_name << "_state state;" << std::endl;
@@ -235,12 +240,19 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
 
     file << "\t" << ast_variable_to_c(target_function_type, "result") << " = " << target_function << "(";
-    for (const auto& parameter_statement: target_function_statement.get_children({parameter})) {
+
+    unsigned int i = 0;
+    std::list<mir_statement> target_parameters = target_function_statement.get_children({parameter});
+    for (const auto& parameter_statement: target_parameters) {
         nlohmann::json parameter_data = parameter_statement.get_ast_data();
         const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-        file << parameter_name << ", ";
+        file << parameter_name;
+        if (i < target_parameters.size() - 1) {
+            file << ", ";
+        }
+        i++;
     }
-    file << "\b\b);" << std::endl;
+    file << ");" << std::endl;
     file << std::endl;
     file << "\treturn 0;" << std::endl;
     file << "}" << std::endl;

@@ -51,7 +51,7 @@ bool print(string s) {
 }
 
 // PUBKEY
-typdef struct pubkey_struct {
+typedef struct pubkey_struct {
     u8 contents[32];
 } pubkey;
 pubkey nondet_pubkey() {

@@ -87,10 +87,15 @@ void mir_statement::print(const int indent_level) {
         std::cout << indents << get_string_type() << std::endl;
     } else {
         std::cout << indents << get_string_type() << " (";
+        unsigned int i = 0;
         for (auto& [key, value] : data.items()) {
-            std::cout << key << "=" << value << ",";
+            std::cout << key << "=" << value;
+            if (i < data.size() - 1) {
+                std::cout << ",";
+            }
+            i++;
         }
-        std::cout << "\b)" << std::endl;
+        std::cout << ")" << std::endl;
     }
     for (const auto& child: _ast_tree["children"]) {
         mir_statement parsed_child = parse_json(child);
@@ -259,7 +264,7 @@ mir_statement mir_statement::parse_block_header(const std::string &line) {
 std::optional<mir_statement> mir_statement::parse_assignment(const std::string &line) {
     nlohmann::json data;
     std::string branching;
-    const std::regex assignment_parts (R"(^(\w+) = (.*?)(?: -> \[(.*)\])?;$)");
+    const std::regex assignment_parts (R"(^(\w+) = (.*?)(?: -> (.*))?;$)");
     if (std::smatch match; regex_match(line, match, assignment_parts)) {
         data["variable"] = match[1].str();
         data["value"] = convert_value(match[2].str());
@@ -270,6 +275,9 @@ std::optional<mir_statement> mir_statement::parse_assignment(const std::string &
 
     auto assignment_statement = mir_statement(assignment, data);
     if (!branching.empty()) {
+        if (branching.starts_with("[") && branching.ends_with("]")) {
+            branching = branching.substr(1, branching.size() - 2);
+        }
         for (const auto& branch_str: utils::split(branching, ", ")) {
             if (std::optional<mir_statement> branch_statement = parse_branch(branch_str); branch_statement.has_value()) {
                 assignment_statement.add_child(branch_statement.value());
@@ -309,6 +317,7 @@ std::optional<mir_statement> mir_statement::parse_branch(const std::string &line
     const std::regex switch_int_regex ("^(\\d+): (bb\\d+)$");
     const std::regex otherwise_regex ("^otherwise: (bb\\d+)$");
     const std::regex unwind_regex ("^unwind: (bb\\d+)$");
+    const std::regex block_regex ("^bb\\d+$");
 
     if (std::regex_match(line, match, return_regex)) {
         data["condition"] = "true";
@@ -322,6 +331,9 @@ std::optional<mir_statement> mir_statement::parse_branch(const std::string &line
     } else if (std::regex_match(line, match, unwind_regex)) {
         data["condition"] = "false";
         data["destination"] = match[1].str();
+    } else if (std::regex_match(line, match, block_regex)) {
+        data["condition"] = "true";
+        data["destination"] = match[0].str();
     } else {
         return std::nullopt;
     }
