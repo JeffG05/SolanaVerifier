@@ -10,6 +10,8 @@ public:
 
     [[nodiscard]] std::string get_path() const;
 
+    void verify() const;
+
 protected:
     std::filesystem::path _path;
 };

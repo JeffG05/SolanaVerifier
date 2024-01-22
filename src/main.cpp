@@ -52,5 +52,8 @@ int main(const int argc, char* argv[])
     c_program solana_c = mir.convert_to_c(temp_dir, target_function);
     std::cout << "C program generated: " << solana_c.get_path() << std::endl;
 
+    std::cout << "Verifying Program" << std::endl;
+    solana_c.verify();
+
     return 0;
 }
