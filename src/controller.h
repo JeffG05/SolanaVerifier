@@ -19,7 +19,7 @@ private:
 
     static std::filesystem::path get_temp_dir();
 
-    static std::string get_millis(std::chrono::time_point<std::chrono::steady_clock> start, std::chrono::time_point<std::chrono::steady_clock> end);
+    static std::string get_millis(std::chrono::time_point<std::chrono::high_resolution_clock> start, std::chrono::time_point<std::chrono::high_resolution_clock> end);
 };
 
 
