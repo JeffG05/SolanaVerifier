@@ -16,7 +16,7 @@ bool controller::is_directory(const std::filesystem::path &path) {
     return !path.has_extension();
 }
 
-std::string controller::get_millis(const std::chrono::time_point<std::chrono::steady_clock> start, const std::chrono::time_point<std::chrono::steady_clock> end) {
+std::string controller::get_millis(const std::chrono::time_point<std::chrono::high_resolution_clock> start, const std::chrono::time_point<std::chrono::high_resolution_clock> end) {
     const std::chrono::duration<double, std::milli> duration = end - start;
     return std::to_string(duration.count()) + "ms";
 }
