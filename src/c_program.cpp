@@ -19,7 +19,7 @@ smt_formula c_program::build_smt(const std::filesystem::path& target) const {
     const std::filesystem::path out = target / (_contract_name + ".smt2");
 
     std::stringstream cmd;
-    cmd << "esbmc " << get_path() << "--smtlib --smt-formula-only --output " << out;
+    cmd << "esbmc " << get_path() << " --smtlib --smt-formula-only --output " << out;
     system(cmd.str().data());
 
     return smt_formula(out);
