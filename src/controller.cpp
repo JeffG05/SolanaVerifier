@@ -115,10 +115,16 @@ bool controller::run(const int argc, char *argv[]) {
     auto t_to_c_end = std::chrono::high_resolution_clock::now();
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
 
-    auto t_verify_start = std::chrono::high_resolution_clock::now();
+    auto t_generate_start = std::chrono::high_resolution_clock::now();
     smt_formula smt = solana_c.build_smt(temp_dir);
-    auto t_verify_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Ran verification: took " << get_millis(t_verify_start, t_verify_end) << std::endl;
+    auto t_generate_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Generate SMT: took " << get_millis(t_generate_start, t_generate_end) << std::endl;
+
+    auto t_z3_start = std::chrono::high_resolution_clock::now();
+    verification_result z3_result = solana_c.verify_z3(temp_dir);
+    auto t_z3_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
+    std::cout << "\t" << (z3_result.get_is_sat() ? "Succeeded" : "Failed") << std::endl;
 
     return true;
 }
