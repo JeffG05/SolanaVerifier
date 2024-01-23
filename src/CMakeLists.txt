@@ -23,7 +23,9 @@ add_executable(SolanaVerifier main.cpp solana_contract.cpp mir_contract.cpp sola
         c_program.cpp
         c_program.h
         controller.cpp
-        controller.h)
+        controller.h
+        smt_formula.cpp
+        smt_formula.h)
 
 target_link_libraries(SolanaVerifier
         PRIVATE tomlplusplus::tomlplusplus

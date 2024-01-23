@@ -41,7 +41,7 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     // Export library file
     export_library_file(target);
 
-    return c_program(c_file_path);
+    return c_program(_contract_name, c_file_path);
 
 }
 

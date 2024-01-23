@@ -116,7 +116,7 @@ bool controller::run(const int argc, char *argv[]) {
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
 
     auto t_verify_start = std::chrono::high_resolution_clock::now();
-    solana_c.verify();
+    smt_formula smt = solana_c.build_smt(temp_dir);
     auto t_verify_end = std::chrono::high_resolution_clock::now();
     std::cout << "Ran verification: took " << get_millis(t_verify_start, t_verify_end) << std::endl;
 

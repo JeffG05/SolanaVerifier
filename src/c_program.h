@@ -2,17 +2,19 @@
 #define C_PROGRAM_H
 
 #include <filesystem>
+#include "smt_formula.h"
 
 class c_program {
 public:
-    explicit c_program(const std::filesystem::path& path);
-    explicit c_program(const std::string& path);
+    explicit c_program(const std::string &contract_name, const std::filesystem::path& path);
+    explicit c_program(const std::string &contract_name, const std::string& path);
 
     [[nodiscard]] std::string get_path() const;
 
-    void verify() const;
+    [[nodiscard]] smt_formula build_smt(const std::filesystem::path& target) const;
 
 protected:
+    std::string _contract_name;
     std::filesystem::path _path;
 };
 
