@@ -20,6 +20,14 @@ u32 nondet_u32() {
     return x;
 }
 
+typedef unsigned long long int u16;
+u16 MAX_U16 = 65535uLL;
+u16 nondet_u16() {
+    u16 x;
+    __ESBMC_assume(x <= MAX_U16);
+    return x;
+}
+
 typedef unsigned long long int u8;
 u8 MAX_U8 = 255uLL;
 u8 nondet_u8() {
@@ -27,6 +35,51 @@ u8 nondet_u8() {
     __ESBMC_assume(x <= MAX_U8);
     return x;
 }
+
+typedef u64 usize;
+
+// SIGNED INTEGERS
+typedef unsigned long long int i64;
+i64 MIN_I64 = -9223372036854775808uLL;
+i64 MAX_I64 = 9223372036854775807uLL;
+i64 nondet_i64() {
+    i64 x;
+    __ESBMC_assume(x >= MIN_I64);
+    __ESBMC_assume(x <= MAX_I64);
+    return x;
+}
+
+typedef unsigned long long int i32;
+i32 MIN_I32 = -2147483648uLL;
+i32 MAX_I32 = 2147483647uLL;
+i32 nondet_i32() {
+    i32 x;
+    __ESBMC_assume(x >= MIN_I32);
+    __ESBMC_assume(x <= MAX_I32);
+    return x;
+}
+
+typedef unsigned long long int i16;
+i16 MIN_I16 = -32768uLL;
+i16 MAX_I16 = 32767uLL;
+i16 nondet_i16() {
+    i16 x;
+    __ESBMC_assume(x >= MIN_I16);
+    __ESBMC_assume(x <= MAX_I16);
+    return x;
+}
+
+typedef unsigned long long int i8;
+i8 MIN_I8 = -128uLL;
+i8 MAX_I8 = 127uLL;
+i8 nondet_i8() {
+    i8 x;
+    __ESBMC_assume(x >= MIN_I8);
+    __ESBMC_assume(x <= MAX_I8);
+    return x;
+}
+
+typedef i64 isize;
 
 // STRING
 typedef char* string;

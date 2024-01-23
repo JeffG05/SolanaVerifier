@@ -346,8 +346,17 @@ std::string mir_statement::convert_type(const std::string &type) {
     if (type.starts_with("&")) {
         return convert_type(type.substr(1));
     }
+    if (type.starts_with("*")) {
+        return convert_type(type.substr(1));
+    }
+    if (type.starts_with("mut ")) {
+        return convert_type(type.substr(4));
+    }
     if (type.starts_with("[") && type.ends_with("]")) {
         return "array " + convert_type(type.substr(1, type.size()-2));
+    }
+    if (type.starts_with("std::vec::Vec<") && type.ends_with(">")) {
+        return "array " + convert_type(type.substr(14, type.size()-15));
     }
     if (type.starts_with("`") && type.ends_with("`")) {
         return convert_type(type.substr(1, type.size()-2));
@@ -355,7 +364,10 @@ std::string mir_statement::convert_type(const std::string &type) {
     if (type == "Result<(), ProgramError>" || type == "std::result::Result<(), solana_program::program_error::ProgramError>") {
         return "program_result";
     }
-    if (type == "u8" || type == "u32" || type == "u64") {
+    if (type == "u8" || type == "u16" || type == "u32" || type == "u64" || type == "usize") {
+        return type;
+    }
+    if (type == "i8" || type == "i16" || type == "i32" || type == "i64" || type == "usize") {
         return type;
     }
     if (type == "str") {
@@ -379,6 +391,10 @@ std::string mir_statement::convert_value(const std::string &value) {
         return convert_value(value.substr(1));
     }
 
+    if (value.starts_with("*")) {
+        return convert_value(value.substr(1));
+    }
+
     std::smatch match;
 
     const std::regex variable_regex ("^_\\d+$");
@@ -399,6 +415,26 @@ std::string mir_statement::convert_value(const std::string &value) {
     const std::regex sol_log (R"(^solana_program::log::sol_log\((.+)\)$)");
     if (std::regex_match(value, match, sol_log)) {
         return "print(" + convert_value(match[1].str()) + ")";
+    }
+
+    const std::regex deref_copy (R"(^deref_copy \((.+)\)$)");
+    if (std::regex_match(value, match, deref_copy)) {
+        return convert_value(match[1].str());
+    }
+
+    const std::regex deref (R"(^<.+ as Deref>::deref\((.+)\)$)");
+    if (std::regex_match(value, match, deref)) {
+        return convert_value(match[1].str());
+    }
+
+    const std::regex array_indexer (R"(^\((.+)\.(\d+): .+\)$)");
+    if (std::regex_match(value, match, array_indexer)) {
+        return convert_value(match[1].str()) + "[" + match[2].str() + "]";
+    }
+
+    const std::regex move (R"(^move (.+)$)");
+    if (std::regex_match(value, match, move)) {
+        return convert_value(match[1].str());
     }
 
     return value;
