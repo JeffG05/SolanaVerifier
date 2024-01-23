@@ -30,7 +30,7 @@ smt_formula c_program::build_smt(const std::filesystem::path& target) const {
     }
 
     std::fstream out;
-    out.open(out_path, std::ios::in);
+    out.open(out_path, std::ios::out);
     if (!out.is_open()) {
         std::throw_with_nested(std::runtime_error("Unable to write SMT output"));
     }
