@@ -1,3 +1,4 @@
+#include <sstream>
 #include "utils.h"
 
 std::string utils::trim(std::string s) {
@@ -40,5 +41,17 @@ std::list<std::string> utils::split(const std::string& s, const std::string& del
     return tokens;
 }
 
+std::string utils::join(const std::list<std::string> &l, const std::string &delim) {
+    std::stringstream res;
+    unsigned int i = 0;
+    for (const auto& item: l) {
+        res << item;
+        if (i < l.size() - 1) {
+            res << delim;
+        }
+        i++;
+    }
+    return res.str();
+}
 
 
