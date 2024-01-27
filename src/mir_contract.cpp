@@ -32,8 +32,9 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     }
 
     // Create AST tree
-    const mir_statement ast_tree = create_ast_tree(file);
+    mir_statement ast_tree = create_ast_tree(file);
     file.close();
+    ast_tree.print();
 
     // Export AST tree as C program
     const std::filesystem::path c_file_path = export_c_program(target, ast_tree, target_funtion);
@@ -103,6 +104,28 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
         std::list<mir_statement> function_states;
         std::ranges::copy(function_parameters, std::back_insert_iterator(function_states));
         std::ranges::copy(function_variables, std::back_insert_iterator(function_states));
+
+        // Create function tuple structs
+        for (const auto& parameter_statement: function_states) {
+            nlohmann::json parameter_data = parameter_statement.get_ast_data();
+            const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+            const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+            if (!parameter_type.starts_with("tuple ")) {
+                continue;
+            }
+
+            std::string raw_value_types = parameter_type.substr(7, parameter_type.size() - 8);
+            std::list<std::string> value_types = utils::split(raw_value_types, ", ");
+
+            file << "typedef struct tuple" << parameter_name << "_struct {" << std::endl;
+            unsigned int tuple_i = 0;
+            for (const auto& value_type: value_types) {
+                file << "\t" << value_type << " get" << tuple_i << ";" << std::endl;
+                tuple_i++;
+            }
+            file << "} " << "tuple" << parameter_name << ";" << std::endl;
+            file << std::endl;
+        }
 
         // Create function state struct
         file << "typedef struct " << function_name << "_state_struct {" << std::endl;
@@ -183,6 +206,19 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
                     file << parameter_name << "[i" << parameter_name << "];" << std::endl;
                 } else {
                     file << "nondet_" << ast_variable_to_c(parameter_type) << "();" << std::endl;
+                }
+            } else if (parameter_type.starts_with("tuple ")) {
+                std::string value_types_string = parameter_type.substr(7, parameter_type.size() - 8);
+                std::list<std::string> value_types = utils::split(value_types_string, ", ");
+                unsigned int tuple_i = 0;
+                for (const auto& value_type: value_types) {
+                    file << "\tstate." << parameter_name << ".get" << tuple_i << " = ";
+                    if (parameter_statement.get_type() == parameter) {
+                        file << parameter_name << ".get" << tuple_i << ";" << std::endl;
+                    } else {
+                        file << "nondet_" << value_type << "();" << std::endl;
+                    }
+                    tuple_i++;
                 }
             } else {
                 file << "\tstate." << parameter_name << " = ";
@@ -265,6 +301,9 @@ std::string mir_contract::ast_variable_to_c(const std::string &type, const std::
     if (type.starts_with("array ")) {
         const std::string subtype = type.substr(6);
         return subtype + " " + name + "[256]";
+    }
+    if (type.starts_with("tuple ")) {
+        return "tuple" + name + "_struct " + name;
     }
     return type + " " + name;
 }

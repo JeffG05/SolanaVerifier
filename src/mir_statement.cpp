@@ -355,6 +355,15 @@ std::string mir_statement::convert_type(const std::string &type) {
     if (type.starts_with("[") && type.ends_with("]")) {
         return "array " + convert_type(type.substr(1, type.size()-2));
     }
+    if (type.starts_with("(") && type.ends_with(")")) {
+        const std::string types = type.substr(1, type.size()-2);
+        const std::list<std::string> listed_types = utils::split(types, ", ");
+        std::list<std::string> converted_types;
+        for (const auto& raw_type: listed_types) {
+            converted_types.push_back(convert_type(raw_type));
+        }
+        return "tuple (" + utils::join(converted_types, ", ") + ")";
+    }
     if (type.starts_with("std::vec::Vec<") && type.ends_with(">")) {
         return "array " + convert_type(type.substr(14, type.size()-15));
     }
@@ -373,7 +382,7 @@ std::string mir_statement::convert_type(const std::string &type) {
     if (type == "str") {
         return "string";
     }
-    if (type == "()") {
+    if (type == "()" || type == "bool") {
         return "bool";
     }
     if (type == "AccountInfo<'_>" || type == "solana_program::account_info::AccountInfo<'_>") {
@@ -407,6 +416,11 @@ std::string mir_statement::convert_value(const std::string &value) {
         return match[1].str();
     }
 
+    const std::regex int_const ("^const (\\d+)_[ui]\\d+$");
+    if (std::regex_match(value, match, int_const)) {
+        return match[1].str();
+    }
+
     const std::regex ok_result (R"(^Result::<\(\), ProgramError>::Ok\(.*\)$)");
     if (std::regex_match(value, match, ok_result)) {
         return "ok";
@@ -427,9 +441,9 @@ std::string mir_statement::convert_value(const std::string &value) {
         return convert_value(match[1].str());
     }
 
-    const std::regex array_indexer (R"(^\((.+)\.(\d+): .+\)$)");
-    if (std::regex_match(value, match, array_indexer)) {
-        return convert_value(match[1].str()) + "[" + match[2].str() + "]";
+    const std::regex tuple_indexer (R"(^\((.+)\.(\d+): .+\)$)");
+    if (std::regex_match(value, match, tuple_indexer)) {
+        return convert_value(match[1].str()) + ".get" + match[2].str();
     }
 
     const std::regex move (R"(^move (.+)$)");
