@@ -11,6 +11,7 @@ private:
     std::string _contract_dir;
     std::string _mir_file;
     std::string _target_function;
+    std::string _esbmc_path;
 
     static bool is_mir(const std::filesystem::path &path);
     static bool is_directory(const std::filesystem::path &path);

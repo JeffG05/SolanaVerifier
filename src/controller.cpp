@@ -51,6 +51,7 @@ bool controller::run(const int argc, char *argv[]) {
         ("contract", boost::program_options::value<std::string>(&_contract_dir), "Directory of Solana smart contract")
         ("mir", boost::program_options::value<std::string>(&_mir_file), "MIR representation of Solana smart contract")
         ("target", boost::program_options::value<std::string>(&_target_function)->default_value("entrypoint"), "The target function to verify")
+        ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
     ;
 
     boost::program_options::variables_map vm;
@@ -116,12 +117,12 @@ bool controller::run(const int argc, char *argv[]) {
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
 
     auto t_generate_start = std::chrono::high_resolution_clock::now();
-    smt_formula smt = solana_c.build_smt(temp_dir);
+    smt_formula smt = solana_c.build_smt(temp_dir, std::filesystem::path(_esbmc_path));
     auto t_generate_end = std::chrono::high_resolution_clock::now();
     std::cout << "Generate SMT: took " << get_millis(t_generate_start, t_generate_end) << std::endl;
 
     auto t_z3_start = std::chrono::high_resolution_clock::now();
-    verification_result z3_result = solana_c.verify_z3(temp_dir);
+    verification_result z3_result = solana_c.verify_z3(temp_dir, std::filesystem::path(_esbmc_path));
     auto t_z3_end = std::chrono::high_resolution_clock::now();
     std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
     std::cout << "\t" << (z3_result.get_is_sat() ? "Succeeded" : "Failed") << std::endl;
