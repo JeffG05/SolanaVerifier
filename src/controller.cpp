@@ -125,7 +125,11 @@ bool controller::run(const int argc, char *argv[]) {
     verification_result z3_result = solana_c.verify_z3(temp_dir, std::filesystem::path(_esbmc_path));
     auto t_z3_end = std::chrono::high_resolution_clock::now();
     std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
-    std::cout << "\t" << (z3_result.get_is_sat() ? "Succeeded" : "Failed") << std::endl;
+    if (z3_result.get_is_sat()) {
+        std::cout << "\tNo vulnerability found" << std::endl;
+    } else {
+        std::cout << "\tContains vulnerability: " << z3_result.get_vulnerability() << std::endl;
+    }
 
     return true;
 }

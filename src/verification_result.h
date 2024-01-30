@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-typedef std::tuple<bool> result;
+typedef std::tuple<bool, std::string> result;
 
 enum class verifier {
     z3
@@ -14,14 +14,17 @@ public:
     explicit verification_result(verifier v, const std::filesystem::path &path);
     explicit verification_result(verifier v, const std::string &path);
 
-    bool get_is_sat() const;
+    [[nodiscard]] bool get_is_sat() const;
+    [[nodiscard]] std::string get_vulnerability() const;
 
     [[nodiscard]] result parse_log() const;
     [[nodiscard]] result parse_z3() const;
 private:
     std::filesystem::path _log_path;
     verifier _verifier;
+
     bool _is_sat;
+    std::string _vulnerability;
 };
 
 
