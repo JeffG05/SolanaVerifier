@@ -150,13 +150,13 @@ mir_statement mir_statement::create_root(const std::string &contract_name) {
     return {root, data};
 }
 
-std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::string> &lines) {
+std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::string> &lines, const std::list<mir_statement>& variables) {
     if (line_is_function(lines.front())) {
         return parse_function(lines);
     }
 
     if (line_is_block(lines.front())) {
-        return parse_block(lines);
+        return parse_block(lines, variables);
     }
 
     return std::nullopt;
@@ -170,15 +170,15 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
     lines.pop_front();
 
     // Create variables
-    while (lines.front().starts_with("debug")) {
+    while (!lines.front().empty()) {
+        if (lines.front().starts_with("let")) {
+            mir_statement variable_statement = parse_variable(lines.front());
+            function_header.add_child(variable_statement);
+        }
         lines.pop_front();
     }
 
-    while (lines.front().starts_with("let")) {
-        mir_statement variable_statement = parse_variable(lines.front());
-        function_header.add_child(variable_statement);
-        lines.pop_front();
-    }
+    std::list<mir_statement> all_variables = function_header.get_children();
 
     // Create blocks
     auto current_block_lines = std::list<std::string>();
@@ -186,7 +186,7 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
         const std::string line = lines.front();
         if (line_is_block(line)) {
             if (!current_block_lines.empty()) {
-                if (std::optional<mir_statement> statement = parse_lines(current_block_lines); statement.has_value()) {
+                if (std::optional<mir_statement> statement = parse_lines(current_block_lines, all_variables); statement.has_value()) {
                     function_header.add_child(statement.value());
                 }
                 current_block_lines.clear();
@@ -197,7 +197,7 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
     }
 
     if (!current_block_lines.empty()) {
-        if (const std::optional<mir_statement> statement = parse_lines(current_block_lines); statement.has_value()) {
+        if (const std::optional<mir_statement> statement = parse_lines(current_block_lines, all_variables); statement.has_value()) {
             function_header.add_child(statement.value());
         }
         current_block_lines.clear();
@@ -233,7 +233,7 @@ mir_statement mir_statement::parse_function_header(const std::string& line) {
     return function_statement;
 }
 
-std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> lines) {
+std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> lines, const std::list<mir_statement> &variables) {
     // Create block header
     const std::string header_line = lines.front();
     mir_statement block = parse_block_header(header_line);
@@ -242,7 +242,7 @@ std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> l
     // Create assignments
     while (!lines.empty()) {
         std::string line = lines.front();
-        if (std::optional<mir_statement> assignment = parse_assignment(line); assignment.has_value()) {
+        if (std::optional<mir_statement> assignment = parse_assignment(line, variables); assignment.has_value()) {
             block.add_child(assignment.value());
         }
         lines.pop_front();
@@ -261,14 +261,20 @@ mir_statement mir_statement::parse_block_header(const std::string &line) {
 }
 
 
-std::optional<mir_statement> mir_statement::parse_assignment(const std::string &line) {
+std::optional<mir_statement> mir_statement::parse_assignment(const std::string &line, const std::list<mir_statement>& variables) {
     nlohmann::json data;
     std::string branching;
     const std::regex assignment_parts (R"(^(\w+) = (.*?)(?: -> (.*))?;$)");
-    if (std::smatch match; regex_match(line, match, assignment_parts)) {
+    const std::regex assert_parts (R"(^assert\((.+), ".*\) -> (.*);$)");
+    std::smatch match;
+    if (regex_match(line, match, assignment_parts)) {
         data["variable"] = match[1].str();
-        data["value"] = convert_value(match[2].str());
+        data["value"] = convert_value(match[2].str(), variables);
         branching = match[3].str();
+    } else if (regex_match(line, match, assert_parts)) {
+        data["variable"] = "";
+        data["value"] = convert_value(match[1].str(), variables);
+        branching = match[2].str();
     } else {
         return std::nullopt;
     }
@@ -314,6 +320,7 @@ std::optional<mir_statement> mir_statement::parse_branch(const std::string &line
 
     std::smatch match;
     const std::regex return_regex ("^return: (bb\\d+)$");
+    const std::regex success_regex ("^success: (bb\\d+)$");
     const std::regex switch_int_regex ("^(\\d+): (bb\\d+)$");
     const std::regex otherwise_regex ("^otherwise: (bb\\d+)$");
     const std::regex unwind_regex ("^unwind: (bb\\d+)$");
@@ -322,18 +329,27 @@ std::optional<mir_statement> mir_statement::parse_branch(const std::string &line
     if (std::regex_match(line, match, return_regex)) {
         data["condition"] = "true";
         data["destination"] = match[1].str();
+        data["ignore_var"] = true;
+    } else if (std::regex_match(line, match, success_regex)) {
+        data["condition"] = "true";
+        data["destination"] = match[1].str();
+        data["ignore_var"] = false;
     } else if (std::regex_match(line, match, switch_int_regex)) {
         data["condition"] = match[1].str();
         data["destination"] = match[2].str();
+        data["ignore_var"] = false;
     } else if (std::regex_match(line, match, otherwise_regex)) {
         data["condition"] = "true";
         data["destination"] = match[1].str();
+        data["ignore_var"] = true;
     } else if (std::regex_match(line, match, unwind_regex)) {
         data["condition"] = "false";
         data["destination"] = match[1].str();
+        data["ignore_var"] = true;
     } else if (std::regex_match(line, match, block_regex)) {
         data["condition"] = "true";
         data["destination"] = match[0].str();
+        data["ignore_var"] = true;
     } else {
         return std::nullopt;
     }
@@ -376,7 +392,7 @@ std::string mir_statement::convert_type(const std::string &type) {
     if (type == "u8" || type == "u16" || type == "u32" || type == "u64" || type == "usize") {
         return type;
     }
-    if (type == "i8" || type == "i16" || type == "i32" || type == "i64" || type == "usize") {
+    if (type == "i8" || type == "i16" || type == "i32" || type == "i64" || type == "isize") {
         return type;
     }
     if (type == "str") {
@@ -395,13 +411,17 @@ std::string mir_statement::convert_type(const std::string &type) {
     return type;
 }
 
-std::string mir_statement::convert_value(const std::string &value) {
+std::string mir_statement::convert_value(const std::string &value, const std::list<mir_statement>& variables) {
     if (value.starts_with("&")) {
-        return convert_value(value.substr(1));
+        return convert_value(value.substr(1), variables);
     }
 
     if (value.starts_with("*")) {
-        return convert_value(value.substr(1));
+        return convert_value(value.substr(1), variables);
+    }
+
+    if (value.starts_with("!")) {
+        return "!(" + convert_value(value.substr(1), variables) + ")";
     }
 
     std::smatch match;
@@ -428,27 +448,89 @@ std::string mir_statement::convert_value(const std::string &value) {
 
     const std::regex sol_log (R"(^solana_program::log::sol_log\((.+)\)$)");
     if (std::regex_match(value, match, sol_log)) {
-        return "print(" + convert_value(match[1].str()) + ")";
+        return "print(" + convert_value(match[1].str(), variables) + ")";
     }
 
     const std::regex deref_copy (R"(^deref_copy \((.+)\)$)");
     if (std::regex_match(value, match, deref_copy)) {
-        return convert_value(match[1].str());
+        return convert_value(match[1].str(), variables);
     }
 
     const std::regex deref (R"(^<.+ as Deref>::deref\((.+)\)$)");
     if (std::regex_match(value, match, deref)) {
-        return convert_value(match[1].str());
+        return convert_value(match[1].str(), variables);
     }
 
     const std::regex tuple_indexer (R"(^\((.+)\.(\d+): .+\)$)");
     if (std::regex_match(value, match, tuple_indexer)) {
-        return convert_value(match[1].str()) + ".get" + match[2].str();
+        return convert_value(match[1].str(), variables) + ".get" + match[2].str();
     }
 
     const std::regex move (R"(^move (.+)$)");
     if (std::regex_match(value, match, move)) {
-        return convert_value(match[1].str());
+        return convert_value(match[1].str(), variables);
+    }
+
+    const std::regex checked_add (R"(^CheckedAdd\((.+), (.+)\)$)");
+    if (std::regex_match(value, match, checked_add)) {
+        std::string variable_type;
+        for (const auto& variable: variables) {
+            std::string var_name = variable.get_ast_data().at("variable");
+            if (var_name == match[1].str() || var_name == match[2].str()) {
+                variable_type = variable.get_ast_data().at("variable_type");
+                break;
+            }
+        }
+
+        for (char& c : variable_type) {
+            c = static_cast<char>(toupper(c));
+        }
+
+        std::string func = "addition(" + convert_value(match[1].str(), variables) + ", " + convert_value(match[2].str(), variables) + ", MAX_" + variable_type;
+
+        if (variable_type.starts_with("U")) {
+            return "u_" + func + ")";
+        }
+        if (variable_type.starts_with("I")) {
+            return "i_" + func + ", MIN_" + variable_type + ")";
+        }
+        std::throw_with_nested(std::runtime_error("Unsupported addition"));
+    }
+
+    const std::regex checked_mul (R"(^CheckedMul\((.+), (.+)\)$)");
+    if (std::regex_match(value, match, checked_mul)) {
+        std::string variable_type;
+        for (const auto& variable: variables) {
+            std::string var_name = variable.get_ast_data().at("variable");
+            if (var_name == match[1].str() || var_name == match[2].str()) {
+                variable_type = variable.get_ast_data().at("variable_type");
+                break;
+            }
+        }
+
+        for (char& c : variable_type) {
+            c = static_cast<char>(toupper(c));
+        }
+
+        std::string func = "multiplication(" + convert_value(match[1].str(), variables) + ", " + convert_value(match[2].str(), variables) + ", MAX_" + variable_type;
+
+        if (variable_type.starts_with("U")) {
+            return "u_" + func + ")";
+        }
+        if (variable_type.starts_with("I")) {
+            return "i_" + func + ", MIN_" + variable_type + ")";
+        }
+        std::throw_with_nested(std::runtime_error("Unsupported multiplication"));
+    }
+
+    const std::regex custom_function (R"(^(.+)\((.*)\)$)");
+    if (std::regex_match(value, match, custom_function)) {
+        const std::list<std::string> listed_types = utils::split(match[2].str(), ", ");
+        std::list<std::string> converted_types;
+        for (const auto& raw_type: listed_types) {
+            converted_types.push_back(convert_value(raw_type, variables));
+        }
+        return match[1].str() + "(" + utils::join(converted_types, ", ") + ")";
     }
 
     return value;

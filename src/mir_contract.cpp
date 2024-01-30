@@ -34,7 +34,6 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     // Create AST tree
     mir_statement ast_tree = create_ast_tree(file);
     file.close();
-    ast_tree.print();
 
     // Export AST tree as C program
     const std::filesystem::path c_file_path = export_c_program(target, ast_tree, target_funtion);
@@ -94,7 +93,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
     file << std::endl;
 
     std::list<mir_statement> functions = ast_tree.get_children();
-    for (auto function_statement: functions) {
+    for (auto function_statement: std::ranges::reverse_view(functions)) {
         nlohmann::json function_data = function_statement.get_ast_data();
         const std::string function_name = function_data.at("name").get<std::string>();
         const std::string function_return = function_data.at("return_type").get<std::string>();
@@ -153,7 +152,19 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
                 const std::string assignment_value = assignment_data.at("value").get<std::string>();
                 std::list<mir_statement> assignment_branches = assignment_statement.get_children({branch});
 
-                file << "\tstate." << assignment_variable << " = " << assignment_value << ";" << std::endl;
+                if (assignment_variable.empty()) {
+
+                } else if (
+                    assignment_value.starts_with("u_addition(") ||
+                    assignment_value.starts_with("i_addition(") ||
+                    assignment_value.starts_with("u_multiplication(") ||
+                    assignment_value.starts_with("i_multiplication(")
+                    ) {
+                    file << "\tstate." << assignment_variable << ".get0 = " << assignment_value << ".value;" << std::endl;
+                    file << "\tstate." << assignment_variable << ".get1 = " << assignment_value << ".errors;" << std::endl;
+                } else {
+                    file << "\tstate." << assignment_variable << " = " << assignment_value << ";" << std::endl;
+                }
 
                 // Add branching logic
                 auto branch_it = assignment_branches.begin();
@@ -161,7 +172,14 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
                     nlohmann::json branch_data = branch_it->get_ast_data();
                     const std::string branch_condition = branch_data.at("condition").get<std::string>();
                     const std::string branch_destination = branch_data.at("destination").get<std::string>();
-                    file << "\tif (state." << assignment_variable << " == " << branch_condition << ") {" << std::endl;
+                    const bool branch_ignore_var = branch_data.at("ignore_var").get<bool>();
+                    if (assignment_variable.empty()) {
+                        file << "\tif (" << assignment_value << " == " << branch_condition << ") {" << std::endl;
+                    } else if (branch_ignore_var) {
+                        file << "\tif (" << branch_condition << ") {" << std::endl;
+                    } else {
+                        file << "\tif (state." << assignment_variable << " == " << branch_condition << ") {" << std::endl;
+                    }
                     file << "\t\treturn " << function_name << "_" << branch_destination << "(state);" << std::endl;
                     if (i == assignment_branches.size() - 1) {
                         file << "\t} else {" << std::endl;
@@ -303,7 +321,7 @@ std::string mir_contract::ast_variable_to_c(const std::string &type, const std::
         return subtype + " " + name + "[256]";
     }
     if (type.starts_with("tuple ")) {
-        return "tuple" + name + "_struct " + name;
+        return "struct tuple" + name + "_struct " + name;
     }
     return type + " " + name;
 }

@@ -22,17 +22,17 @@ public:
     void print(int indent_level = 0);
 
     static mir_statement parse_json(const nlohmann::json &json);
-    static std::optional<mir_statement> parse_lines(const std::list<std::string> &lines);
+    static std::optional<mir_statement> parse_lines(const std::list<std::string> &lines, const std::list<mir_statement>& variables = {});
     static mir_statement parse_function(std::list<std::string> lines);
     static mir_statement parse_function_header(const std::string& line);
-    static std::optional<mir_statement> parse_block(std::list<std::string> lines);
+    static std::optional<mir_statement> parse_block(std::list<std::string> lines, const std::list<mir_statement> &variables);
     static mir_statement parse_block_header(const std::string& line);
-    static std::optional<mir_statement> parse_assignment(const std::string& line);
+    static std::optional<mir_statement> parse_assignment(const std::string& line, const std::list<mir_statement>& variables);
     static mir_statement parse_variable(const std::string& line);
     static std::optional<mir_statement> parse_branch(const std::string& line);
 
     static std::string convert_type(const std::string& type);
-    static std::string convert_value(const std::string& value);
+    static std::string convert_value(const std::string& value, const std::list<mir_statement>& variables);
 
     static mir_statement create_root(const std::string &contract_name);
 

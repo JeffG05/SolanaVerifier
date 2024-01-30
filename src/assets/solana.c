@@ -39,7 +39,7 @@ u8 nondet_u8() {
 typedef u64 usize;
 
 // SIGNED INTEGERS
-typedef unsigned long long int i64;
+typedef signed long long int i64;
 i64 MIN_I64 = -9223372036854775808uLL;
 i64 MAX_I64 = 9223372036854775807uLL;
 i64 nondet_i64() {
@@ -49,7 +49,7 @@ i64 nondet_i64() {
     return x;
 }
 
-typedef unsigned long long int i32;
+typedef signed long long int i32;
 i32 MIN_I32 = -2147483648uLL;
 i32 MAX_I32 = 2147483647uLL;
 i32 nondet_i32() {
@@ -59,7 +59,7 @@ i32 nondet_i32() {
     return x;
 }
 
-typedef unsigned long long int i16;
+typedef signed long long int i16;
 i16 MIN_I16 = -32768uLL;
 i16 MAX_I16 = 32767uLL;
 i16 nondet_i16() {
@@ -69,7 +69,7 @@ i16 nondet_i16() {
     return x;
 }
 
-typedef unsigned long long int i8;
+typedef signed long long int i8;
 i8 MIN_I8 = -128uLL;
 i8 MAX_I8 = 127uLL;
 i8 nondet_i8() {
@@ -80,6 +80,59 @@ i8 nondet_i8() {
 }
 
 typedef i64 isize;
+
+// MATH OPERATORS
+typedef struct unsigned_math_result_struct {
+    unsigned long long int value;
+    bool errors;
+} unsigned_math_result;
+
+typedef struct signed_math_result_struct {
+    signed long long int value;
+    bool errors;
+} signed_math_result;
+
+unsigned_math_result u_addition(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
+    unsigned_math_result result;
+    result.value = a + b;
+    result.errors = a > max - b;
+    return result;
+}
+
+signed_math_result i_addition(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
+    signed_math_result result;
+    result.value = a + b;
+    result.errors = b >= 0 ? a > max - b : a < min - b;
+    return result;
+}
+
+unsigned_math_result u_multiplication(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
+    unsigned_math_result result;
+    result.value = a * b;
+    if (b == 0) {
+        result.errors = false;
+    } else {
+        result.errors = a > max / b;
+    }
+    return result;
+}
+
+signed_math_result i_multiplication(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
+    signed_math_result result;
+    result.value = a * b;
+    if (b == 0) {
+        result.errors = false;
+    } else if ((b > 0) && (a > 0)) {
+        result.errors = a > max / b;
+    } else if ((b < 0) && (a < 0)) {
+        result.errors = a < max / b;
+    } else if ((b > 0) && (a < 0)) {
+        result.errors = a < min / b;
+    } else if ((b < 0) && (a > 0)) {
+        result.errors = a > min / b;
+    }
+    return result;
+}
 
 // STRING
 typedef char* string;
