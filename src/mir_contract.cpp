@@ -92,243 +92,65 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
     file << "#include \"solana.c\"" << std::endl;
     file << std::endl;
 
-    std::list<mir_statement> functions = ast_tree.get_children();
+    mir_statements functions = ast_tree.get_children();
     for (auto function_statement: std::ranges::reverse_view(functions)) {
         nlohmann::json function_data = function_statement.get_ast_data();
         const std::string function_name = function_data.at("name").get<std::string>();
         const std::string function_return = function_data.at("return_type").get<std::string>();
-        std::list<mir_statement> function_parameters = function_statement.get_children({ parameter });
-        std::list<mir_statement> function_variables = function_statement.get_children({ variable });
-        std::list<mir_statement> function_blocks = function_statement.get_children({block});
-        std::list<mir_statement> function_states;
+        
+        mir_statements function_parameters = function_statement.get_children({statement_type::parameter });
+        mir_statements function_variables = function_statement.get_children({statement_type::variable });
+        mir_statements function_blocks = function_statement.get_children({statement_type::block});
+
+        mir_statements function_states;
         std::ranges::copy(function_parameters, std::back_insert_iterator(function_states));
         std::ranges::copy(function_variables, std::back_insert_iterator(function_states));
 
-        // Create function tuple structs
-        for (const auto& parameter_statement: function_states) {
-            nlohmann::json parameter_data = parameter_statement.get_ast_data();
-            const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-            const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-            if (!parameter_type.starts_with("tuple ")) {
-                continue;
-            }
+        reference_map references;
 
-            std::string raw_value_types = parameter_type.substr(7, parameter_type.size() - 8);
-            std::list<std::string> value_types = utils::split(raw_value_types, ", ");
+        generate_result_structs(&file, function_states, function_name);
+        generate_tuple_structs(&file, function_states, function_name);
+        generate_function_struct(&file, function_states, function_name);
 
-            file << "typedef struct tuple" << parameter_name << "_struct {" << std::endl;
-            unsigned int tuple_i = 0;
-            for (const auto& value_type: value_types) {
-                file << "\t" << value_type << " get" << tuple_i << ";" << std::endl;
-                tuple_i++;
-            }
-            file << "} " << "tuple" << parameter_name << ";" << std::endl;
-            file << std::endl;
+        for (const auto& block_statement : std::ranges::reverse_view(function_blocks)) {
+            generate_block_function(&file, block_statement, function_name, &references);
         }
 
-        // Create function state struct
-        file << "typedef struct " << function_name << "_state_struct {" << std::endl;
-        for (const auto& parameter_statement: function_states) {
-            nlohmann::json parameter_data = parameter_statement.get_ast_data();
-            const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-            const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-            file << "\t" << ast_variable_to_c(parameter_type, parameter_name) << ";" << std::endl;
-        }
-        file << "} " << function_name << "_state;" << std::endl;
-        file << std::endl;
-
-        // Create block functions
-        for (auto block_statement : std::ranges::reverse_view(function_blocks)) {
-            nlohmann::json block_data = block_statement.get_ast_data();
-            const auto block_name = block_data.at("name").get<std::string>();
-            std::list<mir_statement> block_assignments = block_statement.get_children({assignment});
-
-            file << function_name << "_state " << function_name << "_" << block_name << "(" << function_name << "_state state) {" << std::endl;
-
-            // Add assignments
-            for (auto assignment_statement : block_assignments) {
-                nlohmann::json assignment_data = assignment_statement.get_ast_data();
-                const std::string assignment_variable = assignment_data.at("variable").get<std::string>();
-                const std::string assignment_value = assignment_data.at("value").get<std::string>();
-                std::list<mir_statement> assignment_branches = assignment_statement.get_children({branch});
-
-                if (assignment_variable.empty()) {
-
-                } else if (
-                    assignment_value.starts_with("u_addition(") ||
-                    assignment_value.starts_with("i_addition(") ||
-                    assignment_value.starts_with("u_multiplication(") ||
-                    assignment_value.starts_with("i_multiplication(")
-                    ) {
-                    file << "\tstate." << assignment_variable << ".get0 = " << assignment_value << ".value;" << std::endl;
-                    file << "\tstate." << assignment_variable << ".get1 = " << assignment_value << ".errors;" << std::endl;
-                } else {
-                    file << "\tstate." << assignment_variable << " = " << assignment_value << ";" << std::endl;
-                }
-
-                // Add branching logic
-                auto branch_it = assignment_branches.begin();
-                for (int i = 0; i < assignment_branches.size(); ++i) {
-                    nlohmann::json branch_data = branch_it->get_ast_data();
-                    const std::string branch_condition = branch_data.at("condition").get<std::string>();
-                    const std::string branch_destination = branch_data.at("destination").get<std::string>();
-                    const bool branch_ignore_var = branch_data.at("ignore_var").get<bool>();
-                    if (assignment_variable.empty()) {
-                        file << "\tif (" << assignment_value << " == " << branch_condition << ") {" << std::endl;
-                    } else if (branch_ignore_var) {
-                        file << "\tif (" << branch_condition << ") {" << std::endl;
-                    } else {
-                        file << "\tif (state." << assignment_variable << " == " << branch_condition << ") {" << std::endl;
-                    }
-                    file << "\t\treturn " << function_name << "_" << branch_destination << "(state);" << std::endl;
-                    if (i == assignment_branches.size() - 1) {
-                        file << "\t} else {" << std::endl;
-                        file << "\t\tassert(false);" << std::endl;
-                        file << "\t}" << std::endl;
-                    } else {
-                        file << "\t} else ";
-                    }
-                    ++branch_it;
-                }
-            }
-            file << "\treturn state;" << std::endl;
-            file << "}" << std::endl;
-            file << std::endl;
-        }
-
-        // Create function header
-        file << function_return << " " << function_name << "(";
-        unsigned int i = 0;
-        for (const auto& parameter_statement: function_parameters) {
-            nlohmann::json parameter_data = parameter_statement.get_ast_data();
-            const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-            const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-            file << ast_variable_to_c(parameter_type, parameter_name);
-            if (i < function_parameters.size() - 1) {
-                file << ", ";
-            }
-            i++;
-        }
-        file << ") {" << std::endl;
-
-        // Init function state
-        file << "\t" << function_name << "_state state;" << std::endl;
-        for (const auto& parameter_statement: function_states) {
-            nlohmann::json parameter_data = parameter_statement.get_ast_data();
-            const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-            const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-            if (parameter_type.starts_with("array ")) {
-                file << "\tunsigned int i" << parameter_name << " = nondet_u8();" << std::endl;
-                file << "\tstate." << parameter_name << "[i" << parameter_name << "] = ";
-                if (parameter_statement.get_type() == parameter) {
-                    file << parameter_name << "[i" << parameter_name << "];" << std::endl;
-                } else {
-                    file << "nondet_" << ast_variable_to_c(parameter_type) << "();" << std::endl;
-                }
-            } else if (parameter_type.starts_with("tuple ")) {
-                std::string value_types_string = parameter_type.substr(7, parameter_type.size() - 8);
-                std::list<std::string> value_types = utils::split(value_types_string, ", ");
-                unsigned int tuple_i = 0;
-                for (const auto& value_type: value_types) {
-                    file << "\tstate." << parameter_name << ".get" << tuple_i << " = ";
-                    if (parameter_statement.get_type() == parameter) {
-                        file << parameter_name << ".get" << tuple_i << ";" << std::endl;
-                    } else {
-                        file << "nondet_" << value_type << "();" << std::endl;
-                    }
-                    tuple_i++;
-                }
-            } else {
-                file << "\tstate." << parameter_name << " = ";
-                if (parameter_statement.get_type() == parameter) {
-                    file << parameter_name << ";" << std::endl;
-                } else {
-                    file << "nondet_" << parameter_type << "();" << std::endl;
-                }
-            }
-        }
-        file << std::endl;
-
-        // Call first block
-        const std::string first_block = function_blocks.front().get_ast_data().at("name").get<std::string>();
-        file << "\tstate = " << function_name << "_" << first_block << "(state);" << std::endl;
-        file << std::endl;
-
-        // Return value
-        file << "\treturn state._0;" << std::endl;
-        file << "}" << std::endl;
-        file << std::endl;
+        generate_function(&file, function_states, function_name, function_return);
     }
 
-    // Get target function in AST
-    auto function_it = functions.begin();
-    while (function_it != functions.end() && function_it->get_ast_data().at("name").get<std::string>() != target_function) {
-        ++function_it;
-    }
-    if (function_it == functions.end()) {
-        std::throw_with_nested(std::runtime_error("Target function not found"));
-    }
-    mir_statement target_function_statement = *function_it;
-    const std::string target_function_type = target_function_statement.get_ast_data().at("return_type").get<std::string>();
-
-    // Create main function
-    file << "int main() {" << std::endl;
-    for (const auto& parameter_statement: target_function_statement.get_children({parameter})) {
-        nlohmann::json parameter_data = parameter_statement.get_ast_data();
-        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-        file << "\t" << ast_variable_to_c(parameter_type, parameter_name) << ";" << std::endl;
-    }
-    file << std::endl;
-    for (const auto& parameter_statement: target_function_statement.get_children({parameter})) {
-        nlohmann::json parameter_data = parameter_statement.get_ast_data();
-        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-        if (parameter_type.starts_with("array ")) {
-            file << "\t" << parameter_name << "[nondet_u8()] = nondet_" << ast_variable_to_c(parameter_type) << "();" << std::endl;
-        } else {
-            file << "\t" << parameter_name << " = nondet_" << parameter_type << "();" << std::endl;
-        }
-    }
-    file << std::endl;
-
-
-    file << "\t" << ast_variable_to_c(target_function_type, "result") << " = " << target_function << "(";
-
-    unsigned int i = 0;
-    std::list<mir_statement> target_parameters = target_function_statement.get_children({parameter});
-    for (const auto& parameter_statement: target_parameters) {
-        nlohmann::json parameter_data = parameter_statement.get_ast_data();
-        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-        file << parameter_name;
-        if (i < target_parameters.size() - 1) {
-            file << ", ";
-        }
-        i++;
-    }
-    file << ");" << std::endl;
-    file << std::endl;
-    file << "\treturn 0;" << std::endl;
-    file << "}" << std::endl;
+    generate_main_function(&file, functions, target_function);
 
     file.close();
     return out;
 }
 
-std::string mir_contract::ast_variable_to_c(const std::string &type, const std::string &name) {
-    if (type.starts_with("array ")) {
-        const std::string subtype = type.substr(6);
-        return subtype + " " + name + "[256]";
+std::string mir_contract::get_c_type(const std::string &type, const std::string &name, const std::string &function_name) {
+    if (type.starts_with("array<")) {
+        return get_c_subtype(type) + " " + name + "[256]";
     }
-    if (type.starts_with("tuple ")) {
-        return "struct tuple" + name + "_struct " + name;
+    if (type.starts_with("tuple<")) {
+        return function_name + name + "_tuple " + name;
+    }
+    if (type.starts_with("result<")) {
+        return function_name + name + "_result " + name;
     }
     return type + " " + name;
 }
 
-std::string mir_contract::ast_variable_to_c(const std::string &type) {
-    if (type.starts_with("array ")) {
-        const std::string subtype = type.substr(6);
+std::string mir_contract::get_return_c_type(const std::string &type, const std::string &name, const std::string &function_name) {
+    const std::string c_type = get_c_type(type, "_0", function_name);
+    if (!c_type.ends_with(" _0")) {
+        std::throw_with_nested(std::runtime_error("Unsupported return type: " + type));
+    }
+
+    return c_type.substr(0, c_type.size() - 3);
+}
+
+
+std::string mir_contract::get_c_subtype(const std::string &type) {
+    if (type.starts_with("array<")) {
+        const std::string subtype = type.substr(6, type.size()-7);
         return subtype;
     }
     return type;
@@ -358,3 +180,342 @@ std::string mir_contract::trim_line(const std::string &line) {
     }
     return trimmed;
 }
+
+void mir_contract::generate_tuple_structs(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
+    for (const auto& parameter_statement: state_statements) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        if (!parameter_type.starts_with("tuple<")) {
+            continue;
+        }
+
+        std::string struct_name = function_name + parameter_name + "_tuple";
+        std::string raw_value_types = parameter_type.substr(6, parameter_type.size() - 7);
+        std::list<std::string> value_types = utils::split(raw_value_types, ", ");
+
+        *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+        unsigned int tuple_i = 0;
+        for (const auto& value_type: value_types) {
+            *out << "\t" << value_type << " get" << tuple_i << ";" << std::endl;
+            tuple_i++;
+        }
+        *out << "} " << struct_name << ";" << std::endl;
+        *out << std::endl;
+    }
+}
+
+void mir_contract::generate_result_structs(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
+    std::list<std::string> generated_types;
+    for (const auto& parameter_statement: state_statements) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        if (!parameter_type.starts_with("result<")) {
+            continue;
+        }
+
+        std::string struct_name = function_name + parameter_name + "_result";
+        std::string success_type = parameter_type.substr(7, parameter_type.size() - 8);
+
+        *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+        *out << "\tbool is_success;" << std::endl;
+        if (success_type != "void") {
+            *out << "\t" << success_type << " value;" << std::endl;
+        }
+        *out << "} " << struct_name << ";" << std::endl;
+
+        *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
+        *out << "\t" << struct_name << " r;" << std::endl;
+        *out << "\tr.is_success = nondet_bool();" << std::endl;
+        if (success_type != "void") {
+            *out << "\tr.value = nondet_" << success_type << "();" << std::endl;
+        }
+        *out << "\treturn r;" << std::endl;
+        *out << "}" << std::endl;
+
+        *out << std::endl;
+    }
+}
+
+
+void mir_contract::generate_function_struct(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
+    *out << "typedef struct " << function_name << "_state_struct {" << std::endl;
+    for (const auto& parameter_statement: state_statements) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        if (parameter_type != "void") {
+            *out << "\t" << get_c_type(parameter_type, parameter_name, function_name) << ";" << std::endl;
+        }
+    }
+    *out << "} " << function_name << "_state;" << std::endl;
+    *out << std::endl;
+}
+
+void mir_contract::generate_block_function(std::ostream *out, mir_statement block_statement, const std::string &function_name, reference_map* references) {
+    nlohmann::json block_data = block_statement.get_ast_data();
+    const auto block_name = block_data.at("name").get<std::string>();
+    const mir_statements statements = block_statement.get_children({statement_type::assignment, statement_type::add_ref, statement_type::remove_ref});
+
+    *out << function_name << "_state " << function_name << "_" << block_name << "(" << function_name << "_state state) {" << std::endl;
+
+    // Add assignments
+    for (const auto& statement : statements) {
+        generate_block_statement(out, statement, function_name, references);
+    }
+
+    *out << "\treturn state;" << std::endl;
+    *out << "}" << std::endl;
+    *out << std::endl;
+}
+ 
+void mir_contract::generate_block_statement(std::ostream *out, mir_statement statement, const std::string &function_name, reference_map *references) {
+    nlohmann::json assignment_data = statement.get_ast_data();
+
+    if (statement.get_type() == statement_type::add_ref) {
+        const std::string variable1 = assignment_data.at("variable1").get<std::string>();
+        const std::string variable2 = assignment_data.at("variable2").get<std::string>();
+        (*references)[variable1].push_back(variable2);
+        (*references)[variable2].push_back(variable1);
+        return;
+    }
+
+    if (statement.get_type() == statement_type::remove_ref) {
+        const std::string variable1 = assignment_data.at("variable1").get<std::string>();
+        const std::string variable2 = assignment_data.at("variable2").get<std::string>();
+        (*references)[variable1].remove(variable2);
+        (*references)[variable2].remove(variable1);
+        return;
+    }
+
+
+    const std::string assignment_variable = assignment_data.at("variable").get<std::string>();
+    const std::string assignment_value = assignment_data.at("value").get<std::string>();
+    const bool assignment_returns = assignment_data.at("returns").get<bool>();
+    mir_statements assignment_branches = statement.get_children({statement_type::branch});
+
+    generate_block_assignment(out, assignment_variable, assignment_value, assignment_returns);
+
+    // Add branching logic
+    if (!assignment_branches.empty()) {
+        for (const auto& branch_statement : assignment_branches) {
+            generate_branch(out, branch_statement, function_name, assignment_variable, assignment_value);
+        }
+        *out << "{" << std::endl;
+        *out << "\t\tassert(false);" << std::endl;
+        *out << "\t}" << std::endl;
+    }
+}
+
+void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns) {
+    if (
+        value.starts_with("u_addition(") ||
+        value.starts_with("i_addition(") ||
+        value.starts_with("u_multiplication(") ||
+        value.starts_with("i_multiplication(")
+    ) {
+        *out << "\tstate." << variable << ".get0 = " << value << ".value;" << std::endl;
+        *out << "\tstate." << variable << ".get1 = " << value << ".errors;" << std::endl;
+    } else if (value.starts_with("ok<")) {
+        *out << "\tstate." << variable << ".is_success = true;" << std::endl;
+        const std::string ok_value = value.substr(3, value.size() - 4);
+        if (ok_value != "void") {
+            generate_block_assignment(out, variable + ".value", ok_value, false);
+        }
+    } else if (!variable.empty()) {
+        if (returns) {
+            *out << "\tstate." << variable << " = " << value << ";" << std::endl;
+        } else {
+            *out << "\t" << value << ";" << std::endl;
+        }
+    }
+}
+
+
+void mir_contract::generate_branch(std::ostream *out, const mir_statement &branch_statement, const std::string &function_name, const std::string &variable, const std::string &value) {
+    nlohmann::json branch_data = branch_statement.get_ast_data();
+    const std::string branch_condition = branch_data.at("condition").get<std::string>();
+    const std::string branch_destination = branch_data.at("destination").get<std::string>();
+    const bool branch_ignore_var = branch_data.at("ignore_var").get<bool>();
+    if (variable.empty()) {
+        *out << "\tif (" << value << " == " << branch_condition << ") {" << std::endl;
+    } else if (branch_ignore_var) {
+        *out << "\tif (" << branch_condition << ") {" << std::endl;
+    } else {
+        *out << "\tif (state." << variable << " == " << branch_condition << ") {" << std::endl;
+    }
+    *out << "\t\treturn " << function_name << "_" << branch_destination << "(state);" << std::endl;
+    *out << "\t} else ";
+}
+
+void mir_contract::generate_function(std::ostream *out, const mir_statements &state_statements, const std::string &function_name, const std::string &function_return) {
+    std::list<std::string> parameters;
+    for (const auto& statement: state_statements) {
+        if (statement.get_type() != statement_type::parameter) {
+            continue;
+        }
+        nlohmann::json parameter_data = statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        parameters.push_back(get_c_type(parameter_type, parameter_name, function_name));
+    }
+    const std::string return_type = get_return_c_type(function_return, "_0", function_name);
+    *out << return_type << " " << function_name << "(" << utils::join(parameters, ", ") << ") {" << std::endl;
+
+    // Init function state
+    *out << "\t" << function_name << "_state state;" << std::endl;
+    for (const auto& statement: state_statements) {
+        if (statement.get_ast_data()["variable_type"].get<std::string>() != "void") {
+            generate_nondet(out, statement, function_name);
+        }
+    }
+    *out << std::endl;
+
+    // Call first block
+    *out << "\tstate = " << function_name << "_bb0(state);" << std::endl;
+    *out << std::endl;
+
+    // Return value
+    *out << "\treturn state._0;" << std::endl;
+    *out << "}" << std::endl;
+    *out << std::endl;
+}
+
+void mir_contract::generate_nondet(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) {
+    nlohmann::json parameter_data = statement.get_ast_data();
+    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+
+    if (parameter_type.starts_with("array<")) {
+        generate_nondet_array(out, statement, in_main);
+    } else if (parameter_type.starts_with("tuple<")) {
+        generate_nondet_tuple(out, statement, in_main);
+    } else if (parameter_type.starts_with("result<")) {
+        generate_nondet_result(out, statement, function_name, in_main);
+    } else {
+        if (in_main) {
+            *out << "\t" << parameter_name << " = ";
+        } else {
+            *out << "\tstate." << parameter_name << " = ";
+        }
+        if (in_main || statement.get_type() == statement_type::variable) {
+            *out << "nondet_" << parameter_type << "();" << std::endl;
+        } else {
+            *out << parameter_name << ";" << std::endl;
+        }
+    }
+
+}
+
+void mir_contract::generate_nondet_array(std::ostream *out, const mir_statement& statement, const bool in_main) {
+    nlohmann::json parameter_data = statement.get_ast_data();
+    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+
+    *out << "\tunsigned int i" << parameter_name << " = nondet_u8();" << std::endl;
+    if (in_main) {
+        *out << "\t" << parameter_name << "[i" << parameter_name << "] = ";
+    } else {
+        *out << "\tstate." << parameter_name << "[i" << parameter_name << "] = ";
+    }
+    if (in_main || statement.get_type() == statement_type::variable) {
+        *out << "nondet_" << get_c_subtype(parameter_type) << "();" << std::endl;
+    } else {
+        *out << parameter_name << "[i" << parameter_name << "];" << std::endl;
+    }
+}
+
+void mir_contract::generate_nondet_tuple(std::ostream *out, const mir_statement &statement, const bool in_main) {
+    nlohmann::json parameter_data = statement.get_ast_data();
+    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+
+    const std::string value_types_string = parameter_type.substr(6, parameter_type.size() - 7);
+    const std::list<std::string> value_types = utils::split(value_types_string, ", ");
+    unsigned int tuple_i = 0;
+    for (const auto& value_type: value_types) {
+        if (in_main) {
+            *out << "\t" << parameter_name << ".get" << tuple_i << " = ";
+        } else {
+            *out << "\tstate." << parameter_name << ".get" << tuple_i << " = ";
+        }
+        if (in_main || statement.get_type() == statement_type::variable) {
+            *out << "nondet_" << value_type << "();" << std::endl;
+        } else {
+            *out << parameter_name << ".get" << tuple_i << ";" << std::endl;
+        }
+        tuple_i++;
+    }
+}
+
+void mir_contract::generate_nondet_result(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) {
+    nlohmann::json parameter_data = statement.get_ast_data();
+    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+    if (in_main) {
+        *out << "\t" << parameter_name << " = ";
+    } else {
+        *out << "\tstate." << parameter_name << " = ";
+    }
+    if (in_main || statement.get_type() == statement_type::variable) {
+        *out << "nondet_" << get_return_c_type(parameter_type, parameter_name, function_name) << "();" << std::endl;
+    } else {
+        *out << parameter_name << ";" << std::endl;
+    }
+}
+
+
+mir_statement mir_contract::get_target_function(mir_statements function_statements, const std::string &function_name) {
+    auto function_it = function_statements.begin();
+    while (function_it != function_statements.end() && function_it->get_ast_data().at("name").get<std::string>() != function_name) {
+        ++function_it;
+    }
+    if (function_it == function_statements.end()) {
+        std::throw_with_nested(std::runtime_error("Target function not found"));
+    }
+    return *function_it;
+}
+
+void mir_contract::generate_main_function(std::ostream *out, const mir_statements &function_statements, const std::string &target_function_name) {
+    mir_statement target_function_statement = get_target_function(function_statements, target_function_name);
+    const std::string target_function_type = target_function_statement.get_ast_data().at("return_type").get<std::string>();
+    const mir_statements target_function_parameters = target_function_statement.get_children({statement_type::parameter});
+
+    *out << "int main() {" << std::endl;
+    for (const auto& parameter_statement: target_function_parameters) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        *out << "\t" << get_c_type(parameter_type, parameter_name, target_function_name) << ";" << std::endl;
+    }
+    *out << std::endl;
+
+    for (const auto& parameter_statement: target_function_parameters) {
+        generate_nondet(out, parameter_statement, target_function_name, true);
+    }
+    *out << std::endl;
+
+
+    *out << "\t" << get_return_c_type(target_function_type, "_0", target_function_name) << " result = " << target_function_name << "(";
+
+    unsigned int i = 0;
+    mir_statements target_parameters = target_function_statement.get_children({statement_type::parameter});
+    for (const auto& parameter_statement: target_parameters) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        *out << parameter_name;
+        if (i < target_parameters.size() - 1) {
+            *out << ", ";
+        }
+        i++;
+    }
+    *out << ");" << std::endl;
+    *out << std::endl;
+    *out << "\treturn 0;" << std::endl;
+    *out << "}" << std::endl;
+}
+
+
+
+

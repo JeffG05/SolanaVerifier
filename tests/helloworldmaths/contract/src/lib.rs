@@ -23,6 +23,6 @@ pub fn process_instruction(
 }
 
 fn calculate(a: u64, b: u64) -> u64 {
-    let result = (a + b) * 2;
+    let result = (a + b) * (1 + 1);
     result
 }

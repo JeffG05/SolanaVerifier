@@ -127,7 +127,9 @@ fn calculate(_1: u64, _2: u64) -> u64 {
     let mut _0: u64;
     let mut _3: u64;
     let mut _4: (u64, bool);
-    let mut _5: (u64, bool);
+    let mut _5: u64;
+    let mut _6: (u64, bool);
+    let mut _7: (u64, bool);
     scope 1 {
         debug result => _0;
     }
@@ -139,12 +141,18 @@ fn calculate(_1: u64, _2: u64) -> u64 {
 
     bb1: {
         _3 = move (_4.0: u64);
-        _5 = CheckedMul(_3, const 2_u64);
-        assert(!move (_5.1: bool), "attempt to compute `{} * {}`, which would overflow", move _3, const 2_u64) -> [success: bb2, unwind continue];
+        _6 = CheckedAdd(const 1_u64, const 1_u64);
+        assert(!move (_6.1: bool), "attempt to compute `{} + {}`, which would overflow", const 1_u64, const 1_u64) -> [success: bb2, unwind continue];
     }
 
     bb2: {
-        _0 = move (_5.0: u64);
+        _5 = move (_6.0: u64);
+        _7 = CheckedMul(_3, _5);
+        assert(!move (_7.1: bool), "attempt to compute `{} * {}`, which would overflow", move _3, move _5) -> [success: bb3, unwind continue];
+    }
+
+    bb3: {
+        _0 = move (_7.0: u64);
         return;
     }
 }

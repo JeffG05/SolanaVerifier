@@ -163,9 +163,8 @@ string nondet_string() {
 
     return str;
 }
-bool print(string s) {
-    int chars = printf("%s\n", s);
-    return chars >= 0;
+void print(string s) {
+    printf("%s\n", s);
 }
 
 // PUBKEY
