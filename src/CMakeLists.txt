@@ -65,6 +65,15 @@ add_executable(SolanaVerifier
         mir-types/types/string_mir_type.h
         mir-values/values/const_string_mir_value.h
         mir-values/values/print_mir_value.h
+        mir-types/types/mutable_mir_type.h
+        mir-types/types/ref_mir_type.h
+        mir-types/types/ref_cell_mir_type.h
+        mir-types/types/ref_mut_mir_type.h
+        mir-types/types/rc_mir_type.h
+        mir-types/types/infallible_mir_type.h
+        mir-types/types/error_mir_type.h
+        mir-types/types/control_flow_mir_type.h
+        mir-types/types/iter_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier

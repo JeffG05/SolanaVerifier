@@ -6,7 +6,7 @@
 class pubkey_mir_type : public mir_type {
 public:
     pubkey_mir_type() : mir_type(
-        std::regex (R"(^Pubkey$)"),
+        std::regex (R"(^(?:solana_program::pubkey::)?Pubkey$)"),
         [](const std::smatch &match) {
             return "pubkey";
         }

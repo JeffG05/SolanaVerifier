@@ -53,6 +53,8 @@ public:
             if (var_type.starts_with("I")) {
                 return std::make_tuple("i_" + func + ", MIN_" + var_type + ")", true, add_refs, remove_refs);
             }
+
+            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
             std::throw_with_nested(std::runtime_error("Unsupported addition: " + var_type));
         }
     ) {}

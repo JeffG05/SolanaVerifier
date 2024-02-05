@@ -214,3 +214,10 @@ program_result nondet_program_result() {
     program_result r;
     return r;
 }
+
+// INFALLIBLE
+typedef enum { unreachable } infallible;
+infallible nondet_infallible() {
+    infallible i;
+    return i;
+}
