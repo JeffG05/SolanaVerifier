@@ -74,6 +74,13 @@ add_executable(SolanaVerifier
         mir-types/types/error_mir_type.h
         mir-types/types/control_flow_mir_type.h
         mir-types/types/iter_mir_type.h
+        mir-values/values/iter_mir_value.h
+        mir-values/values/borrow_mir_value.h
+        mir-values/values/mutable_mir_value.h
+        mir-values/values/not_equal_mir_value.h
+        mir-values/values/deref_mir_value.h
+        mir-values/values/program_error_mir_value.h
+        mir-values/values/result_error_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

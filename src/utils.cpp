@@ -54,4 +54,11 @@ std::string utils::join(const std::list<std::string> &l, const std::string &deli
     return res.str();
 }
 
+std::string utils::add_item(const std::string &s, const std::string &item, const std::string &delim) {
+    if (s.empty()) {
+        return item;
+    }
+
+    return s + delim + item;
+}
 

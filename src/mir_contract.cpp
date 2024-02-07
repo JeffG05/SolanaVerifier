@@ -110,6 +110,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
         generate_result_structs(&file, function_states, function_name);
         generate_tuple_structs(&file, function_states, function_name);
+        generate_controlflow_structs(&file, function_states, function_name);
         generate_function_struct(&file, function_states, function_name);
 
         for (const auto& block_statement : std::ranges::reverse_view(function_blocks)) {
@@ -130,10 +131,16 @@ std::string mir_contract::get_c_type(const std::string &type, const std::string 
         return get_c_subtype(type) + " " + name + "[256]";
     }
     if (type.starts_with("tuple<")) {
-        return function_name + name + "_tuple " + name;
+        const std::string tuple_name = get_tuple_name(type, function_name);
+        return tuple_name + " " + name;
     }
     if (type.starts_with("result<")) {
-        return function_name + name + "_result " + name;
+        const std::string result_name = get_result_name(type, function_name);
+        return result_name + " " + name;
+    }
+    if (type.starts_with("controlflow<")) {
+        const std::string controlflow_name = get_controlflow_name(type, function_name);
+        return controlflow_name + " " + name;
     }
     return type + " " + name;
 }
@@ -190,7 +197,7 @@ void mir_contract::generate_tuple_structs(std::ostream *out, const mir_statement
             continue;
         }
 
-        std::string struct_name = function_name + parameter_name + "_tuple";
+        std::string struct_name = get_tuple_name(parameter_type, function_name);
         std::string raw_value_types = parameter_type.substr(6, parameter_type.size() - 7);
         std::list<std::string> value_types = utils::split(raw_value_types, ", ");
 
@@ -206,7 +213,6 @@ void mir_contract::generate_tuple_structs(std::ostream *out, const mir_statement
 }
 
 void mir_contract::generate_result_structs(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
-    std::list<std::string> generated_types;
     for (const auto& parameter_statement: state_statements) {
         nlohmann::json parameter_data = parameter_statement.get_ast_data();
         const std::string parameter_name = parameter_data.at("variable").get<std::string>();
@@ -215,7 +221,7 @@ void mir_contract::generate_result_structs(std::ostream *out, const mir_statemen
             continue;
         }
 
-        std::string struct_name = function_name + parameter_name + "_result";
+        std::string struct_name = get_result_name(parameter_type, function_name);
         std::string success_type = parameter_type.substr(7, parameter_type.size() - 8);
 
         *out << "typedef struct " << struct_name << "_struct {" << std::endl;
@@ -238,6 +244,32 @@ void mir_contract::generate_result_structs(std::ostream *out, const mir_statemen
     }
 }
 
+void mir_contract::generate_controlflow_structs(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
+    for (const auto& parameter_statement: state_statements) {
+        nlohmann::json parameter_data = parameter_statement.get_ast_data();
+        const std::string parameter_name = parameter_data.at("variable").get<std::string>();
+        const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
+        if (!parameter_type.starts_with("controlflow<")) {
+            continue;
+        }
+
+        std::string struct_name = get_controlflow_name(parameter_type, function_name);
+        std::string raw_controlflow_types = parameter_type.substr(12, parameter_type.size() - 13);
+        std::pair<std::string, std::string> types = get_argument_pair(raw_controlflow_types);
+
+        *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+        *out << "\tcontrolflow type;" << std::endl;
+        if (types.first != "void") {
+            *out << "\t" << get_c_type(types.first, "continue_value", function_name) << std::endl;
+        }
+        if (types.second != "void") {
+            *out << "\t" << get_c_type(types.second, "break_value", function_name) << std::endl;
+        }
+        *out << "} " << struct_name << ";" << std::endl;
+
+        *out << std::endl;
+    }
+}
 
 void mir_contract::generate_function_struct(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
     *out << "typedef struct " << function_name << "_state_struct {" << std::endl;
@@ -323,6 +355,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         if (ok_value != "void") {
             generate_block_assignment(out, variable + ".value", ok_value, false);
         }
+    } else if (value.starts_with("result_error<")) {
+        *out << "\tstate." << variable << ".is_success = false;" << std::endl;
     } else if (!variable.empty()) {
         if (returns) {
             *out << "\tstate." << variable << " = " << value << ";" << std::endl;
@@ -514,6 +548,45 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
     *out << std::endl;
     *out << "\treturn 0;" << std::endl;
     *out << "}" << std::endl;
+}
+
+std::pair<std::string, std::string> mir_contract::get_argument_pair(const std::string &raw) {
+    const std::regex pattern (R"(^([^<>,]+<[^<>]+>|[^<>,]+), ([^<>,]+<[^<>]+>|[^<>,]+)$)");
+    if (std::smatch match; std::regex_match(raw, match, pattern)) {
+        return std::make_pair(match[1].str(), match[2].str());
+    }
+    std::throw_with_nested(std::runtime_error("Error parsing argument pair: " + raw));
+}
+
+std::string mir_contract::clean_type(const std::string &type) {
+    std::string clean;
+    for (const char c : type) {
+        if (isalnum(c)) {
+            clean += static_cast<char>(tolower(c));
+        }
+    }
+    return clean;
+}
+
+std::string mir_contract::get_tuple_name(const std::string &type, const std::string &function_name) {
+    const std::string raw_types = type.substr(6, type.size() - 7);
+    std::list<std::string> types_list = utils::split(raw_types, ", ");
+    for (auto & raw_type : types_list) {
+        raw_type = clean_type(raw_type);
+    }
+    const std::string clean_types = utils::join(types_list, "_");
+    return function_name + "_" + clean_types + "_tuple";
+}
+
+std::string mir_contract::get_result_name(const std::string &type, const std::string &function_name) {
+    const std::string raw_type = type.substr(7, type.size() - 8);
+    return function_name + "_" + clean_type(raw_type) + "_result";
+}
+
+std::string mir_contract::get_controlflow_name(const std::string &type, const std::string &function_name) {
+    const std::string raw_types = type.substr(12, type.size() - 13);
+    const auto [continue_type, break_type] = get_argument_pair(raw_types);
+    return function_name + "_" + clean_type(continue_type) + "_" + clean_type(break_type) + "_controlflow";
 }
 
 

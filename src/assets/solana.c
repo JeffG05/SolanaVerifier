@@ -221,3 +221,12 @@ infallible nondet_infallible() {
     infallible i;
     return i;
 }
+
+// CONTROL FLOW
+typedef enum { _continue, _break } controlflow;
+
+typedef struct process_instruction_0_controlflow_struct {
+    controlflow type;
+    string continue_value;
+    string break_value;
+} process_instruction_0_controlflow;
