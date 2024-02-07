@@ -47,11 +47,8 @@ private:
     static void generate_function(std::ostream* out, const mir_statements &state_statements, const std::string& function_name, const std::string& function_return);
     static void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name);
 
-
     static void generate_nondet(std::ostream* out, const mir_statement& statement, const std::string& function_name, bool in_main = false);
     static void generate_nondet_array(std::ostream* out, const mir_statement& statement, bool in_main = false);
-    static void generate_nondet_tuple(std::ostream* out, const mir_statement &statement, bool in_main = false);
-    static void generate_nondet_result(std::ostream* out, const mir_statement &statement, const std::string& function_name, bool in_main = false);
 
     static mir_statement get_target_function(mir_statements function_statements, const std::string &function_name);
     static std::pair<std::string, std::string> get_argument_pair(const std::string &raw);

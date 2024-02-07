@@ -208,6 +208,17 @@ void mir_contract::generate_tuple_structs(std::ostream *out, const mir_statement
             tuple_i++;
         }
         *out << "} " << struct_name << ";" << std::endl;
+
+        *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
+        *out << "\t" << struct_name << " t;" << std::endl;
+        unsigned int tuple_i2 = 0;
+        for (const auto& value_type: value_types) {
+            *out << "\tt.get" << tuple_i2 << " = nondet_" << clean_type(value_type) << "();" << std::endl;
+            tuple_i2++;
+        }
+        *out << "\treturn t;" << std::endl;
+        *out << "}" << std::endl;
+
         *out << std::endl;
     }
 }
@@ -423,10 +434,6 @@ void mir_contract::generate_nondet(std::ostream *out, const mir_statement &state
 
     if (parameter_type.starts_with("array<")) {
         generate_nondet_array(out, statement, in_main);
-    } else if (parameter_type.starts_with("tuple<")) {
-        generate_nondet_tuple(out, statement, in_main);
-    } else if (parameter_type.starts_with("result<")) {
-        generate_nondet_result(out, statement, function_name, in_main);
     } else {
         if (in_main) {
             *out << "\t" << parameter_name << " = ";
@@ -434,7 +441,7 @@ void mir_contract::generate_nondet(std::ostream *out, const mir_statement &state
             *out << "\tstate." << parameter_name << " = ";
         }
         if (in_main || statement.get_type() == statement_type::variable) {
-            *out << "nondet_" << parameter_type << "();" << std::endl;
+            *out << "nondet_" << get_return_c_type(parameter_type, parameter_name, function_name) << "();" << std::endl;
         } else {
             *out << parameter_name << ";" << std::endl;
         }
@@ -457,45 +464,6 @@ void mir_contract::generate_nondet_array(std::ostream *out, const mir_statement&
         *out << "nondet_" << get_c_subtype(parameter_type) << "();" << std::endl;
     } else {
         *out << parameter_name << "[i" << parameter_name << "];" << std::endl;
-    }
-}
-
-void mir_contract::generate_nondet_tuple(std::ostream *out, const mir_statement &statement, const bool in_main) {
-    nlohmann::json parameter_data = statement.get_ast_data();
-    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-
-    const std::string value_types_string = parameter_type.substr(6, parameter_type.size() - 7);
-    const std::list<std::string> value_types = utils::split(value_types_string, ", ");
-    unsigned int tuple_i = 0;
-    for (const auto& value_type: value_types) {
-        if (in_main) {
-            *out << "\t" << parameter_name << ".get" << tuple_i << " = ";
-        } else {
-            *out << "\tstate." << parameter_name << ".get" << tuple_i << " = ";
-        }
-        if (in_main || statement.get_type() == statement_type::variable) {
-            *out << "nondet_" << value_type << "();" << std::endl;
-        } else {
-            *out << parameter_name << ".get" << tuple_i << ";" << std::endl;
-        }
-        tuple_i++;
-    }
-}
-
-void mir_contract::generate_nondet_result(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) {
-    nlohmann::json parameter_data = statement.get_ast_data();
-    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-    if (in_main) {
-        *out << "\t" << parameter_name << " = ";
-    } else {
-        *out << "\tstate." << parameter_name << " = ";
-    }
-    if (in_main || statement.get_type() == statement_type::variable) {
-        *out << "nondet_" << get_return_c_type(parameter_type, parameter_name, function_name) << "();" << std::endl;
-    } else {
-        *out << parameter_name << ";" << std::endl;
     }
 }
 
