@@ -1,5 +1,5 @@
-#ifndef MOVE_MIR_TYPE_H
-#define MOVE_MIR_TYPE_H
+#ifndef MOVE_MIR_VALUE_H
+#define MOVE_MIR_VALUE_H
 
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
@@ -19,4 +19,4 @@ public:
     ) {}
 };
 
-#endif //MOVE_MIR_TYPE_H
+#endif //MOVE_MIR_VALUE_H

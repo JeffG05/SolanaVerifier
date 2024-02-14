@@ -1,5 +1,5 @@
-#ifndef PROGRAM_ERROR_MIR_TYPE_H
-#define PROGRAM_ERROR_MIR_TYPE_H
+#ifndef PROGRAM_ERROR_MIR_VALUE_H
+#define PROGRAM_ERROR_MIR_VALUE_H
 
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
@@ -14,4 +14,4 @@ public:
     ) {}
 };
 
-#endif //PROGRAM_ERROR_MIR_TYPE_H
+#endif //PROGRAM_ERROR_MIR_VALUE_H

@@ -37,11 +37,17 @@ u8 nondet_u8() {
 }
 
 typedef u64 usize;
+usize MAX_USIZE = 18446744073709551615uLL;
+usize nondet_usize() {
+    usize x;
+    __ESBMC_assume(x <= MAX_USIZE);
+    return x;
+}
 
 // SIGNED INTEGERS
 typedef signed long long int i64;
-i64 MIN_I64 = -9223372036854775808uLL;
-i64 MAX_I64 = 9223372036854775807uLL;
+i64 MIN_I64 = -9223372036854775807LL;
+i64 MAX_I64 = 9223372036854775807LL;
 i64 nondet_i64() {
     i64 x;
     __ESBMC_assume(x >= MIN_I64);
@@ -50,8 +56,8 @@ i64 nondet_i64() {
 }
 
 typedef signed long long int i32;
-i32 MIN_I32 = -2147483648uLL;
-i32 MAX_I32 = 2147483647uLL;
+i32 MIN_I32 = -2147483647LL;
+i32 MAX_I32 = 2147483647LL;
 i32 nondet_i32() {
     i32 x;
     __ESBMC_assume(x >= MIN_I32);
@@ -60,8 +66,8 @@ i32 nondet_i32() {
 }
 
 typedef signed long long int i16;
-i16 MIN_I16 = -32768uLL;
-i16 MAX_I16 = 32767uLL;
+i16 MIN_I16 = -32767LL;
+i16 MAX_I16 = 32767LL;
 i16 nondet_i16() {
     i16 x;
     __ESBMC_assume(x >= MIN_I16);
@@ -70,8 +76,8 @@ i16 nondet_i16() {
 }
 
 typedef signed long long int i8;
-i8 MIN_I8 = -128uLL;
-i8 MAX_I8 = 127uLL;
+i8 MIN_I8 = -127LL;
+i8 MAX_I8 = 127LL;
 i8 nondet_i8() {
     i8 x;
     __ESBMC_assume(x >= MIN_I8);
@@ -80,6 +86,14 @@ i8 nondet_i8() {
 }
 
 typedef i64 isize;
+isize MIN_ISIZE = -9223372036854775807LL;
+isize MAX_ISIZE = 9223372036854775807LL;
+isize nondet_isize() {
+    isize x;
+    __ESBMC_assume(x >= MIN_ISIZE);
+    __ESBMC_assume(x <= MAX_ISIZE);
+    return x;
+}
 
 // MATH OPERATORS
 typedef struct unsigned_math_result_struct {
@@ -186,33 +200,26 @@ bool is_equal(pubkey lhs, pubkey rhs) {
 
 // ACCOUNT INFO
 typedef struct account_info_struct {
-    pubkey key;
-    u64 lamports;
-    u8 data[4294967296uLL];
-    pubkey owner;
-    u64 epoch;
-    bool is_signer;
-    bool is_writable;
-    bool executable;
+    pubkey get0;
+    u64 get1;
+    u8 get2[4294967296uLL];
+    pubkey get3;
+    u64 get4;
+    bool get5;
+    bool get6;
+    bool get7;
 } account_info;
 account_info nondet_account_info() {
     account_info info;
-    info.key = nondet_pubkey();
-    info.lamports = nondet_u64();
-    info.data[nondet_u32()] = nondet_u8();
-    info.owner = nondet_pubkey();
-    info.epoch = nondet_u64();
-    info.is_signer = nondet_bool();
-    info.is_writable = nondet_bool();
-    info.executable = nondet_bool();
+    info.get0 = nondet_pubkey();
+    info.get1 = nondet_u64();
+    info.get2[nondet_u32()] = nondet_u8();
+    info.get3 = nondet_pubkey();
+    info.get4 = nondet_u64();
+    info.get5 = nondet_bool();
+    info.get6 = nondet_bool();
+    info.get7 = nondet_bool();
     return info;
-}
-
-// PROGRAM RESULT
-typedef enum { ok, error } program_result;
-program_result nondet_program_result() {
-    program_result r;
-    return r;
 }
 
 // INFALLIBLE
@@ -224,9 +231,7 @@ infallible nondet_infallible() {
 
 // CONTROL FLOW
 typedef enum { _continue, _break } controlflow;
-
-typedef struct process_instruction_0_controlflow_struct {
-    controlflow type;
-    string continue_value;
-    string break_value;
-} process_instruction_0_controlflow;
+controlflow nondet_controlflow() {
+    controlflow c;
+    return c;
+}

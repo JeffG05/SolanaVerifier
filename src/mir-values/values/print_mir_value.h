@@ -1,5 +1,5 @@
-#ifndef PRINT_MIR_TYPE_H
-#define PRINT_MIR_TYPE_H
+#ifndef PRINT_MIR_VALUE_H
+#define PRINT_MIR_VALUE_H
 
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
@@ -15,4 +15,4 @@ public:
     ) {}
 };
 
-#endif //PRINT_MIR_TYPE_H
+#endif //PRINT_MIR_VALUE_H

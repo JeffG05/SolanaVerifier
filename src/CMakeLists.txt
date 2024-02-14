@@ -81,6 +81,18 @@ add_executable(SolanaVerifier
         mir-values/values/deref_mir_value.h
         mir-values/values/program_error_mir_value.h
         mir-values/values/result_error_mir_value.h
+        mir-values/values/as_continue_mir_value.h
+        mir-values/values/as_break_mir_value.h
+        mir-values/values/try_branch_result_mir_value.h
+        mir-values/values/from_residual_mir_value.h
+        mir-values/values/discriminant_mir_value.h
+        mir-values/values/borrow_mutable_mir_value.h
+        mir-values/values/next_mir_value.h
+        mir-values/values/index_mut_range_full_mir_value.h
+        hir_contract.cpp
+        hir_contract.h
+        mir-values/values/serialize_mir_value.h
+        mir-values/values/deserialize_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

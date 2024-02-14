@@ -1,0 +1,75 @@
+#include <fstream>
+#include "hir_contract.h"
+
+#include <iostream>
+#include <regex>
+
+#include "mir_contract.h"
+
+hir_contract::hir_contract(const std::filesystem::path &path) {
+    _path = path;
+}
+
+hir_contract::hir_contract(const std::string &path) : hir_contract(std::filesystem::path(path)) {}
+
+std::string hir_contract::get_path() const {
+    return _path.string();
+}
+
+mir_statements hir_contract::extract_structs() const {
+    std::fstream file;
+    file.open(_path, std::ios::in);
+    if (!file.is_open()) {
+        std::throw_with_nested(std::runtime_error("Unable to read HIR file"));
+    }
+
+    mir_statements structs;
+
+    std::string line;
+    bool struct_active = false;
+    unsigned int var_i = 0;
+    while (getline(file, line)) {
+        std::string trimmed_line = mir_contract::trim_line(line);
+        if (!struct_active) {
+            if (trimmed_line.starts_with("struct ")) {
+                std::regex struct_regex (R"(^struct (.+) \{$)");
+                std::smatch match;
+                if (std::regex_match(trimmed_line, match, struct_regex)) {
+                    nlohmann::json data;
+                    data["name"] = match[1].str();
+                    auto root = mir_statement(statement_type::data_struct, data);
+                    structs.push_back(root);
+                    struct_active = true;
+                }
+            }
+            continue;
+        }
+
+        if (trimmed_line.starts_with("//")) {
+            continue;
+        }
+
+        if (trimmed_line == "}") {
+            struct_active = false;
+            var_i = 0;
+            continue;
+        }
+
+        std::regex field_regex (R"(^(.+): (.+),$)");
+        std::smatch match;
+        if (std::regex_match(trimmed_line, match, field_regex)) {
+            nlohmann::json data;
+            data["variable"] = "get" + std::to_string(var_i);
+            data["variable_type"] = mir_statement::convert_type(match[2].str());
+            auto field = mir_statement(statement_type::variable, data);
+            structs.back().add_child(field);
+        }
+    }
+
+    file.close();
+
+    return structs;
+}
+
+
+

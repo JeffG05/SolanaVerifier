@@ -1,6 +1,8 @@
 #include <sstream>
 #include "utils.h"
 
+#include "mir_statement.h"
+
 std::string utils::trim(std::string s) {
     auto itr = s.begin();
     while (itr != s.end() && isspace(*itr)) {
@@ -61,4 +63,3 @@ std::string utils::add_item(const std::string &s, const std::string &item, const
 
     return s + delim + item;
 }
-

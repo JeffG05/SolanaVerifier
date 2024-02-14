@@ -14,6 +14,13 @@ mir_statement::mir_statement(const statement_type type, nlohmann::json data) {
     }
 }
 
+mir_statement mir_statement::new_variable(const std::string& variable, const std::string& variable_type) {
+    nlohmann::json data;
+    data["variable"] = variable;
+    data["variable_type"] = variable_type;
+    return { statement_type::variable, data };
+}
+
 statement_type mir_statement::get_type() const {
     return _type;
 }
@@ -40,6 +47,8 @@ std::string mir_statement::get_string_type() const {
             return "Add Reference";
         case statement_type::remove_ref:
             return "Remove Reference";
+        case statement_type::data_struct:
+            return "Struct";
         default:
             return "Unknown Statement";
     }
@@ -132,6 +141,8 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::add_ref;
     } else if (string_type == "Remove Reference") {
         type = statement_type::remove_ref;
+    } else if (string_type == "Struct") {
+        type = statement_type::data_struct;
     } else {
         type = statement_type::unknown;
     }
@@ -160,9 +171,13 @@ mir_statement mir_statement::create_root(const std::string &contract_name) {
     return {statement_type::root, data};
 }
 
-std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::string> &lines, const mir_statements& variables) {
+std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::string> &lines, const mir_statements &structs, const mir_statements &variables) {
     if (line_is_function(lines.front())) {
-        return parse_function(lines);
+        mir_statement function_statement = parse_function(lines, structs);
+        if (function_statement.get_ast_data().contains("source") || function_statement.get_ast_data().at("name") == "entrypoint") {
+            return std::nullopt;
+        }
+        return parse_function(lines, structs);
     }
 
     if (line_is_block(lines.front())) {
@@ -173,7 +188,7 @@ std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::str
 }
 
 
-mir_statement mir_statement::parse_function(std::list<std::string> lines) {
+mir_statement mir_statement::parse_function(std::list<std::string> lines, const mir_statements& structs) {
     // Create function header
     const std::string header_line = lines.front();
     mir_statement function_header = parse_function_header(header_line);
@@ -188,7 +203,10 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
         lines.pop_front();
     }
 
-    mir_statements all_variables = function_header.get_children();
+    mir_statements all_variables = get_all_variables(function_header, structs);
+    // for (auto var: all_variables) {
+    //     std::cout << var.get_ast_data().at("variable") << " = " << var.get_ast_data().at("variable_type") << std::endl;
+    // }
 
     // Create blocks
     auto current_block_lines = std::list<std::string>();
@@ -196,7 +214,7 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
         const std::string line = lines.front();
         if (line_is_block(line)) {
             if (!current_block_lines.empty()) {
-                if (std::optional<mir_statement> statement = parse_lines(current_block_lines, all_variables); statement.has_value()) {
+                if (std::optional<mir_statement> statement = parse_lines(current_block_lines, structs, all_variables); statement.has_value()) {
                     function_header.add_child(statement.value());
                 }
                 current_block_lines.clear();
@@ -207,7 +225,7 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines) {
     }
 
     if (!current_block_lines.empty()) {
-        if (const std::optional<mir_statement> statement = parse_lines(current_block_lines, all_variables); statement.has_value()) {
+        if (const std::optional<mir_statement> statement = parse_lines(current_block_lines, structs, all_variables); statement.has_value()) {
             function_header.add_child(statement.value());
         }
         current_block_lines.clear();
@@ -265,7 +283,7 @@ std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> l
 
 mir_statement mir_statement::parse_block_header(const std::string &line) {
     nlohmann::json data;
-    const std::regex block_regex (R"(^(bb\d+): \{$)");
+    const std::regex block_regex (R"(^(bb\d+)(?: \(cleanup\))?: \{$)");
     if (std::smatch match; std::regex_match(line, match, block_regex)) {
         data["name"] = match[1].str();
     }
@@ -278,8 +296,11 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     std::string branching;
     std::string add_ref_to;
     std::string remove_ref_to;
-    const std::regex assignment_parts (R"(^(\w+) = (.*?)(?: -> (.*))?;$)");
-    const std::regex assert_parts (R"(^assert\((.+), ".*\) -> (.*);$)");
+    const std::regex assignment_parts (R"(^(\w+) = (.+?)(?: -> (.+))?;$)");
+    const std::regex assert_parts (R"(^assert\((.+), ".+\) -> (.+);$)");
+    const std::regex goto_parts (R"(^goto -> (.+);$)");
+    const std::regex drop_parts (R"(^drop\(.+\) -> (.+);$)");
+    const std::regex unreachable_parts (R"(^unreachable;$)");
     std::smatch match;
     if (regex_match(line, match, assignment_parts)) {
         data["variable"] = match[1].str();
@@ -297,8 +318,48 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
         add_ref_to = add_ref;
         remove_ref_to = remove_ref;
         branching = match[2].str();
+    } else if (regex_match(line, match, goto_parts)) {
+        data["variable"] = "";
+        data["value"] = "true";
+        data["returns"] = true;
+        add_ref_to = "";
+        remove_ref_to = "";
+        branching = match[1].str();
+    } else if (regex_match(line, match, drop_parts)) {
+        data["variable"] = "";
+        data["value"] = "true";
+        data["returns"] = true;
+        add_ref_to = "";
+        remove_ref_to = "";
+        branching = match[1].str();
+    } else if (regex_match(line, match, unreachable_parts)) {
+        data["variable"] = "";
+        data["value"] = "assert(false)";
+        data["returns"] = false;
+        add_ref_to = "";
+        remove_ref_to = "";
+        branching = "";
     } else {
         return std::nullopt;
+    }
+
+    std::string variable_name = data.at("variable");
+    if (!variable_name.empty()) {
+        std::optional<mir_statement> variable_statement = get_statement(variables, variable_name);
+        if (variable_statement.has_value()) {
+            std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
+            if (variable_type.starts_with("array<")) {
+                data["value"] = "copy_array<" + data.at("value").get<std::string>() + ">";
+            } else if (variable_type == "account_info") {
+                data["value"] = "copy_account_info<" + data.at("value").get<std::string>() + ">";
+            } else if (variable_type.starts_with("result<")) {
+                if (variable_type == "result<void>") {
+                    data["value"] = "copy_void_result<" + data.at("value").get<std::string>() + ">";
+                } else {
+                    data["value"] = "copy_result<" + data.at("value").get<std::string>() + ">";
+                }
+            }
+        }
     }
 
     mir_statements all_statements;
@@ -353,9 +414,7 @@ mir_statement mir_statement::parse_variable(const std::string &line) {
     const std::regex param_regex ("^(_\\d+): (.+?)$");
 
     if (std::regex_match(line, match, var_regex)) {
-        data["variable"] = match[1].str();
-        data["variable_type"] = convert_type(match[2].str());
-        return {statement_type::variable, data};
+        return new_variable(match[1].str(), convert_type(match[2].str()));
     }
 
     if (std::regex_match(line, match, param_regex)) {
@@ -418,16 +477,11 @@ std::tuple<std::string, bool, std::string, std::string> mir_statement::convert_v
 }
 
 bool mir_statement::line_is_function(const std::string &line) {
-    if (line.starts_with("fn")) {
-        if (!line.starts_with("fn entrypoint(")) {
-            return true;
-        }
-    }
-    return false;
+    return line.starts_with("fn");
 }
 
 bool mir_statement::line_is_block(const std::string &line) {
-    const std::regex block_regex (R"(^bb\d+: \{$)");
+    const std::regex block_regex (R"(^bb\d+(?: \(cleanup\))?: \{$)");
     std::smatch match;
     return std::regex_match(line, match, block_regex);
 }
@@ -435,6 +489,14 @@ bool mir_statement::line_is_block(const std::string &line) {
 
 bool mir_statement::line_is_statement_start(const std::string &line) {
     return line_is_function(line);
+}
+
+std::pair<std::string, std::string> mir_statement::get_argument_pair(const std::string &raw) {
+    const std::regex pattern (R"(^([^<>,]+<[^<>]+>|[^<>,]+), ([^<>,]+<[^<>]+>|[^<>,]+)$)");
+    if (std::smatch match; std::regex_match(raw, match, pattern)) {
+        return std::make_pair(match[1].str(), match[2].str());
+    }
+    std::throw_with_nested(std::runtime_error("Error parsing argument pair: " + raw));
 }
 
 std::optional<mir_statement> mir_statement::get_statement(const mir_statements &variables, const std::string &name) {
@@ -445,6 +507,89 @@ std::optional<mir_statement> mir_statement::get_statement(const mir_statements &
         }
     }
     return std::nullopt;
+}
+
+mir_statements mir_statement::get_all_variables(mir_statement function_header, const mir_statements& structs) {
+    mir_statements all_variables;
+    for (const auto& variable: function_header.get_children()) {
+        utils::extend(&all_variables, get_subvariables(variable, structs));
+    }
+    return all_variables;
+}
+
+mir_statements mir_statement::get_subvariables(const mir_statement &variable, const mir_statements &structs) {
+    mir_statements subvariables;
+    subvariables.push_back(variable);
+
+    const std::string name = variable.get_ast_data().at("variable");
+    const std::string type = variable.get_ast_data().at("variable_type");
+
+    for (auto struct_statement: structs) {
+        if (type == struct_statement.get_ast_data().at("name")) {
+            for (const auto& child_variable: struct_statement.get_children()) {
+                const std::string child_type = child_variable.get_ast_data().at("variable_type");
+                std::string new_var_name = name + ".";
+                new_var_name += child_variable.get_ast_data().at("variable");
+                const mir_statement subvariable = new_variable(new_var_name, child_type);
+                utils::extend(&subvariables, get_subvariables(subvariable, structs));
+            }
+        }
+    }
+    if (type == "account_info") {
+        const mir_statement get0 = new_variable(name + ".get0", "pubkey");
+        const mir_statement get1 = new_variable(name + ".get1", "u64");
+        const mir_statement get2 = new_variable(name + ".get2", "array<u8>");
+        const mir_statement get3 = new_variable(name + ".get3", "pubkey");
+        const mir_statement get4 = new_variable(name + ".get4", "u64");
+        const mir_statement get5 = new_variable(name + ".get5", "bool");
+        const mir_statement get6 = new_variable(name + ".get6", "bool");
+        const mir_statement get7 = new_variable(name + ".get7", "bool");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        utils::extend(&subvariables, get_subvariables(get2, structs));
+        utils::extend(&subvariables, get_subvariables(get3, structs));
+        utils::extend(&subvariables, get_subvariables(get4, structs));
+        utils::extend(&subvariables, get_subvariables(get5, structs));
+        utils::extend(&subvariables, get_subvariables(get6, structs));
+        utils::extend(&subvariables, get_subvariables(get7, structs));
+        return subvariables;
+    }
+    if (type.starts_with("controlflow<")) {
+        std::string raw_controlflow_types = type.substr(12, type.size() - 13);
+        std::pair<std::string, std::string> types = get_argument_pair(raw_controlflow_types);
+
+        const mir_statement break_value = new_variable(name + ".break_value", types.first);
+        const mir_statement continue_value = new_variable(name + ".continue_value", types.second);
+
+        utils::extend(&subvariables, get_subvariables(break_value, structs));
+        utils::extend(&subvariables, get_subvariables(continue_value, structs));
+        return subvariables;
+    }
+    if (type.starts_with("result<")) {
+        std::string success_type = type.substr(7, type.size() - 8);
+
+        const mir_statement is_success = new_variable(name + ".is_success", "bool");
+        utils::extend(&subvariables, get_subvariables(is_success, structs));
+
+        const mir_statement value = new_variable(name + ".value", success_type);
+        utils::extend(&subvariables, get_subvariables(value, structs));
+        return subvariables;
+    }
+    if (type.starts_with("tuple<")) {
+        const std::string raw_value_types = type.substr(6, type.size() - 7);
+        const std::list<std::string> value_types = utils::split(raw_value_types, ", ");
+
+        unsigned int i = 0;
+        for (const auto& value_type: value_types) {
+            const mir_statement statement = new_variable(name + ".get" + std::to_string(i), value_type);
+            utils::extend(&subvariables, get_subvariables(statement, structs));
+            i++;
+        }
+        return subvariables;
+    }
+
+    return subvariables;
 }
 
 

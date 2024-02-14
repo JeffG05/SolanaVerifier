@@ -1,5 +1,5 @@
-#ifndef CONST_NUMBER_MIR_TYPE_H
-#define CONST_NUMBER_MIR_TYPE_H
+#ifndef CONST_NUMBER_MIR_VALUE_H
+#define CONST_NUMBER_MIR_VALUE_H
 
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
@@ -14,4 +14,4 @@ public:
     ) {}
 };
 
-#endif //CONST_NUMBER_MIR_TYPE_H
+#endif //CONST_NUMBER_MIR_VALUE_H

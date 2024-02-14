@@ -1,5 +1,5 @@
-#ifndef CHECKED_MUL_MIR_TYPE_H
-#define CHECKED_MUL_MIR_TYPE_H
+#ifndef CHECKED_MUL_MIR_VALUE_H
+#define CHECKED_MUL_MIR_VALUE_H
 
 #include <regex>
 
@@ -58,4 +58,4 @@ public:
     ) {}
 };
 
-#endif //CHECKED_MUL_MIR_TYPE_H
+#endif //CHECKED_MUL_MIR_VALUE_H

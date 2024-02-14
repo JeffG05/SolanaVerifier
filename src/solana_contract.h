@@ -3,6 +3,8 @@
 
 #include <string>
 #include <filesystem>
+
+#include "hir_contract.h"
 #include "mir_contract.h"
 
 class solana_contract {
@@ -14,7 +16,8 @@ public:
     [[nodiscard]] std::string get_manifest_path() const;
     [[nodiscard]] std::string get_name() const;
 
-    [[nodiscard]] mir_contract convert_to_mir(const std::filesystem::path& target) const;
+    [[nodiscard]] hir_contract convert_to_hir(const std::filesystem::path& target) const;
+    [[nodiscard]] mir_contract convert_to_mir(const std::filesystem::path& target, const mir_statements& structs) const;
 
 protected:
     std::filesystem::path _contract_dir;

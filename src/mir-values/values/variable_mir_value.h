@@ -1,5 +1,5 @@
-#ifndef VARIABLE_MIR_TYPE_H
-#define VARIABLE_MIR_TYPE_H
+#ifndef VARIABLE_MIR_VALUE_H
+#define VARIABLE_MIR_VALUE_H
 
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
@@ -14,4 +14,4 @@ public:
     ) {}
 };
 
-#endif //VARIABLE_MIR_TYPE_H
+#endif //VARIABLE_MIR_VALUE_H

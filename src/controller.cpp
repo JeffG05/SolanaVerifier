@@ -12,6 +12,14 @@ bool controller::is_mir(const std::filesystem::path &path) {
     return extension == ".mir";
 }
 
+bool controller::is_hir(const std::filesystem::path &path) {
+    std::string extension = path.extension().string();
+    for (auto& c: extension) {
+        c = static_cast<char>(tolower(c));
+    }
+    return extension == ".hir";
+}
+
 bool controller::is_directory(const std::filesystem::path &path) {
     return !path.has_extension();
 }
@@ -50,6 +58,7 @@ bool controller::run(const int argc, char *argv[]) {
         ("help", "Print help message")
         ("contract", boost::program_options::value<std::string>(&_contract_dir), "Directory of Solana smart contract")
         ("mir", boost::program_options::value<std::string>(&_mir_file), "MIR representation of Solana smart contract")
+        ("hir", boost::program_options::value<std::string>(&_hir_file), "HIR representation of Solana smart contract")
         ("target", boost::program_options::value<std::string>(&_target_function)->default_value("entrypoint"), "The target function to verify")
         ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
     ;
@@ -64,6 +73,7 @@ bool controller::run(const int argc, char *argv[]) {
     }
 
     std::optional<mir_contract> mir;
+    std::optional<hir_contract> hir;
     const std::filesystem::path temp_dir = get_temp_dir();
 
     if (vm.contains("contract")) {
@@ -75,17 +85,30 @@ bool controller::run(const int argc, char *argv[]) {
         if (vm.contains("mir")) {
             std::cerr << "warning: ignoring MIR file" << std::endl;
         }
+        if (vm.contains("hir")) {
+            std::cerr << "warning: ignoring HIR file" << std::endl;
+        }
 
         auto t_contract_start = std::chrono::high_resolution_clock::now();
         const auto contract = solana_contract(_contract_dir);
         auto t_contract_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded solana contract: took " << get_millis(t_contract_start, t_contract_end) << std::endl;
 
+        auto t_to_hir_start = std::chrono::high_resolution_clock::now();
+        hir = contract.convert_to_hir(temp_dir);
+        auto t_to_hir_end = std::chrono::high_resolution_clock::now();
+        std::cout << "Converted to HIR: took " << get_millis(t_to_hir_start, t_to_hir_end) << std::endl;
+
+        if (!hir.has_value()) {
+            std::cerr << "error: failed to generate hir file" << std::endl;
+            return false;
+        }
+
         auto t_to_mir_start = std::chrono::high_resolution_clock::now();
-        mir = contract.convert_to_mir(temp_dir);
+        mir = contract.convert_to_mir(temp_dir, hir->extract_structs());
         auto t_to_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Converted to MIR: took " << get_millis(t_to_mir_start, t_to_mir_end) << std::endl;
-    } else if (vm.contains("mir")) {
+    } else if (vm.contains("mir") && vm.contains("hir")) {
         std::cout << "Running SolanaVerifier on MIR file" << std::endl;
         if (!is_mir(_mir_file)) {
             if (is_directory(_mir_file)) {
@@ -96,13 +119,23 @@ bool controller::run(const int argc, char *argv[]) {
             return false;
         }
 
+        auto t_hir_start = std::chrono::high_resolution_clock::now();
+        hir = hir_contract(_hir_file);
+        auto t_hir_end = std::chrono::high_resolution_clock::now();
+        std::cout << "Loaded HIR: took " << get_millis(t_hir_start, t_hir_end) << std::endl;
+
+        if (!hir.has_value()) {
+            std::cerr << "error: failed to generate hir file" << std::endl;
+            return false;
+        }
+
         auto t_mir_start = std::chrono::high_resolution_clock::now();
         std::string contract_name = std::filesystem::path(_mir_file).stem().string();
-        mir = mir_contract(contract_name, _mir_file);
+        mir = mir_contract(contract_name, _mir_file, hir->extract_structs());
         auto t_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded MIR: took " << get_millis(t_mir_start, t_mir_end) << std::endl;
     } else {
-        std::cerr << "error: expected contract or mir file" << std::endl;
+        std::cerr << "error: expected contract or mir & hir file" << std::endl;
         return false;
     }
 
@@ -115,6 +148,9 @@ bool controller::run(const int argc, char *argv[]) {
     c_program solana_c = mir.value().convert_to_c(temp_dir, _target_function);
     auto t_to_c_end = std::chrono::high_resolution_clock::now();
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
+
+    std::cout << solana_c.get_path() << std::endl;
+    // return true;
 
     auto t_generate_start = std::chrono::high_resolution_clock::now();
     smt_formula smt = solana_c.build_smt(temp_dir, std::filesystem::path(_esbmc_path));
