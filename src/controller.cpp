@@ -4,6 +4,10 @@
 #include "mir_contract.h"
 #include "solana_contract.h"
 
+controller::controller() {
+    _globals = config();
+}
+
 bool controller::is_mir(const std::filesystem::path &path) {
     std::string extension = path.extension().string();
     for (auto& c: extension) {
@@ -61,6 +65,7 @@ bool controller::run(const int argc, char *argv[]) {
         ("hir", boost::program_options::value<std::string>(&_hir_file), "HIR representation of Solana smart contract")
         ("target", boost::program_options::value<std::string>(&_target_function)->default_value("entrypoint"), "The target function to verify")
         ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
+        ("array-size", boost::program_options::value<int>(&_globals.ARRAY_SIZE)->default_value(10), "Max size of arrays in SMT model")
     ;
 
     boost::program_options::variables_map vm;
@@ -90,7 +95,7 @@ bool controller::run(const int argc, char *argv[]) {
         }
 
         auto t_contract_start = std::chrono::high_resolution_clock::now();
-        const auto contract = solana_contract(_contract_dir);
+        const auto contract = solana_contract(_contract_dir, _globals);
         auto t_contract_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded solana contract: took " << get_millis(t_contract_start, t_contract_end) << std::endl;
 
@@ -131,7 +136,7 @@ bool controller::run(const int argc, char *argv[]) {
 
         auto t_mir_start = std::chrono::high_resolution_clock::now();
         std::string contract_name = std::filesystem::path(_mir_file).stem().string();
-        mir = mir_contract(contract_name, _mir_file, hir->extract_structs());
+        mir = mir_contract(contract_name, _mir_file, hir->extract_structs(), _globals);
         auto t_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded MIR: took " << get_millis(t_mir_start, t_mir_end) << std::endl;
     } else {

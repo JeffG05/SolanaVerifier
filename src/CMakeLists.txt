@@ -10,7 +10,7 @@ FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download
 FetchContent_MakeAvailable(json)
 
 include(CMakeRC.cmake)
-cmrc_add_resource_library(SolanaVerifierAssets assets/solana.c)
+cmrc_add_resource_library(SolanaVerifierAssets assets/solana.casset)
 
 find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -93,6 +93,11 @@ add_executable(SolanaVerifier
         hir_contract.h
         mir-values/values/serialize_mir_value.h
         mir-values/values/deserialize_mir_value.h
+        config.h
+        mir-values/values/less_than_mir_value.h
+        mir-values/values/greater_than_mir_value.h
+        mir-values/values/less_than_equal_mir_value.h
+        mir-values/values/greater_than_equal_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

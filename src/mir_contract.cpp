@@ -6,28 +6,26 @@
 #include <regex>
 #include <cmrc/cmrc.hpp>
 #include "mir_contract.h"
-
-#include <regex>
-
 #include "mir_statement.h"
 #include "utils.h"
 
 CMRC_DECLARE(SolanaVerifierAssets);
 
-mir_contract::mir_contract(const std::string &contract_name, const std::filesystem::path &path, const mir_statements &structs) {
+mir_contract::mir_contract(const std::string &contract_name, const std::filesystem::path &path, const mir_statements &structs, const config globals) {
     _contract_name = contract_name;
     _path = path;
     _structs = structs;
+    _globals = globals;
 }
 
-mir_contract::mir_contract(const std::string &contract_name, const std::string &path, const mir_statements &structs) : mir_contract(contract_name, std::filesystem::path(path), structs) {}
+mir_contract::mir_contract(const std::string &contract_name, const std::string &path, const mir_statements &structs, const config globals) : mir_contract(contract_name, std::filesystem::path(path), structs, globals) {}
 
 
 std::string mir_contract::get_path() const {
     return _path;
 }
 
-c_program mir_contract::convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) const {
+c_program mir_contract::convert_to_c(const std::filesystem::path& target, const std::string& target_funtion) {
     // Open file in read mode
     std::fstream file;
     file.open(_path, std::ios::in);
@@ -36,9 +34,8 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     }
 
     // Create AST tree
-    mir_statement ast_tree = create_ast_tree(file);
+    const mir_statement ast_tree = create_ast_tree(file);
     file.close();
-    ast_tree.print();
 
     // Export AST tree as C program
     const std::filesystem::path c_file_path = export_c_program(target, ast_tree, target_funtion);
@@ -136,9 +133,9 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
     return out;
 }
 
-std::string mir_contract::get_c_type(const std::string &type, const std::string &name, const std::string &function_name) {
+std::string mir_contract::get_c_type(const std::string &type, const std::string &name, const std::string &function_name) const {
     if (type.starts_with("array<")) {
-        return get_c_subtype(type) + " " + name + "[256]";
+        return get_c_subtype(type) + " " + name + "[" + std::to_string(_globals.ARRAY_SIZE) + "]";
     }
     if (type.starts_with("tuple<")) {
         const std::string tuple_name = get_tuple_name(type, function_name);
@@ -155,7 +152,7 @@ std::string mir_contract::get_c_type(const std::string &type, const std::string 
     return type + " " + name;
 }
 
-std::string mir_contract::get_return_c_type(const std::string &type, const std::string &function_name) {
+std::string mir_contract::get_return_c_type(const std::string &type, const std::string &function_name) const {
     const std::string c_type = get_c_type(type, "_0", function_name);
     if (!c_type.ends_with(" _0")) {
         std::throw_with_nested(std::runtime_error("Unsupported return type: " + type));
@@ -167,6 +164,9 @@ std::string mir_contract::get_return_c_type(const std::string &type, const std::
 std::string mir_contract::get_c_value(const std::string &value) {
     if (value.starts_with("copy_array<")) {
         return get_c_value(value.substr(11, value.size() - 12));
+    }
+    if (value.starts_with("copy_pubkey<")) {
+        return get_c_value(value.substr(12, value.size() - 13));
     }
     if (value.starts_with("copy_account_info<")) {
         return get_c_value(value.substr(18, value.size() - 19));
@@ -188,7 +188,7 @@ std::string mir_contract::get_c_subtype(const std::string &type) {
     return type;
 }
 
-std::filesystem::path mir_contract::export_library_file(const std::filesystem::path &target) {
+void mir_contract::export_library_file(const std::filesystem::path &target) const {
     const std::filesystem::path out = target / "solana.c";
     std::fstream file;
     file.open(out, std::ios::out);
@@ -197,11 +197,12 @@ std::filesystem::path mir_contract::export_library_file(const std::filesystem::p
     }
 
     const auto asset_fs = cmrc::SolanaVerifierAssets::get_filesystem();
-    const cmrc::file lib_file = asset_fs.open("assets/solana.c");
+    const cmrc::file lib_file = asset_fs.open("assets/solana.casset");
 
-    file << std::string(lib_file.begin(), lib_file.end()) << std::endl;
+    auto asset_file = std::string(lib_file.begin(), lib_file.end());
+    asset_file = std::regex_replace(asset_file, std::regex(R"(\{\{ARRAY_SIZE\}\})"), std::to_string(_globals.ARRAY_SIZE));
+    file << asset_file << std::endl;
     file.close();
-    return out;
 }
 
 std::string mir_contract::trim_line(const std::string &line) {
@@ -213,7 +214,7 @@ std::string mir_contract::trim_line(const std::string &line) {
     return trimmed;
 }
 
-void mir_contract::generate_struct_struct(std::ostream *out, const mir_statements &state_statements, const std::string &struct_name) {
+void mir_contract::generate_struct_struct(std::ostream *out, const mir_statements &state_statements, const std::string &struct_name) const {
     *out << "typedef struct " << struct_name << "_struct {" << std::endl;
     for (const auto& variable : state_statements) {
         std::string var_name = variable.get_ast_data().at("variable");
@@ -371,7 +372,7 @@ void mir_contract::generate_controlflow_struct(std::ostream *out, const std::str
     *out << std::endl;
 }
 
-void mir_contract::generate_function_struct(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) {
+void mir_contract::generate_function_struct(std::ostream *out, const mir_statements &state_statements, const std::string &function_name) const {
     *out << "typedef struct " << function_name << "_state_struct {" << std::endl;
     for (const auto& parameter_statement: state_statements) {
         nlohmann::json parameter_data = parameter_statement.get_ast_data();
@@ -475,17 +476,25 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const std::string iter_value = value.substr(5, value.size() - 6);
         *out << "\tstate." << variable << ".is_success = true;" << std::endl;
         *out << "\tstate." << variable << ".value = " <<  get_c_value(iter_value) << "[0];" << std::endl;
-        *out << "\tfor (int i = 0; i < 255; i++) {" << std::endl;
+        *out << "\tfor (int i = 0; i < " << _globals.ARRAY_SIZE-1 << "; i++) {" << std::endl;
         *out << "\t\t" << get_c_value(iter_value) << "[i] = " << get_c_value(iter_value) << "[i+1];" << std::endl;
         *out << "\t}" << std::endl;
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
-        *out << "\tunsigned int i" << clean_type(variable) << " = nondet_u8();" << std::endl;
-        *out << "\tstate." << variable << "[i" << clean_type(variable) << "] = " << array_value << "[i" << clean_type(variable) << "];" << std::endl;
+        *out << "\tfor (int i_" << clean_type(variable) << " = 0; i_" << clean_type(variable) << " < " << _globals.ARRAY_SIZE << "; i_" << clean_type(variable) << "++) {" << std::endl;
+        *out << "\t\tstate." << variable << "[i_" << clean_type(variable) << "] = " << array_value << "[i_" << clean_type(variable) << "];" << std::endl;
+        *out << "\t}" << std::endl;
+    } else if (value.starts_with("copy_pubkey<")) {
+        const std::string pubkey_value = value.substr(12, value.size() - 13);
+        for (int i = 0; i < 32; i++) {
+            *out << "\tstate." << variable << ".p" << i << " = " << pubkey_value << ".p" << i << ";" << std::endl;
+        }
     } else if (value.starts_with("copy_account_info<")) {
         const std::string info_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 8; i++) {
-            if (i == 2) {
+            if (i == 0 || i == 3) {
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + info_value + ".get" + std::to_string(i) + ">", true);
+            } else if (i == 2) {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + info_value + ".get" + std::to_string(i) + ">", true);
             } else {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true);
@@ -536,7 +545,7 @@ void mir_contract::generate_branch(std::ostream *out, const mir_statement &branc
     *out << "\t} else ";
 }
 
-void mir_contract::generate_function(std::ostream *out, const mir_statements &state_statements, const std::string &function_name, const std::string &function_return) {
+void mir_contract::generate_function(std::ostream *out, const mir_statements &state_statements, const std::string &function_name, const std::string &function_return) const {
     std::list<std::string> parameters;
     for (const auto& statement: state_statements) {
         if (statement.get_type() != statement_type::parameter) {
@@ -569,7 +578,7 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
     *out << std::endl;
 }
 
-void mir_contract::generate_nondet(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) {
+void mir_contract::generate_nondet(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) const {
     nlohmann::json parameter_data = statement.get_ast_data();
     const std::string parameter_name = parameter_data.at("variable").get<std::string>();
     const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
@@ -591,22 +600,23 @@ void mir_contract::generate_nondet(std::ostream *out, const mir_statement &state
 
 }
 
-void mir_contract::generate_nondet_array(std::ostream *out, const mir_statement& statement, const bool in_main) {
+void mir_contract::generate_nondet_array(std::ostream *out, const mir_statement& statement, const bool in_main) const {
     nlohmann::json parameter_data = statement.get_ast_data();
     const std::string parameter_name = parameter_data.at("variable").get<std::string>();
     const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
 
-    *out << "\tunsigned int i" << parameter_name << " = nondet_u8();" << std::endl;
+    *out << "\tfor (int i" << parameter_name << " = 0; i" << parameter_name << " < " << _globals.ARRAY_SIZE << "; i" << parameter_name << "++) {" << std::endl;
     if (in_main) {
-        *out << "\t" << parameter_name << "[i" << parameter_name << "] = ";
+        *out << "\t\t" << parameter_name << "[i" << parameter_name << "] = ";
     } else {
-        *out << "\tstate." << parameter_name << "[i" << parameter_name << "] = ";
+        *out << "\t\tstate." << parameter_name << "[i" << parameter_name << "] = ";
     }
     if (in_main || statement.get_type() == statement_type::variable) {
         *out << "nondet_" << get_c_subtype(parameter_type) << "();" << std::endl;
     } else {
         *out << parameter_name << "[i" << parameter_name << "];" << std::endl;
     }
+    *out << "\t}" << std::endl;
 }
 
 void mir_contract::generate_serialization(std::ostream *out, const std::string &variable_name, const std::string& variable_type, unsigned int *counter) {
@@ -643,7 +653,7 @@ mir_statement mir_contract::get_target_function(mir_statements function_statemen
     return *function_it;
 }
 
-void mir_contract::generate_main_function(std::ostream *out, const mir_statements &function_statements, const std::string &target_function_name) {
+void mir_contract::generate_main_function(std::ostream *out, const mir_statements &function_statements, const std::string &target_function_name) const {
     mir_statement target_function_statement = get_target_function(function_statements, target_function_name);
     const std::string target_function_type = target_function_statement.get_ast_data().at("return_type").get<std::string>();
     const mir_statements target_function_parameters = target_function_statement.get_children({statement_type::parameter});
@@ -678,8 +688,21 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
     }
     *out << ");" << std::endl;
     *out << std::endl;
+
+    generate_verification_statements(out, target_function_statement);
+
     *out << "\treturn 0;" << std::endl;
     *out << "}" << std::endl;
+}
+
+void mir_contract::generate_verification_statements(std::ostream *out, const mir_statement& target_function) {
+    std::string target_return_type = target_function.get_ast_data().at("return_type");
+    if (target_return_type.starts_with("result<")) {
+        // Check owner is calling function
+        // LOGIC: A successful return implies that the owner called the function
+        *out << "\t__ESBMC_assert(!result.is_success || is_equal(_1, _2[0].get3), \"Vulnerability Found: Missing Ownership Checks\");" << std::endl;
+        *out << std::endl;
+    }
 }
 
 std::string mir_contract::clean_type(const std::string &type) {

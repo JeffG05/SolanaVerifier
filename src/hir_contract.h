@@ -12,9 +12,11 @@ public:
 
     [[nodiscard]] std::string get_path() const;
 
-    mir_statements extract_structs() const;
+    [[nodiscard]] mir_statements extract_structs() const;
 private:
     std::filesystem::path _path;
+
+    static std::string trim_line(const std::string& line);
 };
 
 #endif //HIR_CONTRACT_H

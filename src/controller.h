@@ -3,9 +3,13 @@
 
 #include <filesystem>
 
+#include "config.h"
+
 class controller {
 
 public:
+    controller();
+
     bool run(int argc, char *argv[]);
 private:
     std::string _contract_dir;
@@ -13,6 +17,7 @@ private:
     std::string _hir_file;
     std::string _target_function;
     std::string _esbmc_path;
+    config _globals{};
 
     static bool is_mir(const std::filesystem::path &path);
     static bool is_hir(const std::filesystem::path &path);

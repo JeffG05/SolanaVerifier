@@ -13,8 +13,12 @@
 #include "values/discriminant_mir_value.h"
 #include "values/from_residual_mir_value.h"
 #include "values/function_mir_value.h"
+#include "values/greater_than_equal_mir_value.h"
+#include "values/greater_than_mir_value.h"
 #include "values/index_mut_range_full_mir_value.h"
 #include "values/iter_mir_value.h"
+#include "values/less_than_equal_mir_value.h"
+#include "values/less_than_mir_value.h"
 #include "values/move_mir_value.h"
 #include "values/mutable_mir_value.h"
 #include "values/negation_mir_value.h"
@@ -67,6 +71,10 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     index_mut_range_full_mir_value(),
     serialize_mir_value(),
     deserialize_mir_value(),
+    less_than_mir_value(),
+    greater_than_mir_value(),
+    less_than_equal_mir_value(),
+    greater_than_equal_mir_value(),
 
     // KEEP LAST
     function_mir_value()

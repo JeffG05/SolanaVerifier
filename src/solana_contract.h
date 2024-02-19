@@ -9,8 +9,8 @@
 
 class solana_contract {
 public:
-    explicit solana_contract(const std::filesystem::path& path);
-    explicit solana_contract(const std::string& path);
+    explicit solana_contract(const std::filesystem::path& path, config globals);
+    explicit solana_contract(const std::string& path, config globals);
 
     [[nodiscard]] std::string get_path() const;
     [[nodiscard]] std::string get_manifest_path() const;
@@ -19,8 +19,9 @@ public:
     [[nodiscard]] hir_contract convert_to_hir(const std::filesystem::path& target) const;
     [[nodiscard]] mir_contract convert_to_mir(const std::filesystem::path& target, const mir_statements& structs) const;
 
-protected:
+private:
     std::filesystem::path _contract_dir;
+    config _globals;
 };
 
 

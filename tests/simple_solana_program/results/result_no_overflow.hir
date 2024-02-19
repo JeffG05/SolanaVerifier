@@ -1,0 +1,135 @@
+#[prelude_import]
+use std::prelude::rust_2018::*;
+#[macro_use]
+extern crate std;
+use borsh::{};
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use solana_program::{};
+use solana_program::account_info::{};
+use solana_program::account_info::next_account_info;
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint;
+use solana_program::program_error::ProgramError;
+use solana_program::pubkey::Pubkey;
+
+/// The type of state managed by this program. The type defined here
+/// much match the `GreetingAccount` type defined by the client.
+struct GreetingAccount {
+    /// The number of greetings that have been sent to this account.
+    counter: u32,
+}
+impl borsh::ser::BorshSerialize for GreetingAccount where
+    u32: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.counter,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for GreetingAccount where
+    u32: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            ::core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            Ok(Self{
+                    counter:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for GreetingAccount {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(f,
+                "GreetingAccount", "counter", &&self.counter)
+        }
+}
+
+
+// Get the account that stores greeting count information.
+
+// The account must be owned by the program in order for the
+// program to write to it. If that is not the case then the
+// program has been invoked incorrectly and we report as much.
+
+// Deserialize the greeting information from the account, modify
+// it, and then write it back.
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+/// Logic that runs when the program is executed. This program expects
+/// a single account that is owned by the program as an argument and
+/// no instructions.
+///
+/// The account passed in ought to contain a `GreetingAccount`. This
+/// program will increment the `counter` value in the
+/// `GreetingAccount` when executed.
+fn process_instruction<'_, '_, '_,
+    '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+    instruction_data: &'_ [u8])
+    ->
+        entrypoint::ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let account =
+            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        if account.owner != program_id
+                { return Err(ProgramError::IncorrectProgramId); }
+                let mut greeting =
+                    match #[lang = "branch"](GreetingAccount::try_from_slice(&account.data.borrow()))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                if greeting.counter < 1000 { greeting.counter += 1; }
+                        match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                        Ok(())
+                    }

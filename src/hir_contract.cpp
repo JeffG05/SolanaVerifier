@@ -5,6 +5,7 @@
 #include <regex>
 
 #include "mir_contract.h"
+#include "utils.h"
 
 hir_contract::hir_contract(const std::filesystem::path &path) {
     _path = path;
@@ -29,7 +30,7 @@ mir_statements hir_contract::extract_structs() const {
     bool struct_active = false;
     unsigned int var_i = 0;
     while (getline(file, line)) {
-        std::string trimmed_line = mir_contract::trim_line(line);
+        std::string trimmed_line = trim_line(line);
         if (!struct_active) {
             if (trimmed_line.starts_with("struct ")) {
                 std::regex struct_regex (R"(^struct (.+) \{$)");
@@ -71,5 +72,12 @@ mir_statements hir_contract::extract_structs() const {
     return structs;
 }
 
-
+std::string hir_contract::trim_line(const std::string &line) {
+    std::string trimmed = utils::trim(line);
+    const std::regex comment_regex (R"(^(.*?[;{])?(?:\s*\/\/.*)$)");
+    if (std::smatch match; std::regex_match(trimmed, match, comment_regex)) {
+        return match[1].str();
+    }
+    return trimmed;
+}
 

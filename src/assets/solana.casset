@@ -164,17 +164,7 @@ signed_math_result i_multiplication(signed long long int a, signed long long int
 typedef char* string;
 unsigned int MAX_STRING_LEN = 1024;
 string nondet_string() {
-    unsigned int len = nondet_uint();
-    __ESBMC_assume(len < MAX_STRING_LEN);
-
-    char* str = malloc(len + 1);
-    __ESBMC_assume(str != NULL);
-
-    unsigned int i = nondet_uint();
-    __ESBMC_assume(i < len);
-    str[i] = nondet_char();
-    str[len] = '\0';
-
+    char* str;
     return str;
 }
 void print(string s) {
@@ -183,26 +173,62 @@ void print(string s) {
 
 // PUBKEY
 typedef struct pubkey_struct {
-    u8 contents[32];
+    u8 p0;
+    u8 p1;
+    u8 p2;
+    u8 p3;
+    u8 p4;
+    u8 p5;
+    u8 p6;
+    u8 p7;
+    u8 p8;
+    u8 p9;
+    u8 p10;
+    u8 p11;
+    u8 p12;
+    u8 p13;
+    u8 p14;
+    u8 p15;
+    u8 p16;
+    u8 p17;
+    u8 p18;
+    u8 p19;
+    u8 p20;
+    u8 p21;
+    u8 p22;
+    u8 p23;
+    u8 p24;
+    u8 p25;
+    u8 p26;
+    u8 p27;
+    u8 p28;
+    u8 p29;
+    u8 p30;
+    u8 p31;
 } pubkey;
 pubkey nondet_pubkey() {
     pubkey p;
-    unsigned int i = nondet_uint();
-    __ESBMC_assume(i < 32);
-    p.contents[i] = nondet_u8();
     return p;
 }
 bool is_equal(pubkey lhs, pubkey rhs) {
-    unsigned int i = nondet_uint();
-    __ESBMC_assume(i < 32);
-    return lhs.contents[i] == rhs.contents[i];
+    return lhs.p0 == rhs.p0 && lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2 &&
+        lhs.p3 == rhs.p3 && lhs.p4 == rhs.p4 && lhs.p5 == rhs.p5 &&
+        lhs.p6 == rhs.p6 && lhs.p7 == rhs.p7 && lhs.p8 == rhs.p8 &&
+        lhs.p9 == rhs.p9 && lhs.p10 == rhs.p10 && lhs.p11 == rhs.p11 &&
+        lhs.p12 == rhs.p12 && lhs.p13 == rhs.p13 && lhs.p14 == rhs.p14 &&
+        lhs.p15 == rhs.p15 && lhs.p16 == rhs.p16 && lhs.p17 == rhs.p17 &&
+        lhs.p18 == rhs.p18 && lhs.p19 == rhs.p19 && lhs.p20 == rhs.p20 &&
+        lhs.p21 == rhs.p21 && lhs.p22 == rhs.p22 && lhs.p23 == rhs.p23 &&
+        lhs.p24 == rhs.p24 && lhs.p25 == rhs.p25 && lhs.p26 == rhs.p26 &&
+        lhs.p27 == rhs.p27 && lhs.p28 == rhs.p28 && lhs.p29 == rhs.p29 &&
+        lhs.p30 == rhs.p30 && lhs.p31 == rhs.p31;
 }
 
 // ACCOUNT INFO
 typedef struct account_info_struct {
     pubkey get0;
     u64 get1;
-    u8 get2[4294967296uLL];
+    u8 get2[{{ARRAY_SIZE}}];
     pubkey get3;
     u64 get4;
     bool get5;
@@ -211,14 +237,6 @@ typedef struct account_info_struct {
 } account_info;
 account_info nondet_account_info() {
     account_info info;
-    info.get0 = nondet_pubkey();
-    info.get1 = nondet_u64();
-    info.get2[nondet_u32()] = nondet_u8();
-    info.get3 = nondet_pubkey();
-    info.get4 = nondet_u64();
-    info.get5 = nondet_bool();
-    info.get6 = nondet_bool();
-    info.get7 = nondet_bool();
     return info;
 }
 

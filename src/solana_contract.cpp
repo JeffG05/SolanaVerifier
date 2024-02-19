@@ -1,11 +1,12 @@
 #include <toml++/toml.hpp>
 #include "solana_contract.h"
 
-solana_contract::solana_contract(const std::filesystem::path &path) {
+solana_contract::solana_contract(const std::filesystem::path &path, const config globals) {
     _contract_dir = path;
+    _globals = globals;
 }
 
-solana_contract::solana_contract(const std::string &path) : solana_contract(std::filesystem::path(path)) {}
+solana_contract::solana_contract(const std::string &path, const config globals) : solana_contract(std::filesystem::path(path), globals) {}
 
 
 std::string solana_contract::get_path() const {
@@ -38,7 +39,7 @@ mir_contract solana_contract::convert_to_mir(const std::filesystem::path &target
 
     // Return mir contract
     const std::string mir_path = (target / "result.mir").string();
-    return {get_name(), mir_path, structs};
+    return {get_name(), mir_path, structs, _globals};
 }
 
 hir_contract solana_contract::convert_to_hir(const std::filesystem::path& target) const {

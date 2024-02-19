@@ -12,6 +12,7 @@ enum class statement_type { unknown, root, function, block, assignment, variable
 class mir_statement {
 public:
     mir_statement(statement_type type, nlohmann::json data);
+    static mir_statement extract_node(const mir_statement& statement);
     static mir_statement new_variable(const std::string& variable, const std::string& variable_type);
 
     [[nodiscard]] statement_type get_type() const;
@@ -22,11 +23,21 @@ public:
     [[nodiscard]] mir_statements get_children(std::initializer_list<statement_type> types);
 
     void add_child(const mir_statement& child);
-
     void print(int indent_level = 0);
 
-    static mir_statement parse_json(const nlohmann::json &json);
+    static std::pair<std::string, std::string> get_argument_pair(const std::string &raw);
+    static std::optional<mir_statement> get_statement(const mir_statements& variables, const std::string& name);
+
     static std::optional<mir_statement> parse_lines(const std::list<std::string> &lines, const mir_statements &structs, const mir_statements& variables = {});
+    static mir_statement create_root(const std::string &contract_name);
+    static bool line_is_statement_start(const std::string &line);
+    static std::string convert_type(const std::string& type);
+
+private:
+    statement_type _type;
+    nlohmann::json _ast_tree;
+
+    static mir_statement parse_json(const nlohmann::json &json);
     static mir_statement parse_function(std::list<std::string> lines, const mir_statements& structs);
     static mir_statement parse_function_header(const std::string& line);
     static std::optional<mir_statement> parse_block(std::list<std::string> lines, const mir_statements &variables);
@@ -35,23 +46,13 @@ public:
     static mir_statement parse_variable(const std::string& line);
     static std::optional<mir_statement> parse_branch(const std::string& line);
 
-    static std::string convert_type(const std::string& type);
     static std::tuple<std::string, bool, std::string, std::string> convert_value(const std::string& value, const mir_statements& variables);
-
-    static mir_statement create_root(const std::string &contract_name);
 
     static bool line_is_function(const std::string &line);
     static bool line_is_block(const std::string& line);
-    static bool line_is_statement_start(const std::string &line);
 
-    static std::pair<std::string, std::string> get_argument_pair(const std::string &raw);
-    static std::optional<mir_statement> get_statement(const mir_statements& variables, const std::string& name);
     static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
     static mir_statements get_subvariables(const mir_statement& variable, const mir_statements& structs);
-
-protected:
-    statement_type _type;
-    nlohmann::json _ast_tree;
 };
 
 [[nodiscard]] nlohmann::json extract_data(nlohmann::json json);
