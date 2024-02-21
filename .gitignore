@@ -3,4 +3,3 @@ cmake-*
 build
 
 tests/**/contract/target/
-tests/**/contract/Cargo.lock

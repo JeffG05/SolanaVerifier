@@ -430,6 +430,8 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
 
     generate_block_assignment(out, assignment_variable, assignment_value, assignment_returns);
 
+    generate_reference_assignments(out, assignment_variable, *references);
+
     // Add branching logic
     if (!assignment_branches.empty()) {
         for (const auto& branch_statement : assignment_branches) {
@@ -528,6 +530,34 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     }
 }
 
+void mir_contract::generate_reference_assignments(std::ostream *out, const std::string &variable, const reference_map &references) {
+    std::set<std::string> referenced_variables;
+    std::set<std::string> queue;
+
+    if (!references.contains(variable)) {
+        return;
+    }
+
+    for (const auto& ref: references.at(variable)) {
+        queue.insert(ref);
+    }
+
+    while (!queue.empty()) {
+        auto ref = *queue.begin();
+        queue.erase(queue.begin());
+
+        if (!referenced_variables.contains(ref) && ref != variable) {
+            referenced_variables.insert(ref);
+            for (const auto& r: references.at(ref)) {
+                queue.insert(r);
+            }
+        }
+    }
+
+    for (const auto& ref: referenced_variables) {
+        *out << "\t" << ref << " = " << variable << std::endl;
+    }
+}
 
 void mir_contract::generate_branch(std::ostream *out, const mir_statement &branch_statement, const std::string &function_name, const std::string &variable, const std::string &value) {
     nlohmann::json branch_data = branch_statement.get_ast_data();
