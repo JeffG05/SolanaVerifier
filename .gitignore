@@ -1,3 +1,6 @@
 cmake-*
 .idea
 build
+
+tests/**/contract/target/
+tests/**/contract/Cargo.lock
