@@ -1,0 +1,15 @@
+[package]
+name = "test_addition_underflow"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+exclude_entrypoint = []
+
+[dependencies]
+solana-program = "1.18.2"
+borsh = "0.9.3"
+
+[lib]
+name = "test_addition_underflow"
+crate-type = ["cdylib", "lib"]

@@ -155,22 +155,28 @@ bool controller::run(const int argc, char *argv[]) {
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
 
     std::cout << solana_c.get_path() << std::endl;
+    // system(("cat " + solana_c.get_path()).data());
     // return true;
 
-    auto t_generate_start = std::chrono::high_resolution_clock::now();
-    smt_formula smt = solana_c.build_smt(temp_dir, std::filesystem::path(_esbmc_path));
-    auto t_generate_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Generate SMT: took " << get_millis(t_generate_start, t_generate_end) << std::endl;
-
-    auto t_z3_start = std::chrono::high_resolution_clock::now();
-    verification_result z3_result = solana_c.verify_z3(temp_dir, std::filesystem::path(_esbmc_path));
-    auto t_z3_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
-    if (z3_result.get_is_sat()) {
+    auto t_boolector_start = std::chrono::high_resolution_clock::now();
+    verification_result boolector_result = solana_c.verify_boolector(temp_dir, std::filesystem::path(_esbmc_path));
+    auto t_boolector_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Verification using Boolector: took " << get_millis(t_boolector_start, t_boolector_end) << std::endl;
+    if (boolector_result.get_is_sat()) {
         std::cout << "\tNo vulnerability found" << std::endl;
     } else {
-        std::cout << "\tContains vulnerability: " << z3_result.get_vulnerability() << std::endl;
+        std::cout << "\tContains vulnerability: " << boolector_result.get_vulnerability() << std::endl;
     }
+
+    // auto t_z3_start = std::chrono::high_resolution_clock::now();
+    // verification_result z3_result = solana_c.verify_z3(temp_dir, std::filesystem::path(_esbmc_path));
+    // auto t_z3_end = std::chrono::high_resolution_clock::now();
+    // std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
+    // if (z3_result.get_is_sat()) {
+    //     std::cout << "\tNo vulnerability found" << std::endl;
+    // } else {
+    //     std::cout << "\tContains vulnerability: " << z3_result.get_vulnerability() << std::endl;
+    // }
 
     return true;
 }

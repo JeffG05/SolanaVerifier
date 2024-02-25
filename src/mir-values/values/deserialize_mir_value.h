@@ -7,7 +7,7 @@
 class deserialize_mir_value : public mir_value {
 public:
     deserialize_mir_value() : mir_value(
-        std::regex (R"(^<(.+) as BorshDeserialize>::try_from_slice\((.+)\)$)"),
+        std::regex (R"(^<(.+) as BorshDeserialize>::(?:try_from_slice|deserialize)\((.+)\)$)"),
         [](const std::smatch &match, const std::list<mir_statement>& variables) {
             auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[2].str(), variables);
             const std::string deserialize_func = "deserialize_" + match[1].str();

@@ -64,6 +64,7 @@ mir_statements hir_contract::extract_structs() const {
             data["variable_type"] = mir_statement::convert_type(match[2].str());
             auto field = mir_statement(statement_type::variable, data);
             structs.back().add_child(field);
+            var_i++;
         }
     }
 

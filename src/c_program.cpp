@@ -13,22 +13,19 @@ std::string c_program::get_path() const {
     return _path.string();
 }
 
-smt_formula c_program::build_smt(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const {
-    const std::filesystem::path smt_out = target / (_contract_name + ".smt2");
-    const std::filesystem::path log_out = target / (_contract_name + "_smt_log.txt");
-
-    std::stringstream cmd;
-    cmd << esbmc_path << " " << get_path() << " --smtlib --smt-formula-only --output " << smt_out << " --file-output " << log_out << " > /dev/null 2>&1";
-    system(cmd.str().data());
-
-    return smt_formula(smt_out);
+verification_result c_program::verify_boolector(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const {
+    return verify(target, esbmc_path, "boolector");
 }
 
 verification_result c_program::verify_z3(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const {
+    return verify(target, esbmc_path, "z3");
+}
+
+verification_result c_program::verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const {
     const std::filesystem::path log_out = target / (_contract_name + "_z3_log.txt");
 
     std::stringstream cmd;
-    cmd << esbmc_path << " " << get_path() << " --z3 --file-output " << log_out << " > /dev/null 2>&1";
+    cmd << esbmc_path << " " << get_path() << " --" << smt_solver << " --file-output " << log_out << " > /dev/null 2>&1";
     system(cmd.str().data());
 
     return verification_result(verifier::z3, log_out);

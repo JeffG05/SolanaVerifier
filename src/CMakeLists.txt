@@ -12,7 +12,17 @@ FetchContent_MakeAvailable(json)
 include(CMakeRC.cmake)
 cmrc_add_resource_library(SolanaVerifierAssets assets/solana.casset)
 
+set(Boost_NO_SYSTEM_PATHS TRUE)
+set(Boost_NO_BOOST_CMAKE TRUE)
+if (Boost_NO_SYSTEM_PATHS)
+    set(BOOST_ROOT "/usr/local")
+    set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
+    set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
+endif (Boost_NO_SYSTEM_PATHS)
 find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
+if (Boost_FOUND)
+    message(STATUS "Found Boost: ${Boost_INCLUDE_DIRS}")
+endif ()
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(SolanaVerifier
@@ -29,8 +39,6 @@ add_executable(SolanaVerifier
         c_program.h
         controller.cpp
         controller.h
-        smt_formula.cpp
-        smt_formula.h
         verification_result.cpp
         verification_result.h
         mir-types/mir_type.cpp

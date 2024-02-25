@@ -7,7 +7,7 @@
 class array_mir_type : public mir_type {
 public:
     array_mir_type() : mir_type(
-        std::regex (R"(^\[(.+)\]$)"),
+        std::regex (R"(^\[(.+?)(?:; \d+)?\]$)"),
         [](const std::smatch &match) {
             return "array<" + mir_type_converter::convert(match[1].str()) + ">";
         }

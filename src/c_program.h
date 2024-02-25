@@ -2,7 +2,6 @@
 #define C_PROGRAM_H
 
 #include <filesystem>
-#include "smt_formula.h"
 #include "verification_result.h"
 
 class c_program {
@@ -12,12 +11,14 @@ public:
 
     [[nodiscard]] std::string get_path() const;
 
-    [[nodiscard]] smt_formula build_smt(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
+    [[nodiscard]] verification_result verify_boolector(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
     [[nodiscard]] verification_result verify_z3(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
 
-protected:
+private:
     std::string _contract_name;
     std::filesystem::path _path;
+
+    [[nodiscard]] verification_result verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const;
 };
 
 #endif //C_PROGRAM_H

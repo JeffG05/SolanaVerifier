@@ -1,0 +1,2 @@
+#!/bin/bash
+./build/src/SolanaVerifier --mir tests/"$1"/results/result.mir --hir tests/"$1"/results/result.hir --target process_instruction --esbmc ~/Downloads/esbmc-7.5/cmake-build-debug/src/esbmc/esbmc
