@@ -6,12 +6,22 @@ fn <impl at src/lib.rs:11:10: 11:24>::serialize(_1: &GreetingAccount, _2: &mut W
     let mut _0: std::result::Result<(), std::io::Error>;
     let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
     let mut _4: std::result::Result<(), std::io::Error>;
-    let _5: &u32;
+    let mut _5: &i32;
     let mut _6: isize;
     let _7: std::result::Result<std::convert::Infallible, std::io::Error>;
     scope 1 {
         debug residual => _7;
         scope 2 {
+            scope 14 (inlined #[track_caller] <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual) {
+                debug residual => _7;
+                let _15: std::io::Error;
+                scope 15 {
+                    debug e => _15;
+                    scope 16 (inlined <std::io::Error as From<std::io::Error>>::from) {
+                        debug t => _15;
+                    }
+                }
+            }
         }
     }
     scope 3 {
@@ -19,36 +29,110 @@ fn <impl at src/lib.rs:11:10: 11:24>::serialize(_1: &GreetingAccount, _2: &mut W
         scope 4 {
         }
     }
+    scope 5 (inlined <i32 as BorshSerialize>::serialize::<W>) {
+        debug self => _5;
+        debug writer => _2;
+        let _8: [u8; 4];
+        let mut _9: i32;
+        let mut _10: &[u8];
+        let mut _11: &[u8; 4];
+        scope 6 {
+            debug bytes => _8;
+        }
+        scope 7 (inlined core::num::<impl i32>::to_le_bytes) {
+            debug self => _9;
+            scope 8 (inlined core::num::<impl i32>::to_le) {
+                debug self => _9;
+            }
+            scope 9 (inlined core::num::<impl i32>::to_ne_bytes) {
+                debug self => _9;
+                scope 10 {
+                }
+            }
+        }
+    }
+    scope 11 (inlined <Result<(), std::io::Error> as Try>::branch) {
+        debug self => _4;
+        let mut _12: isize;
+        let _13: std::io::Error;
+        let mut _14: std::result::Result<std::convert::Infallible, std::io::Error>;
+        scope 12 {
+            debug v => const ();
+        }
+        scope 13 {
+            debug e => _13;
+        }
+    }
 
     bb0: {
-        _5 = &((*_1).0: u32);
-        _4 = <u32 as BorshSerialize>::serialize::<W>(_5, _2) -> [return: bb1, unwind continue];
+        StorageLive(_3);
+        StorageLive(_4);
+        StorageLive(_5);
+        _5 = &((*_1).0: i32);
+        StorageLive(_8);
+        StorageLive(_9);
+        _9 = ((*_1).0: i32);
+        _8 = _9 as [u8; 4] (Transmute);
+        StorageDead(_9);
+        StorageLive(_10);
+        StorageLive(_11);
+        _11 = &_8;
+        _10 = move _11 as &[u8] (PointerCoercion(Unsize));
+        StorageDead(_11);
+        _4 = <W as std::io::Write>::write_all(move _2, move _10) -> [return: bb4, unwind continue];
     }
 
     bb1: {
-        _3 = <Result<(), std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+        StorageDead(_3);
+        _0 = const Result::<(), std::io::Error>::Ok(());
+        goto -> bb3;
     }
 
     bb2: {
-        _6 = discriminant(_3);
-        switchInt(move _6) -> [0: bb3, 1: bb4, otherwise: bb6];
+        _7 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _15 = ((_7 as Err).0: std::io::Error);
+        _0 = Result::<(), std::io::Error>::Err(_15);
+        StorageDead(_3);
+        goto -> bb3;
     }
 
     bb3: {
-        _0 = Result::<(), std::io::Error>::Ok(const ());
-        goto -> bb5;
-    }
-
-    bb4: {
-        _7 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _7) -> [return: bb5, unwind continue];
-    }
-
-    bb5: {
         return;
     }
 
+    bb4: {
+        StorageDead(_10);
+        StorageDead(_8);
+        StorageDead(_5);
+        StorageLive(_12);
+        StorageLive(_13);
+        _12 = discriminant(_4);
+        switchInt(move _12) -> [0: bb7, 1: bb6, otherwise: bb8];
+    }
+
+    bb5: {
+        StorageDead(_13);
+        StorageDead(_12);
+        StorageDead(_4);
+        _6 = discriminant(_3);
+        switchInt(move _6) -> [0: bb1, 1: bb2, otherwise: bb8];
+    }
+
     bb6: {
+        _13 = move ((_4 as Err).0: std::io::Error);
+        StorageLive(_14);
+        _14 = Result::<Infallible, std::io::Error>::Err(_13);
+        _3 = ControlFlow::<Result<Infallible, std::io::Error>>::Break(move _14);
+        StorageDead(_14);
+        goto -> bb5;
+    }
+
+    bb7: {
+        _3 = const ControlFlow::<Result<Infallible, std::io::Error>>::Continue(());
+        goto -> bb5;
+    }
+
+    bb8: {
         unreachable;
     }
 }
@@ -57,14 +141,24 @@ fn <impl at src/lib.rs:11:26: 11:42>::deserialize(_1: &mut &[u8]) -> Result<Gree
     debug buf => _1;
     let mut _0: std::result::Result<GreetingAccount, std::io::Error>;
     let mut _2: GreetingAccount;
-    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u32>;
-    let mut _4: std::result::Result<u32, std::io::Error>;
+    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, i32>;
+    let mut _4: std::result::Result<i32, std::io::Error>;
     let mut _5: isize;
     let _6: std::result::Result<std::convert::Infallible, std::io::Error>;
-    let _7: u32;
+    let _7: i32;
     scope 1 {
         debug residual => _6;
         scope 2 {
+            scope 8 (inlined #[track_caller] <Result<GreetingAccount, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual) {
+                debug residual => _6;
+                let _12: std::io::Error;
+                scope 9 {
+                    debug e => _12;
+                    scope 10 (inlined <std::io::Error as From<std::io::Error>>::from) {
+                        debug t => _12;
+                    }
+                }
+            }
         }
     }
     scope 3 {
@@ -72,37 +166,82 @@ fn <impl at src/lib.rs:11:26: 11:42>::deserialize(_1: &mut &[u8]) -> Result<Gree
         scope 4 {
         }
     }
+    scope 5 (inlined <Result<i32, std::io::Error> as Try>::branch) {
+        debug self => _4;
+        let mut _8: isize;
+        let _9: i32;
+        let _10: std::io::Error;
+        let mut _11: std::result::Result<std::convert::Infallible, std::io::Error>;
+        scope 6 {
+            debug v => _9;
+        }
+        scope 7 {
+            debug e => _10;
+        }
+    }
 
     bb0: {
-        _4 = <u32 as BorshDeserialize>::deserialize(_1) -> [return: bb1, unwind continue];
+        StorageLive(_2);
+        StorageLive(_3);
+        StorageLive(_4);
+        _4 = <i32 as BorshDeserialize>::deserialize(move _1) -> [return: bb1, unwind continue];
     }
 
     bb1: {
-        _3 = <Result<u32, std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+        StorageLive(_8);
+        StorageLive(_9);
+        StorageLive(_10);
+        _8 = discriminant(_4);
+        switchInt(move _8) -> [0: bb7, 1: bb6, otherwise: bb8];
     }
 
     bb2: {
-        _5 = discriminant(_3);
-        switchInt(move _5) -> [0: bb3, 1: bb4, otherwise: bb6];
+        _7 = ((_3 as Continue).0: i32);
+        _2 = GreetingAccount { counter: _7 };
+        _0 = Result::<GreetingAccount, std::io::Error>::Ok(move _2);
+        StorageDead(_2);
+        StorageDead(_3);
+        goto -> bb4;
     }
 
     bb3: {
-        _7 = ((_3 as Continue).0: u32);
-        _2 = GreetingAccount { counter: _7 };
-        _0 = Result::<GreetingAccount, std::io::Error>::Ok(move _2);
-        goto -> bb5;
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _12 = ((_6 as Err).0: std::io::Error);
+        _0 = Result::<GreetingAccount, std::io::Error>::Err(_12);
+        StorageDead(_2);
+        StorageDead(_3);
+        goto -> bb4;
     }
 
     bb4: {
-        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<GreetingAccount, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb5, unwind continue];
-    }
-
-    bb5: {
         return;
     }
 
+    bb5: {
+        StorageDead(_10);
+        StorageDead(_9);
+        StorageDead(_8);
+        StorageDead(_4);
+        _5 = discriminant(_3);
+        switchInt(move _5) -> [0: bb2, 1: bb3, otherwise: bb8];
+    }
+
     bb6: {
+        _10 = move ((_4 as Err).0: std::io::Error);
+        StorageLive(_11);
+        _11 = Result::<Infallible, std::io::Error>::Err(_10);
+        _3 = ControlFlow::<Result<Infallible, std::io::Error>, i32>::Break(move _11);
+        StorageDead(_11);
+        goto -> bb5;
+    }
+
+    bb7: {
+        _9 = move ((_4 as Ok).0: i32);
+        _3 = ControlFlow::<Result<Infallible, std::io::Error>, i32>::Continue(_9);
+        goto -> bb5;
+    }
+
+    bb8: {
         unreachable;
     }
 }
@@ -114,19 +253,25 @@ fn <impl at src/lib.rs:11:44: 11:49>::fmt(_1: &GreetingAccount, _2: &mut Formatt
     let _3: &str;
     let _4: &str;
     let mut _5: &dyn std::fmt::Debug;
-    let _6: &&u32;
-    let _7: &u32;
+    let mut _6: &&i32;
+    let _7: &i32;
 
     bb0: {
         _3 = const "GreetingAccount";
         _4 = const "counter";
-        _7 = &((*_1).0: u32);
+        StorageLive(_5);
+        StorageLive(_6);
+        StorageLive(_7);
+        _7 = &((*_1).0: i32);
         _6 = &_7;
-        _5 = _6 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
-        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _3, _4, move _5) -> [return: bb1, unwind continue];
+        _5 = move _6 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        StorageDead(_6);
+        _0 = Formatter::<'_>::debug_struct_field1_finish(move _2, move _3, move _4, move _5) -> [return: bb1, unwind continue];
     }
 
     bb1: {
+        StorageDead(_5);
+        StorageDead(_7);
         return;
     }
 }
@@ -139,86 +284,163 @@ fn entrypoint(_1: *mut u8) -> u64 {
     let _4: &[u8];
     let mut _5: (&solana_program::pubkey::Pubkey, std::vec::Vec<solana_program::account_info::AccountInfo<'_>>, &[u8]);
     let mut _6: std::result::Result<(), solana_program::program_error::ProgramError>;
-    let _7: &&solana_program::pubkey::Pubkey;
-    let _8: &[solana_program::account_info::AccountInfo<'_>];
-    let _9: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
-    let _10: &&[u8];
-    let mut _11: isize;
-    let mut _13: &solana_program::pubkey::Pubkey;
-    let mut _14: &[u8];
+    let mut _7: &[solana_program::account_info::AccountInfo<'_>];
+    let mut _8: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let mut _9: isize;
     scope 1 {
         debug program_id => _2;
         debug accounts => _3;
         debug instruction_data => _4;
-        let _12: solana_program::program_error::ProgramError;
+        let _10: solana_program::program_error::ProgramError;
         scope 3 {
-            debug error => _12;
+            debug error => _10;
+            scope 16 (inlined <ProgramError as Into<u64>>::into) {
+                debug self => _10;
+            }
+        }
+        scope 4 (inlined <Vec<AccountInfo<'_>> as Deref>::deref) {
+            debug self => _8;
+            let mut _11: *const solana_program::account_info::AccountInfo<'_>;
+            let mut _12: usize;
+            scope 5 {
+                scope 6 (inlined Vec::<AccountInfo<'_>>::as_ptr) {
+                    debug self => _8;
+                    let mut _13: *mut solana_program::account_info::AccountInfo<'_>;
+                    let mut _14: &alloc::raw_vec::RawVec<solana_program::account_info::AccountInfo<'_>>;
+                    scope 7 (inlined alloc::raw_vec::RawVec::<AccountInfo<'_>>::ptr) {
+                        debug self => _14;
+                        let mut _16: std::ptr::NonNull<solana_program::account_info::AccountInfo<'_>>;
+                        scope 8 (inlined Unique::<AccountInfo<'_>>::as_ptr) {
+                            debug ((self: Unique<AccountInfo<'_>>).0: std::ptr::NonNull<solana_program::account_info::AccountInfo<'_>>) => _16;
+                            debug ((self: Unique<AccountInfo<'_>>).1: std::marker::PhantomData<solana_program::account_info::AccountInfo<'_>>) => const PhantomData::<AccountInfo<'_>>;
+                            scope 9 (inlined NonNull::<AccountInfo<'_>>::as_ptr) {
+                                debug self => _16;
+                                let mut _15: *const solana_program::account_info::AccountInfo<'_>;
+                            }
+                        }
+                    }
+                }
+                scope 10 (inlined std::slice::from_raw_parts::<'_, AccountInfo<'_>>) {
+                    debug data => _11;
+                    debug len => _12;
+                    let _17: *const [solana_program::account_info::AccountInfo<'_>];
+                    scope 11 {
+                        scope 12 (inlined slice_from_raw_parts::<AccountInfo<'_>>) {
+                            debug data => _11;
+                            debug len => _12;
+                            let mut _18: *const ();
+                            scope 13 (inlined std::ptr::const_ptr::<impl *const AccountInfo<'_>>::cast::<()>) {
+                                debug self => _11;
+                            }
+                            scope 14 (inlined std::ptr::from_raw_parts::<[AccountInfo<'_>]>) {
+                                debug data_address => _18;
+                                debug metadata => _12;
+                                let mut _19: std::ptr::metadata::PtrRepr<[solana_program::account_info::AccountInfo<'_>]>;
+                                let mut _20: std::ptr::metadata::PtrComponents<[solana_program::account_info::AccountInfo<'_>]>;
+                                scope 15 {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     scope 2 {
     }
 
     bb0: {
-        _5 = solana_program::entrypoint::deserialize::<'_>(_1) -> [return: bb1, unwind continue];
+        StorageLive(_5);
+        _5 = solana_program::entrypoint::deserialize::<'_>(move _1) -> [return: bb1, unwind continue];
     }
 
     bb1: {
         _2 = (_5.0: &solana_program::pubkey::Pubkey);
+        StorageLive(_3);
         _3 = move (_5.1: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>);
         _4 = (_5.2: &[u8]);
-        _7 = &_2;
-        _13 = deref_copy (*_7);
-        _9 = &_3;
-        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb9];
+        StorageDead(_5);
+        StorageLive(_6);
+        StorageLive(_7);
+        StorageLive(_8);
+        _8 = &_3;
+        StorageLive(_11);
+        StorageLive(_13);
+        StorageLive(_14);
+        _14 = &(_3.0: alloc::raw_vec::RawVec<solana_program::account_info::AccountInfo<'_>>);
+        StorageLive(_16);
+        _16 = (((_3.0: alloc::raw_vec::RawVec<solana_program::account_info::AccountInfo<'_>>).0: std::ptr::Unique<solana_program::account_info::AccountInfo<'_>>).0: std::ptr::NonNull<solana_program::account_info::AccountInfo<'_>>);
+        StorageLive(_15);
+        _15 = (_16.0: *const solana_program::account_info::AccountInfo<'_>);
+        _13 = move _15 as *mut solana_program::account_info::AccountInfo<'_> (PtrToPtr);
+        StorageDead(_15);
+        StorageDead(_16);
+        _11 = move _13 as *const solana_program::account_info::AccountInfo<'_> (PointerCoercion(MutToConstPointer));
+        StorageDead(_14);
+        StorageDead(_13);
+        StorageLive(_12);
+        _12 = (_3.1: usize);
+        StorageLive(_18);
+        _18 = _11 as *const () (PtrToPtr);
+        StorageLive(_19);
+        StorageLive(_20);
+        _20 = std::ptr::metadata::PtrComponents::<[AccountInfo<'_>]> { data_address: _18, metadata: _12 };
+        _19 = std::ptr::metadata::PtrRepr::<[AccountInfo<'_>]> { const_ptr: move _20 };
+        StorageDead(_20);
+        _17 = (_19.0: *const [solana_program::account_info::AccountInfo<'_>]);
+        StorageDead(_19);
+        StorageDead(_18);
+        StorageDead(_12);
+        StorageDead(_11);
+        _7 = &(*_17);
+        StorageDead(_8);
+        _6 = process_instruction(move _2, move _7, move _4) -> [return: bb2, unwind: bb8];
     }
 
     bb2: {
-        _10 = &_4;
-        _14 = deref_copy (*_10);
-        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb9];
+        StorageDead(_7);
+        _9 = discriminant(_6);
+        switchInt(move _9) -> [0: bb4, 1: bb3, otherwise: bb11];
     }
 
     bb3: {
-        _11 = discriminant(_6);
-        switchInt(move _11) -> [0: bb5, 1: bb4, otherwise: bb11];
+        _10 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <u64 as From<ProgramError>>::from(move _10) -> [return: bb10, unwind: bb7];
     }
 
     bb4: {
-        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
-        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb8];
+        _0 = const _;
+        goto -> bb5;
     }
 
     bb5: {
-        _0 = const _;
-        goto -> bb6;
+        drop(_3) -> [return: bb6, unwind continue];
     }
 
     bb6: {
-        drop(_3) -> [return: bb7, unwind continue];
-    }
-
-    bb7: {
+        StorageDead(_3);
+        StorageDead(_6);
         return;
     }
 
+    bb7 (cleanup): {
+        drop(_3) -> [return: bb9, unwind terminate(cleanup)];
+    }
+
     bb8 (cleanup): {
-        drop(_3) -> [return: bb10, unwind terminate(cleanup)];
+        drop(_3) -> [return: bb9, unwind terminate(cleanup)];
     }
 
     bb9 (cleanup): {
-        drop(_3) -> [return: bb10, unwind terminate(cleanup)];
+        resume;
     }
 
-    bb10 (cleanup): {
-        resume;
+    bb10: {
+        goto -> bb5;
     }
 
     bb11: {
         unreachable;
-    }
-
-    bb12: {
-        goto -> bb6;
     }
 }
 
@@ -231,50 +453,58 @@ fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result
     let mut _5: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
     let mut _6: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
     let mut _7: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
-    let mut _8: isize;
-    let mut _11: bool;
-    let mut _12: &&solana_program::pubkey::Pubkey;
+    let mut _8: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _9: isize;
+    let mut _12: bool;
     let mut _13: &&solana_program::pubkey::Pubkey;
-    let mut _14: solana_program::program_error::ProgramError;
-    let mut _16: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, GreetingAccount>;
-    let mut _17: std::result::Result<GreetingAccount, std::io::Error>;
-    let mut _18: &[u8];
-    let _19: &&mut [u8];
-    let _20: &std::cell::Ref<'_, &mut [u8]>;
+    let mut _14: &&solana_program::pubkey::Pubkey;
+    let mut _15: solana_program::program_error::ProgramError;
+    let mut _17: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, GreetingAccount>;
+    let mut _18: std::result::Result<GreetingAccount, std::io::Error>;
+    let mut _19: &[u8];
+    let mut _20: &std::cell::Ref<'_, &mut [u8]>;
     let _21: std::cell::Ref<'_, &mut [u8]>;
-    let _22: &std::cell::RefCell<&mut [u8]>;
+    let mut _22: &std::cell::RefCell<&mut [u8]>;
     let mut _23: &std::rc::Rc<std::cell::RefCell<&mut [u8]>>;
     let mut _24: isize;
-    let mut _27: (u32, bool);
-    let mut _28: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
-    let mut _29: std::result::Result<(), std::io::Error>;
-    let mut _30: &GreetingAccount;
-    let mut _31: &mut &mut [u8];
-    let mut _32: &mut [u8];
-    let mut _33: &mut [u8];
-    let mut _34: &mut &mut [u8];
+    let mut _27: bool;
+    let mut _28: i32;
+    let mut _29: i32;
+    let mut _30: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _31: std::result::Result<(), std::io::Error>;
+    let mut _32: &GreetingAccount;
+    let mut _33: &mut &mut [u8];
+    let mut _34: &mut [u8];
     let mut _35: &mut std::cell::RefMut<'_, &mut [u8]>;
     let mut _36: std::cell::RefMut<'_, &mut [u8]>;
-    let _37: &std::cell::RefCell<&mut [u8]>;
+    let mut _37: &std::cell::RefCell<&mut [u8]>;
     let mut _38: &std::rc::Rc<std::cell::RefCell<&mut [u8]>>;
     let mut _39: isize;
     let mut _41: &mut [u8];
     let mut _42: &mut [u8];
     scope 1 {
         debug accounts_iter => _4;
-        let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
-        let _10: &solana_program::account_info::AccountInfo<'_>;
+        let _10: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _11: &solana_program::account_info::AccountInfo<'_>;
         scope 2 {
-            debug account => _10;
-            let mut _15: GreetingAccount;
+            debug account => _11;
+            let mut _16: GreetingAccount;
             let _25: std::result::Result<std::convert::Infallible, std::io::Error>;
             let _26: GreetingAccount;
             scope 7 {
-                debug greeting => _15;
+                debug greeting => _16;
                 let _40: std::result::Result<std::convert::Infallible, std::io::Error>;
                 scope 12 {
                     debug residual => _40;
                     scope 13 {
+                        scope 88 (inlined #[track_caller] <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual) {
+                            debug residual => _40;
+                            let _93: std::io::Error;
+                            let mut _94: solana_program::program_error::ProgramError;
+                            scope 89 {
+                                debug e => _93;
+                            }
+                        }
                     }
                 }
                 scope 14 {
@@ -282,10 +512,87 @@ fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result
                     scope 15 {
                     }
                 }
+                scope 68 (inlined <Rc<RefCell<&mut [u8]>> as Deref>::deref) {
+                    debug self => _38;
+                    scope 69 (inlined Rc::<RefCell<&mut [u8]>>::inner) {
+                        debug self => _38;
+                        let mut _82: &std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>;
+                        scope 70 {
+                            scope 71 (inlined NonNull::<rc::RcBox<RefCell<&mut [u8]>>>::as_ref::<'_>) {
+                                debug self => _82;
+                                scope 72 {
+                                    scope 73 (inlined NonNull::<rc::RcBox<RefCell<&mut [u8]>>>::as_ptr) {
+                                        debug self => _66;
+                                    }
+                                    scope 74 (inlined std::ptr::mut_ptr::<impl *mut rc::RcBox<RefCell<&mut [u8]>>>::cast_const) {
+                                        debug self => _65;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                scope 75 (inlined #[track_caller] RefCell::<&mut [u8]>::borrow_mut) {
+                    debug self => _37;
+                    let mut _83: std::result::Result<std::cell::RefMut<'_, &mut [u8]>, std::cell::BorrowMutError>;
+                    let mut _84: isize;
+                    let mut _85: !;
+                    scope 76 {
+                        debug b => _36;
+                    }
+                    scope 77 {
+                        debug err => const BorrowMutError {{  }};
+                    }
+                }
+                scope 78 (inlined <RefMut<'_, &mut [u8]> as DerefMut>::deref_mut) {
+                    debug self => _35;
+                    let mut _86: &mut std::ptr::NonNull<&mut [u8]>;
+                    scope 79 {
+                        scope 80 (inlined NonNull::<&mut [u8]>::as_mut::<'_>) {
+                            debug self => _86;
+                            let mut _87: *mut &mut [u8];
+                            let mut _88: std::ptr::NonNull<&mut [u8]>;
+                            scope 81 {
+                                scope 82 (inlined NonNull::<&mut [u8]>::as_ptr) {
+                                    debug self => _88;
+                                    let mut _89: *const &mut [u8];
+                                }
+                            }
+                        }
+                    }
+                }
+                scope 83 (inlined #[track_caller] core::slice::index::<impl IndexMut<RangeFull> for [u8]>::index_mut) {
+                    debug self => _42;
+                    debug index => const RangeFull;
+                    scope 84 (inlined #[track_caller] <RangeFull as SliceIndex<[u8]>>::index_mut) {
+                        debug self => const RangeFull;
+                        debug slice => _42;
+                    }
+                }
+                scope 85 (inlined <Result<(), std::io::Error> as Try>::branch) {
+                    debug self => _31;
+                    let mut _90: isize;
+                    let _91: std::io::Error;
+                    let mut _92: std::result::Result<std::convert::Infallible, std::io::Error>;
+                    scope 86 {
+                        debug v => const ();
+                    }
+                    scope 87 {
+                        debug e => _91;
+                    }
+                }
             }
             scope 8 {
                 debug residual => _25;
                 scope 9 {
+                    scope 66 (inlined #[track_caller] <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual) {
+                        debug residual => _25;
+                        let _80: std::io::Error;
+                        let mut _81: solana_program::program_error::ProgramError;
+                        scope 67 {
+                            debug e => _80;
+                        }
+                    }
                 }
             }
             scope 10 {
@@ -293,179 +600,616 @@ fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result
                 scope 11 {
                 }
             }
+            scope 38 (inlined std::cmp::impls::<impl PartialEq for &Pubkey>::ne) {
+                debug self => _13;
+                debug other => _14;
+                let mut _57: &solana_program::pubkey::Pubkey;
+                let mut _58: &solana_program::pubkey::Pubkey;
+                scope 39 (inlined <Pubkey as PartialEq>::ne) {
+                    debug self => _57;
+                    debug other => _58;
+                    let mut _59: bool;
+                    scope 40 (inlined <Pubkey as PartialEq>::eq) {
+                        debug self => _57;
+                        debug other => _58;
+                        let mut _60: &[u8; 32];
+                        let mut _61: &[u8; 32];
+                        scope 41 (inlined array::equality::<impl PartialEq for [u8; 32]>::eq) {
+                            debug self => _60;
+                            debug other => _61;
+                            scope 42 (inlined <u8 as array::equality::SpecArrayEq<u8, 32>>::spec_eq) {
+                                debug a => _60;
+                                debug b => _61;
+                                scope 43 {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            scope 47 (inlined <Rc<RefCell<&mut [u8]>> as Deref>::deref) {
+                debug self => _23;
+                scope 48 (inlined Rc::<RefCell<&mut [u8]>>::inner) {
+                    debug self => _23;
+                    let mut _63: &std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>;
+                    scope 49 {
+                        scope 50 (inlined NonNull::<rc::RcBox<RefCell<&mut [u8]>>>::as_ref::<'_>) {
+                            debug self => _63;
+                            let _64: *const std::rc::RcBox<std::cell::RefCell<&mut [u8]>>;
+                            let mut _65: *mut std::rc::RcBox<std::cell::RefCell<&mut [u8]>>;
+                            let mut _66: std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>;
+                            scope 51 {
+                                scope 52 (inlined NonNull::<rc::RcBox<RefCell<&mut [u8]>>>::as_ptr) {
+                                    debug self => _66;
+                                    let mut _67: *const std::rc::RcBox<std::cell::RefCell<&mut [u8]>>;
+                                }
+                                scope 53 (inlined std::ptr::mut_ptr::<impl *mut rc::RcBox<RefCell<&mut [u8]>>>::cast_const) {
+                                    debug self => _65;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            scope 54 (inlined #[track_caller] RefCell::<&mut [u8]>::borrow) {
+                debug self => _22;
+                let mut _68: std::result::Result<std::cell::Ref<'_, &mut [u8]>, std::cell::BorrowError>;
+                let mut _69: isize;
+                let mut _70: !;
+                scope 55 {
+                    debug b => _21;
+                }
+                scope 56 {
+                    debug err => const BorrowError {{  }};
+                }
+            }
+            scope 57 (inlined <Ref<'_, &mut [u8]> as Deref>::deref) {
+                debug self => _20;
+                let mut _71: &std::ptr::NonNull<&mut [u8]>;
+                scope 58 {
+                    scope 59 (inlined NonNull::<&mut [u8]>::as_ref::<'_>) {
+                        debug self => _71;
+                        let _72: *const &mut [u8];
+                        let mut _73: *mut &mut [u8];
+                        let mut _74: std::ptr::NonNull<&mut [u8]>;
+                        scope 60 {
+                            scope 61 (inlined NonNull::<&mut [u8]>::as_ptr) {
+                                debug self => _74;
+                                let mut _75: *const &mut [u8];
+                            }
+                            scope 62 (inlined std::ptr::mut_ptr::<impl *mut &mut [u8]>::cast_const) {
+                                debug self => _73;
+                            }
+                        }
+                    }
+                }
+            }
+            scope 63 (inlined <Result<GreetingAccount, std::io::Error> as Try>::branch) {
+                debug self => _18;
+                let mut _76: isize;
+                let _77: GreetingAccount;
+                let _78: std::io::Error;
+                let mut _79: std::result::Result<std::convert::Infallible, std::io::Error>;
+                scope 64 {
+                    debug v => _77;
+                }
+                scope 65 {
+                    debug e => _78;
+                }
+            }
         }
         scope 3 {
-            debug residual => _9;
+            debug residual => _10;
             scope 4 {
+                scope 44 (inlined #[track_caller] <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual) {
+                    debug residual => _10;
+                    let _62: solana_program::program_error::ProgramError;
+                    scope 45 {
+                        debug e => _62;
+                        scope 46 (inlined <ProgramError as From<ProgramError>>::from) {
+                            debug t => _62;
+                        }
+                    }
+                }
             }
         }
         scope 5 {
-            debug val => _10;
+            debug val => _11;
             scope 6 {
+            }
+        }
+        scope 35 (inlined <Result<&AccountInfo<'_>, ProgramError> as Try>::branch) {
+            debug self => _7;
+            let mut _53: isize;
+            let _54: &solana_program::account_info::AccountInfo<'_>;
+            let _55: solana_program::program_error::ProgramError;
+            let mut _56: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            scope 36 {
+                debug v => _54;
+            }
+            scope 37 {
+                debug e => _55;
+            }
+        }
+    }
+    scope 16 (inlined core::slice::<impl [AccountInfo<'_>]>::iter) {
+        debug self => _2;
+        scope 17 (inlined std::slice::Iter::<'_, AccountInfo<'_>>::new) {
+            debug slice => _2;
+            let _43: *const solana_program::account_info::AccountInfo<'_>;
+            let mut _45: usize;
+            let mut _46: usize;
+            let mut _47: std::ptr::NonNull<solana_program::account_info::AccountInfo<'_>>;
+            let mut _48: *mut solana_program::account_info::AccountInfo<'_>;
+            scope 18 {
+                debug ptr => _43;
+                scope 19 {
+                    let _44: *const solana_program::account_info::AccountInfo<'_>;
+                    scope 20 {
+                        debug end_or_len => _44;
+                        scope 26 (inlined NonNull::<AccountInfo<'_>>::new_unchecked) {
+                            debug ptr => _48;
+                            let mut _50: *const solana_program::account_info::AccountInfo<'_>;
+                            let mut _51: *mut solana_program::account_info::AccountInfo<'_>;
+                            scope 27 {
+                                scope 28 (inlined NonNull::<T>::new_unchecked::runtime::<AccountInfo<'_>>) {
+                                    debug ptr => _51;
+                                    scope 29 (inlined std::ptr::mut_ptr::<impl *mut AccountInfo<'_>>::is_null) {
+                                        debug self => _51;
+                                        let mut _52: *mut u8;
+                                        scope 30 {
+                                            scope 31 (inlined std::ptr::mut_ptr::<impl *mut T>::is_null::runtime_impl) {
+                                                debug ptr => _52;
+                                                scope 32 (inlined std::ptr::mut_ptr::<impl *mut u8>::addr) {
+                                                    debug self => _52;
+                                                    scope 33 {
+                                                        scope 34 (inlined std::ptr::mut_ptr::<impl *mut u8>::cast::<()>) {
+                                                            debug self => _52;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    scope 22 (inlined invalid::<AccountInfo<'_>>) {
+                        debug addr => _45;
+                        scope 23 {
+                        }
+                    }
+                    scope 24 (inlined std::ptr::const_ptr::<impl *const AccountInfo<'_>>::add) {
+                        debug self => _43;
+                        debug count => _46;
+                        scope 25 {
+                        }
+                    }
+                }
+            }
+            scope 21 (inlined core::slice::<impl [AccountInfo<'_>]>::as_ptr) {
+                debug self => _2;
+                let mut _49: *const [solana_program::account_info::AccountInfo<'_>];
             }
         }
     }
 
     bb0: {
-        _5 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+        StorageLive(_4);
+        StorageLive(_5);
+        StorageLive(_43);
+        StorageLive(_49);
+        _49 = &raw const (*_2);
+        _43 = move _49 as *const solana_program::account_info::AccountInfo<'_> (PtrToPtr);
+        StorageDead(_49);
+        StorageLive(_46);
+        _46 = Len((*_2));
+        _44 = Offset(_43, _46);
+        StorageDead(_46);
+        StorageLive(_47);
+        StorageLive(_48);
+        _48 = _43 as *mut solana_program::account_info::AccountInfo<'_> (PtrToPtr);
+        StorageLive(_50);
+        StorageLive(_51);
+        StorageLive(_52);
+        _50 = _48 as *const solana_program::account_info::AccountInfo<'_> (PointerCoercion(MutToConstPointer));
+        _47 = NonNull::<AccountInfo<'_>> { pointer: _50 };
+        StorageDead(_52);
+        StorageDead(_51);
+        StorageDead(_50);
+        StorageDead(_48);
+        _5 = std::slice::Iter::<'_, AccountInfo<'_>> { ptr: move _47, end_or_len: _44, _marker: const PhantomData::<&AccountInfo<'_>> };
+        StorageDead(_47);
+        StorageDead(_43);
+        _4 = &mut _5;
+        StorageLive(_6);
+        StorageLive(_7);
+        StorageLive(_8);
+        _8 = &mut _5;
+        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(move _8) -> [return: bb1, unwind continue];
     }
 
     bb1: {
-        _4 = &mut _5;
-        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb2, unwind continue];
+        StorageDead(_8);
+        StorageLive(_53);
+        StorageLive(_54);
+        StorageLive(_55);
+        _53 = discriminant(_7);
+        switchInt(move _53) -> [0: bb27, 1: bb26, otherwise: bb43];
     }
 
     bb2: {
-        _6 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _7) -> [return: bb3, unwind continue];
+        _11 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        StorageDead(_6);
+        StorageLive(_12);
+        StorageLive(_13);
+        _13 = &((*_11).3: &solana_program::pubkey::Pubkey);
+        StorageLive(_14);
+        _14 = &_1;
+        StorageLive(_57);
+        StorageLive(_58);
+        _57 = ((*_11).3: &solana_program::pubkey::Pubkey);
+        _58 = _1;
+        StorageLive(_59);
+        StorageLive(_61);
+        StorageLive(_60);
+        _60 = &((*_57).0: [u8; 32]);
+        _61 = &((*_58).0: [u8; 32]);
+        _59 = raw_eq::<[u8; 32]>(move _60, move _61) -> [return: bb28, unwind unreachable];
     }
 
     bb3: {
-        _8 = discriminant(_6);
-        switchInt(move _8) -> [0: bb4, 1: bb5, otherwise: bb33];
+        _10 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _62 = ((_10 as Err).0: solana_program::program_error::ProgramError);
+        _0 = Result::<(), ProgramError>::Err(_62);
+        StorageDead(_6);
+        goto -> bb20;
     }
 
     bb4: {
-        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _12 = &((*_10).3: &solana_program::pubkey::Pubkey);
-        _13 = &_1;
-        _11 = <&Pubkey as PartialEq>::ne(move _12, move _13) -> [return: bb6, unwind continue];
+        StorageDead(_14);
+        StorageDead(_13);
+        StorageLive(_15);
+        _15 = solana_program::program_error::ProgramError::IncorrectProgramId;
+        _0 = Result::<(), ProgramError>::Err(move _15);
+        StorageDead(_15);
+        StorageDead(_12);
+        goto -> bb20;
     }
 
     bb5: {
-        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb29, unwind continue];
+        StorageDead(_14);
+        StorageDead(_13);
+        StorageDead(_12);
+        StorageLive(_16);
+        StorageLive(_17);
+        StorageLive(_18);
+        StorageLive(_19);
+        StorageLive(_20);
+        StorageLive(_21);
+        StorageLive(_22);
+        StorageLive(_23);
+        _23 = &((*_11).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        StorageLive(_63);
+        _63 = &(((*_11).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>).0: std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>);
+        _66 = (((*_11).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>).0: std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>);
+        _67 = (_66.0: *const std::rc::RcBox<std::cell::RefCell<&mut [u8]>>);
+        _65 = _67 as *mut std::rc::RcBox<std::cell::RefCell<&mut [u8]>> (PtrToPtr);
+        _64 = _65 as *const std::rc::RcBox<std::cell::RefCell<&mut [u8]>> (PointerCoercion(MutToConstPointer));
+        StorageDead(_63);
+        _22 = &((*_64).2: std::cell::RefCell<&mut [u8]>);
+        StorageDead(_23);
+        StorageLive(_69);
+        StorageLive(_68);
+        _68 = RefCell::<&mut [u8]>::try_borrow(move _22) -> [return: bb29, unwind continue];
     }
 
     bb6: {
-        switchInt(move _11) -> [0: bb8, otherwise: bb7];
+        StorageDead(_19);
+        StorageLive(_76);
+        StorageLive(_77);
+        StorageLive(_78);
+        _76 = discriminant(_18);
+        switchInt(move _76) -> [0: bb34, 1: bb33, otherwise: bb43];
     }
 
     bb7: {
-        _14 = solana_program::program_error::ProgramError::IncorrectProgramId;
-        _0 = Result::<(), ProgramError>::Err(move _14);
-        goto -> bb29;
+        StorageLive(_26);
+        _26 = move ((_17 as Continue).0: GreetingAccount);
+        _16 = move _26;
+        StorageDead(_26);
+        drop(_21) -> [return: bb9, unwind continue];
     }
 
     bb8: {
-        _23 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
-        _22 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _23) -> [return: bb9, unwind continue];
+        _25 = move ((_17 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        StorageLive(_80);
+        _80 = ((_25 as Err).0: std::io::Error);
+        StorageLive(_81);
+        _81 = <ProgramError as From<std::io::Error>>::from(move _80) -> [return: bb35, unwind: bb23];
     }
 
     bb9: {
-        _21 = RefCell::<&mut [u8]>::borrow(_22) -> [return: bb10, unwind continue];
+        StorageDead(_21);
+        StorageDead(_17);
+        StorageLive(_27);
+        StorageLive(_28);
+        _28 = (_16.0: i32);
+        _27 = Lt(move _28, const 2147483646_i32);
+        switchInt(move _27) -> [0: bb11, otherwise: bb10];
     }
 
     bb10: {
-        _20 = &_21;
-        _19 = <Ref<'_, &mut [u8]> as Deref>::deref(_20) -> [return: bb11, unwind: bb31];
+        StorageDead(_28);
+        StorageLive(_29);
+        _29 = (_16.0: i32);
+        (_16.0: i32) = Neg(move _29);
+        StorageDead(_29);
+        goto -> bb12;
     }
 
     bb11: {
-        _41 = deref_copy (*_19);
-        _18 = &(*_41);
-        _17 = <GreetingAccount as BorshDeserialize>::try_from_slice(move _18) -> [return: bb12, unwind: bb31];
+        StorageDead(_28);
+        goto -> bb12;
     }
 
     bb12: {
-        _16 = <Result<GreetingAccount, std::io::Error> as Try>::branch(move _17) -> [return: bb13, unwind: bb31];
+        StorageDead(_27);
+        StorageLive(_30);
+        StorageLive(_31);
+        StorageLive(_32);
+        _32 = &_16;
+        StorageLive(_33);
+        StorageLive(_34);
+        StorageLive(_35);
+        StorageLive(_36);
+        StorageLive(_37);
+        StorageLive(_38);
+        _38 = &((*_11).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        StorageLive(_82);
+        _82 = &(((*_11).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>).0: std::ptr::NonNull<std::rc::RcBox<std::cell::RefCell<&mut [u8]>>>);
+        StorageDead(_82);
+        _37 = &((*_64).2: std::cell::RefCell<&mut [u8]>);
+        StorageDead(_38);
+        StorageLive(_84);
+        StorageLive(_83);
+        _83 = RefCell::<&mut [u8]>::try_borrow_mut(move _37) -> [return: bb36, unwind continue];
     }
 
     bb13: {
-        _24 = discriminant(_16);
-        switchInt(move _24) -> [0: bb14, 1: bb15, otherwise: bb33];
+        StorageDead(_33);
+        StorageDead(_32);
+        StorageLive(_90);
+        StorageLive(_91);
+        _90 = discriminant(_31);
+        switchInt(move _90) -> [0: bb41, 1: bb40, otherwise: bb43];
     }
 
     bb14: {
-        _26 = move ((_16 as Continue).0: GreetingAccount);
-        _15 = move _26;
-        drop(_21) -> [return: bb17, unwind continue];
+        drop(_36) -> [return: bb16, unwind continue];
     }
 
     bb15: {
-        _25 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _25) -> [return: bb16, unwind: bb31];
+        _40 = move ((_30 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        StorageLive(_93);
+        _93 = ((_40 as Err).0: std::io::Error);
+        StorageLive(_94);
+        _94 = <ProgramError as From<std::io::Error>>::from(move _93) -> [return: bb42, unwind: bb22];
     }
 
     bb16: {
-        drop(_21) -> [return: bb29, unwind continue];
+        StorageDead(_36);
+        StorageDead(_34);
+        StorageDead(_30);
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        StorageDead(_16);
+        StorageDead(_5);
+        StorageDead(_4);
+        goto -> bb21;
     }
 
     bb17: {
-        _27 = CheckedAdd((_15.0: u32), const 1_u32);
-        assert(!move (_27.1: bool), "attempt to compute `{} + {}`, which would overflow", (_15.0: u32), const 1_u32) -> [success: bb18, unwind continue];
+        StorageDead(_36);
+        StorageDead(_34);
+        StorageDead(_30);
+        goto -> bb19;
     }
 
     bb18: {
-        (_15.0: u32) = move (_27.0: u32);
-        _30 = &_15;
-        _38 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
-        _37 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _38) -> [return: bb19, unwind continue];
+        StorageDead(_21);
+        StorageDead(_17);
+        goto -> bb19;
     }
 
     bb19: {
-        _36 = RefCell::<&mut [u8]>::borrow_mut(_37) -> [return: bb20, unwind continue];
+        StorageDead(_16);
+        goto -> bb20;
     }
 
     bb20: {
-        _35 = &mut _36;
-        _34 = <RefMut<'_, &mut [u8]> as DerefMut>::deref_mut(move _35) -> [return: bb21, unwind: bb30];
+        StorageDead(_5);
+        StorageDead(_4);
+        goto -> bb21;
     }
 
     bb21: {
-        _42 = deref_copy (*_34);
-        _33 = <[u8] as IndexMut<RangeFull>>::index_mut(_42, const RangeFull) -> [return: bb22, unwind: bb30];
-    }
-
-    bb22: {
-        _32 = _33;
-        _31 = &mut _32;
-        _29 = <GreetingAccount as BorshSerialize>::serialize::<&mut [u8]>(move _30, _31) -> [return: bb23, unwind: bb30];
-    }
-
-    bb23: {
-        _28 = <Result<(), std::io::Error> as Try>::branch(move _29) -> [return: bb24, unwind: bb30];
-    }
-
-    bb24: {
-        _39 = discriminant(_28);
-        switchInt(move _39) -> [0: bb25, 1: bb26, otherwise: bb33];
-    }
-
-    bb25: {
-        drop(_36) -> [return: bb28, unwind continue];
-    }
-
-    bb26: {
-        _40 = move ((_28 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _40) -> [return: bb27, unwind: bb30];
-    }
-
-    bb27: {
-        drop(_36) -> [return: bb29, unwind continue];
-    }
-
-    bb28: {
-        _0 = Result::<(), ProgramError>::Ok(const ());
-        goto -> bb29;
-    }
-
-    bb29: {
         return;
     }
 
-    bb30 (cleanup): {
-        drop(_36) -> [return: bb32, unwind terminate(cleanup)];
+    bb22 (cleanup): {
+        drop(_36) -> [return: bb24, unwind terminate(cleanup)];
     }
 
-    bb31 (cleanup): {
-        drop(_21) -> [return: bb32, unwind terminate(cleanup)];
+    bb23 (cleanup): {
+        drop(_21) -> [return: bb24, unwind terminate(cleanup)];
     }
 
-    bb32 (cleanup): {
+    bb24 (cleanup): {
         resume;
     }
 
+    bb25: {
+        StorageDead(_55);
+        StorageDead(_54);
+        StorageDead(_53);
+        StorageDead(_7);
+        _9 = discriminant(_6);
+        switchInt(move _9) -> [0: bb2, 1: bb3, otherwise: bb43];
+    }
+
+    bb26: {
+        _55 = move ((_7 as Err).0: solana_program::program_error::ProgramError);
+        StorageLive(_56);
+        _56 = Result::<Infallible, ProgramError>::Err(_55);
+        _6 = ControlFlow::<Result<Infallible, ProgramError>, &AccountInfo<'_>>::Break(move _56);
+        StorageDead(_56);
+        goto -> bb25;
+    }
+
+    bb27: {
+        _54 = move ((_7 as Ok).0: &solana_program::account_info::AccountInfo<'_>);
+        _6 = ControlFlow::<Result<Infallible, ProgramError>, &AccountInfo<'_>>::Continue(_54);
+        goto -> bb25;
+    }
+
+    bb28: {
+        StorageDead(_60);
+        StorageDead(_61);
+        _12 = Not(move _59);
+        StorageDead(_59);
+        StorageDead(_58);
+        StorageDead(_57);
+        switchInt(move _12) -> [0: bb5, otherwise: bb4];
+    }
+
+    bb29: {
+        _69 = discriminant(_68);
+        switchInt(move _69) -> [0: bb31, 1: bb30, otherwise: bb43];
+    }
+
+    bb30: {
+        _70 = cell::panic_already_mutably_borrowed(const BorrowError {{  }}) -> unwind continue;
+    }
+
+    bb31: {
+        _21 = move ((_68 as Ok).0: std::cell::Ref<'_, &mut [u8]>);
+        StorageDead(_68);
+        StorageDead(_69);
+        StorageDead(_22);
+        _20 = &_21;
+        StorageLive(_71);
+        _71 = &(_21.0: std::ptr::NonNull<&mut [u8]>);
+        StorageLive(_73);
+        StorageLive(_74);
+        _74 = (_21.0: std::ptr::NonNull<&mut [u8]>);
+        StorageLive(_75);
+        _75 = (_74.0: *const &mut [u8]);
+        _73 = move _75 as *mut &mut [u8] (PtrToPtr);
+        StorageDead(_75);
+        StorageDead(_74);
+        _72 = _73 as *const &mut [u8] (PointerCoercion(MutToConstPointer));
+        StorageDead(_73);
+        StorageDead(_71);
+        _41 = (*_72);
+        _19 = &(*_41);
+        StorageDead(_20);
+        _18 = <GreetingAccount as BorshDeserialize>::try_from_slice(move _19) -> [return: bb6, unwind: bb23];
+    }
+
+    bb32: {
+        StorageDead(_78);
+        StorageDead(_77);
+        StorageDead(_76);
+        StorageDead(_18);
+        _24 = discriminant(_17);
+        switchInt(move _24) -> [0: bb7, 1: bb8, otherwise: bb43];
+    }
+
     bb33: {
+        _78 = move ((_18 as Err).0: std::io::Error);
+        StorageLive(_79);
+        _79 = Result::<Infallible, std::io::Error>::Err(_78);
+        _17 = ControlFlow::<Result<Infallible, std::io::Error>, GreetingAccount>::Break(move _79);
+        StorageDead(_79);
+        goto -> bb32;
+    }
+
+    bb34: {
+        _77 = move ((_18 as Ok).0: GreetingAccount);
+        _17 = ControlFlow::<Result<Infallible, std::io::Error>, GreetingAccount>::Continue(_77);
+        goto -> bb32;
+    }
+
+    bb35: {
+        _0 = Result::<(), ProgramError>::Err(move _81);
+        StorageDead(_81);
+        StorageDead(_80);
+        drop(_21) -> [return: bb18, unwind continue];
+    }
+
+    bb36: {
+        _84 = discriminant(_83);
+        switchInt(move _84) -> [0: bb38, 1: bb37, otherwise: bb43];
+    }
+
+    bb37: {
+        _85 = cell::panic_already_borrowed(const BorrowMutError {{  }}) -> unwind continue;
+    }
+
+    bb38: {
+        _36 = move ((_83 as Ok).0: std::cell::RefMut<'_, &mut [u8]>);
+        StorageDead(_83);
+        StorageDead(_84);
+        _35 = &mut _36;
+        StorageLive(_86);
+        _86 = &mut (_36.0: std::ptr::NonNull<&mut [u8]>);
+        StorageLive(_88);
+        _88 = (_36.0: std::ptr::NonNull<&mut [u8]>);
+        StorageLive(_89);
+        _89 = (_88.0: *const &mut [u8]);
+        _87 = move _89 as *mut &mut [u8] (PtrToPtr);
+        StorageDead(_89);
+        StorageDead(_88);
+        StorageDead(_86);
+        _42 = (*_87);
+        StorageDead(_37);
+        StorageDead(_35);
+        _34 = _42;
+        _33 = &mut _34;
+        _31 = <GreetingAccount as BorshSerialize>::serialize::<&mut [u8]>(move _32, move _33) -> [return: bb13, unwind: bb22];
+    }
+
+    bb39: {
+        StorageDead(_91);
+        StorageDead(_90);
+        StorageDead(_31);
+        _39 = discriminant(_30);
+        switchInt(move _39) -> [0: bb14, 1: bb15, otherwise: bb43];
+    }
+
+    bb40: {
+        _91 = move ((_31 as Err).0: std::io::Error);
+        StorageLive(_92);
+        _92 = Result::<Infallible, std::io::Error>::Err(_91);
+        _30 = ControlFlow::<Result<Infallible, std::io::Error>>::Break(move _92);
+        StorageDead(_92);
+        goto -> bb39;
+    }
+
+    bb41: {
+        _30 = const ControlFlow::<Result<Infallible, std::io::Error>>::Continue(());
+        goto -> bb39;
+    }
+
+    bb42: {
+        _0 = Result::<(), ProgramError>::Err(move _94);
+        StorageDead(_94);
+        StorageDead(_93);
+        drop(_36) -> [return: bb17, unwind continue];
+    }
+
+    bb43: {
         unreachable;
     }
 }

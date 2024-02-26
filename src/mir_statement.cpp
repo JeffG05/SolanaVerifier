@@ -300,8 +300,10 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     std::string branching;
     std::string add_ref_to;
     std::string remove_ref_to;
+    std::string assertion;
+
     const std::regex assignment_parts (R"(^(.+) = (.+?)(?: -> (.+))?;$)");
-    const std::regex assert_parts (R"(^assert\((.+), ".+\) -> (.+);$)");
+    const std::regex assert_parts (R"(^assert\((.+), \"(.+)\".*\) -> (.+);$)");
     const std::regex goto_parts (R"(^goto -> (.+);$)");
     const std::regex drop_parts (R"(^drop\(.+\) -> (.+);$)");
     const std::regex unreachable_parts (R"(^unreachable;$)");
@@ -319,11 +321,12 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     } else if (regex_match(line, match, assert_parts)) {
         data["variable"] = "";
         auto [value, returns, add_ref, remove_ref] = convert_value(match[1].str(), variables);
-        data["value"] = value;
-        data["returns"] = returns;
+        assertion = "__ESBMC_assert(" + value + ", \"Vulnerability Found: " + match[2].str() + "\")";
+        data["value"] = "true";
+        data["returns"] = true;
         add_ref_to = add_ref;
         remove_ref_to = remove_ref;
-        branching = match[2].str();
+        branching = match[3].str();
     } else if (regex_match(line, match, goto_parts)) {
         data["variable"] = "";
         data["value"] = "true";
@@ -379,6 +382,15 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     }
 
     mir_statements all_statements;
+
+    if (!assertion.empty()) {
+        nlohmann::json assertion_data;
+        assertion_data["variable"] = "";
+        assertion_data["value"] = assertion;
+        assertion_data["returns"] = false;
+        auto assertion_statement = mir_statement(statement_type::assignment, assertion_data);
+        all_statements.push_back(assertion_statement);
+    }
 
     auto assignment_statement = mir_statement(statement_type::assignment, data);
     if (!branching.empty()) {

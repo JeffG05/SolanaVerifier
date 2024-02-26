@@ -82,7 +82,6 @@ public:
             }
 
             return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
-            std::throw_with_nested(std::runtime_error("Unsupported " + full_name + ": " + var_type));
         }
     ) {}
 };

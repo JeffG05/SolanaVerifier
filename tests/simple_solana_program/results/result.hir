@@ -17,10 +17,10 @@ use solana_program::pubkey::Pubkey;
 /// much match the `GreetingAccount` type defined by the client.
 struct GreetingAccount {
     /// The number of greetings that have been sent to this account.
-    counter: u32,
+    counter: i32,
 }
 impl borsh::ser::BorshSerialize for GreetingAccount where
-    u32: borsh::ser::BorshSerialize {
+    i32: borsh::ser::BorshSerialize {
     fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
         -> ::core::result::Result<(), borsh::maybestd::io::Error> where
         W: borsh::maybestd::io::Write {
@@ -37,7 +37,7 @@ impl borsh::ser::BorshSerialize for GreetingAccount where
         }
 }
 impl borsh::de::BorshDeserialize for GreetingAccount where
-    u32: borsh::BorshDeserialize {
+    i32: borsh::BorshDeserialize {
     fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
         ->
             ::core::result::Result<Self,
@@ -121,15 +121,16 @@ fn process_instruction<'_, '_, '_,
                                 #[allow(unreachable_code)]
                                 val,
                         };
-                greeting.counter += 1;
-                match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
-                            {
-                        #[lang = "Break"] {  0: residual } =>
-                            #[allow(unreachable_code)]
-                            return #[lang = "from_residual"](residual),
-                        #[lang = "Continue"] {  0: val } =>
-                            #[allow(unreachable_code)]
-                            val,
-                    };
-                Ok(())
-            }
+                if greeting.counter < i32::MAX - 1
+                        { greeting.counter = -greeting.counter; }
+                        match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                        Ok(())
+                    }

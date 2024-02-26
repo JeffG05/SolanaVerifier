@@ -46,7 +46,7 @@ usize nondet_usize() {
 
 // SIGNED INTEGERS
 typedef signed long long int i64;
-i64 MIN_I64 = -9223372036854775807LL;
+i64 MIN_I64 = -9223372036854775808LL;
 i64 MAX_I64 = 9223372036854775807LL;
 i64 nondet_i64() {
     i64 x;
@@ -56,7 +56,7 @@ i64 nondet_i64() {
 }
 
 typedef signed long long int i32;
-i32 MIN_I32 = -2147483647LL;
+i32 MIN_I32 = -2147483648LL;
 i32 MAX_I32 = 2147483647LL;
 i32 nondet_i32() {
     i32 x;
@@ -66,7 +66,7 @@ i32 nondet_i32() {
 }
 
 typedef signed long long int i16;
-i16 MIN_I16 = -32767LL;
+i16 MIN_I16 = -32768LL;
 i16 MAX_I16 = 32767LL;
 i16 nondet_i16() {
     i16 x;
@@ -76,7 +76,7 @@ i16 nondet_i16() {
 }
 
 typedef signed long long int i8;
-i8 MIN_I8 = -127LL;
+i8 MIN_I8 = -128LL;
 i8 MAX_I8 = 127LL;
 i8 nondet_i8() {
     i8 x;
@@ -86,7 +86,7 @@ i8 nondet_i8() {
 }
 
 typedef i64 isize;
-isize MIN_ISIZE = -9223372036854775807LL;
+isize MIN_ISIZE = -9223372036854775808LL;
 isize MAX_ISIZE = 9223372036854775807LL;
 isize nondet_isize() {
     isize x;
@@ -202,6 +202,25 @@ signed_math_result i_division(signed long long int a, signed long long int b, si
     } else if (b == -1) {
         result.errors = a == min;
         __ESBMC_assert(!result.errors, "Vulnerability Found: Division Overflow");
+    } else {
+        result.errors = false;
+    }
+    return result;
+}
+
+unsigned_math_result u_negation(unsigned long long int a, unsigned long long int max) {
+    unsigned_math_result result;
+    result.value = -a;
+    result.errors = false;
+    return result;
+}
+
+signed_math_result i_negation(signed long long int a, signed long long int max, signed long long int min) {
+    signed_math_result result;
+    result.value = -a;
+    if (a == min) {
+        result.errors = true;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Negation Overflow");
     } else {
         result.errors = false;
     }

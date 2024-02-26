@@ -34,7 +34,7 @@ mir_contract solana_contract::convert_to_mir(const std::filesystem::path &target
 
     // Run command to generate mir
     std::stringstream cmd;
-    cmd << "cd " << target << " && cargo rustc -- -o result.mir --emit mir > /dev/null 2>&1";
+    cmd << "cd " << target << " && cargo rustc -- -o result.mir --emit mir -C overflow-checks=false -C debug-assertions=false > /dev/null 2>&1";
     system(cmd.str().data());
 
     // Return mir contract
@@ -50,7 +50,7 @@ hir_contract solana_contract::convert_to_hir(const std::filesystem::path& target
 
     // Run command to generate hir
     std::stringstream cmd;
-    cmd << "cd " << target << " && cargo rustc -- -o result.hir --Z unpretty=hir > /dev/null 2>&1";
+    cmd << "cd " << target << " && cargo rustc -- -o result.hir --Z unpretty=hir -C overflow-checks=false -C debug-assertions=false > /dev/null 2>&1";
     system(cmd.str().data());
 
     // Return mir contract

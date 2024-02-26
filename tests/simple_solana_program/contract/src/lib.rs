@@ -11,7 +11,7 @@ use solana_program::{
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct GreetingAccount {
     /// The number of greetings that have been sent to this account.
-    pub counter: u32,
+    pub counter: i32,
 }
 
 /// Declare the programs entrypoint. The entrypoint is the function
@@ -45,8 +45,8 @@ pub fn process_instruction(
     // Deserialize the greeting information from the account, modify
     // it, and then write it back.
     let mut greeting = GreetingAccount::try_from_slice(&account.data.borrow())?;
-    if (greeting.counter < u32::MAX - 1) {
-        greeting.counter += 1;
+    if (greeting.counter < i32::MAX - 1) {
+        greeting.counter = -greeting.counter;
     }
     greeting.serialize(&mut &mut account.data.borrow_mut()[..])?;
     Ok(())

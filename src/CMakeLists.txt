@@ -113,6 +113,8 @@ add_executable(SolanaVerifier
         mir-values/values/negation_mir_value.h
         mir-values/values/const_number_max_mir_value.h
         mir-values/values/const_number_min_mir_value.h
+        vulnerability.cpp
+        vulnerability.h
 )
 
 target_link_libraries(SolanaVerifier
