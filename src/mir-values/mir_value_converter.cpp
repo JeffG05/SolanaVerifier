@@ -3,16 +3,17 @@
 #include "values/as_continue_mir_value.h"
 #include "values/borrow_mir_value.h"
 #include "values/borrow_mutable_mir_value.h"
-#include "values/checked_add_mir_value.h"
-#include "values/checked_div_mir_value.h"
-#include "values/checked_mul_mir_value.h"
-#include "values/checked_sub_mir_value.h"
+#include "values/addition_mir_value.h"
+#include "values/division_mir_value.h"
+#include "values/multiplication_mir_value.h"
+#include "values/subtraction_mir_value.h"
 #include "values/const_number_mir_value.h"
 #include "values/const_string_mir_value.h"
 #include "values/const_void_mir_value.h"
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
 #include "values/discriminant_mir_value.h"
+#include "values/equal_mir_value.h"
 #include "values/from_residual_mir_value.h"
 #include "values/function_mir_value.h"
 #include "values/greater_than_equal_mir_value.h"
@@ -49,10 +50,10 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     const_number_mir_value(),
     const_string_mir_value(),
     const_void_mir_value(),
-    checked_mul_mir_value(),
-    checked_add_mir_value(),
-    checked_sub_mir_value(),
-    checked_div_mir_value(),
+    multiplication_mir_value(),
+    addition_mir_value(),
+    subtraction_mir_value(),
+    division_mir_value(),
     variable_mir_value(),
     move_mir_value(),
     tuple_indexer_mir_value(),
@@ -79,6 +80,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     greater_than_mir_value(),
     less_than_equal_mir_value(),
     greater_than_equal_mir_value(),
+    equal_mir_value(),
 
     // KEEP LAST
     function_mir_value()

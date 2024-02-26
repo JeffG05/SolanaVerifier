@@ -1,17 +1,18 @@
-#ifndef CHECKED_MUL_MIR_VALUE_H
-#define CHECKED_MUL_MIR_VALUE_H
+#ifndef NUMBER_OPERATOR_MIR_VALUE_H
+#define NUMBER_OPERATOR_MIR_VALUE_H
 
+#include <iostream>
 #include <regex>
 
 #include "mir-types/mir_type_converter.h"
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
 
-class checked_mul_mir_value : public mir_value {
+class number_operator_mir_value : public mir_value {
 public:
-    checked_mul_mir_value() : mir_value(
-        std::regex (R"(^CheckedMul\((.+), (.+)\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+    explicit number_operator_mir_value(const std::string &regex_name, const std::string &full_name, bool is_reducing) : mir_value(
+        std::regex (R"(^(?:Checked)?)" + regex_name + R"(\((.+), (.+)\)$)"),
+        [full_name, is_reducing](const std::smatch &match, const std::list<mir_statement>& variables) {
 
             auto [a_value, a_returns, a_add, a_remove] = mir_value_converter::convert(match[1].str(), variables);
             auto [b_value, b_returns, b_add, b_remove] = mir_value_converter::convert(match[2].str(), variables);
@@ -41,10 +42,14 @@ public:
                 a_value = "MAX_" + var_type;
             }
             if (match[2].str() == "const _") {
-                b_value = "MAX_" + var_type;
+                if (is_reducing) {
+                    b_value = "MIN_" + var_type;
+                } else {
+                    b_value = "MAX_" + var_type;
+                }
             }
 
-            std::string func = "multiplication(" + a_value + ", " + b_value + ", MAX_" + var_type;
+            std::string func = full_name + "(" + a_value + ", " + b_value + ", MAX_" + var_type;
 
             std::string add_refs;
             if (!a_add.empty() && !b_add.empty()) {
@@ -60,15 +65,26 @@ public:
                 remove_refs = a_remove + b_remove;
             }
 
+            std::string wrapper;
+            if (match[0].str().starts_with("Checked")) {
+                wrapper = "checked";
+            } else {
+                wrapper = "unchecked";
+            }
+
             if (var_type.starts_with("U")) {
-                return std::make_tuple("u_" + func + ")", true, add_refs, remove_refs);
+                std::string full_func = wrapper + "<u_" + func + ")>";
+                return std::make_tuple(full_func, true, add_refs, remove_refs);
             }
             if (var_type.starts_with("I")) {
-                return std::make_tuple("i_" + func + ", MIN_" + var_type + ")", true, add_refs, remove_refs);
+                std::string full_func = wrapper + "<i_" + func + ", MIN_" + var_type + ")>";
+                return std::make_tuple(full_func, true, add_refs, remove_refs);
             }
-            std::throw_with_nested(std::runtime_error("Unsupported multiplication: " + var_type));
+
+            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
+            std::throw_with_nested(std::runtime_error("Unsupported " + full_name + ": " + var_type));
         }
     ) {}
 };
 
-#endif //CHECKED_MUL_MIR_VALUE_H
+#endif //NUMBER_OPERATOR_MIR_VALUE_H

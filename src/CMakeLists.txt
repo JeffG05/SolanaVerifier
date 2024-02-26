@@ -61,8 +61,8 @@ add_executable(SolanaVerifier
         mir-values/values/ok_result_mir_value.h
         mir-values/values/const_number_mir_value.h
         mir-values/values/const_void_mir_value.h
-        mir-values/values/checked_mul_mir_value.h
-        mir-values/values/checked_add_mir_value.h
+        mir-values/values/multiplication_mir_value.h
+        mir-values/values/addition_mir_value.h
         mir-values/values/variable_mir_value.h
         mir-values/values/move_mir_value.h
         mir-values/values/tuple_indexer_mir_value.h
@@ -106,8 +106,10 @@ add_executable(SolanaVerifier
         mir-values/values/greater_than_mir_value.h
         mir-values/values/less_than_equal_mir_value.h
         mir-values/values/greater_than_equal_mir_value.h
-        mir-values/values/checked_sub_mir_value.h
-        mir-values/values/checked_div_mir_value.h
+        mir-values/values/subtraction_mir_value.h
+        mir-values/values/division_mir_value.h
+        mir-values/values/number_operator_mir_value.h
+        mir-values/values/equal_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

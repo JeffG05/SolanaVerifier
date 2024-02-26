@@ -445,18 +445,13 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
 }
 
 void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns) {
-    if (
-        value.starts_with("u_addition(") ||
-        value.starts_with("i_addition(") ||
-        value.starts_with("u_subtraction(") ||
-        value.starts_with("i_subtraction(") ||
-        value.starts_with("u_multiplication(") ||
-        value.starts_with("i_multiplication(") ||
-        value.starts_with("u_division(") ||
-        value.starts_with("i_division(")
-    ) {
-        *out << "\tstate." << variable << ".get0 = " << value << ".value;" << std::endl;
-        *out << "\tstate." << variable << ".get1 = " << value << ".errors;" << std::endl;
+    if (value.starts_with("checked<")) {
+        const std::string checked_value = value.substr(8, value.size() - 9);
+        *out << "\tstate." << variable << ".get0 = " << checked_value << ".value;" << std::endl;
+        *out << "\tstate." << variable << ".get1 = " << checked_value << ".errors;" << std::endl;
+    } else if (value.starts_with("unchecked<")) {
+        const std::string checked_value = value.substr(10, value.size() - 11);
+        *out << "\tstate." << variable << " = " << checked_value << ".value;" << std::endl;
     } else if (value.starts_with("serialize_")) {
         *out << "\tstate." << variable << ".is_success = true;" << std::endl;
         *out << "\t" << value << ";" << std::endl;
