@@ -4,6 +4,7 @@
 #include "values/borrow_mir_value.h"
 #include "values/borrow_mutable_mir_value.h"
 #include "values/checked_add_mir_value.h"
+#include "values/checked_div_mir_value.h"
 #include "values/checked_mul_mir_value.h"
 #include "values/checked_sub_mir_value.h"
 #include "values/const_number_mir_value.h"
@@ -51,6 +52,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     checked_mul_mir_value(),
     checked_add_mir_value(),
     checked_sub_mir_value(),
+    checked_div_mir_value(),
     variable_mir_value(),
     move_mir_value(),
     tuple_indexer_mir_value(),

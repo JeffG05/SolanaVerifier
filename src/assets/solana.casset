@@ -181,6 +181,33 @@ signed_math_result i_multiplication(signed long long int a, signed long long int
     return result;
 }
 
+unsigned_math_result u_division(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
+    unsigned_math_result result;
+    result.value = a / b;
+    if (b == 0) {
+        result.errors = true;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Division by Zero");
+    } else {
+        result.errors = false;
+    }
+    return result;
+}
+
+signed_math_result i_division(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
+    signed_math_result result;
+    result.value = a / b;
+    if (b == 0) {
+        result.errors = true;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Division by Zero");
+    } else if (b == -1) {
+        result.errors = a == min;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Division Overflow");
+    } else {
+        result.errors = false;
+    }
+    return result;
+}
+
 // STRING
 typedef char* string;
 unsigned int MAX_STRING_LEN = 1024;

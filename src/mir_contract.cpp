@@ -451,7 +451,9 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         value.starts_with("u_subtraction(") ||
         value.starts_with("i_subtraction(") ||
         value.starts_with("u_multiplication(") ||
-        value.starts_with("i_multiplication(")
+        value.starts_with("i_multiplication(") ||
+        value.starts_with("u_division(") ||
+        value.starts_with("i_division(")
     ) {
         *out << "\tstate." << variable << ".get0 = " << value << ".value;" << std::endl;
         *out << "\tstate." << variable << ".get1 = " << value << ".errors;" << std::endl;

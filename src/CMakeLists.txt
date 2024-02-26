@@ -107,6 +107,7 @@ add_executable(SolanaVerifier
         mir-values/values/less_than_equal_mir_value.h
         mir-values/values/greater_than_equal_mir_value.h
         mir-values/values/checked_sub_mir_value.h
+        mir-values/values/checked_div_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

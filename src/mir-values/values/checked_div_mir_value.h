@@ -1,17 +1,16 @@
-#ifndef CHECKED_SUB_MIR_VALUE_H
-#define CHECKED_SUB_MIR_VALUE_H
+#ifndef CHECKED_DIV_MIR_VALUE_H
+#define CHECKED_DIV_MIR_VALUE_H
 
-#include <iostream>
 #include <regex>
 
 #include "mir-types/mir_type_converter.h"
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
 
-class checked_sub_mir_value : public mir_value {
+class checked_div_mir_value : public mir_value {
 public:
-    checked_sub_mir_value() : mir_value(
-        std::regex (R"(^CheckedSub\((.+), (.+)\)$)"),
+    checked_div_mir_value() : mir_value(
+        std::regex (R"(^CheckedDiv\((.+), (.+)\)$)"),
         [](const std::smatch &match, const std::list<mir_statement>& variables) {
 
             auto [a_value, a_returns, a_add, a_remove] = mir_value_converter::convert(match[1].str(), variables);
@@ -45,7 +44,7 @@ public:
                 b_value = "MIN_" + var_type;
             }
 
-            std::string func = "subtraction(" + a_value + ", " + b_value + ", MAX_" + var_type;
+            std::string func = "division(" + a_value + ", " + b_value + ", MAX_" + var_type;
 
             std::string add_refs;
             if (!a_add.empty() && !b_add.empty()) {
@@ -67,11 +66,9 @@ public:
             if (var_type.starts_with("I")) {
                 return std::make_tuple("i_" + func + ", MIN_" + var_type + ")", true, add_refs, remove_refs);
             }
-
-            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
-            std::throw_with_nested(std::runtime_error("Unsupported subtraction: " + var_type));
+            std::throw_with_nested(std::runtime_error("Unsupported division: " + var_type));
         }
     ) {}
 };
 
-#endif //CHECKED_SUB_MIR_VALUE_H
+#endif //CHECKED_DIV_MIR_VALUE_H
