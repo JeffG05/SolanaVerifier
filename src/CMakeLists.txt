@@ -67,7 +67,7 @@ add_executable(SolanaVerifier
         mir-values/values/move_mir_value.h
         mir-values/values/tuple_indexer_mir_value.h
         mir-values/values/tuple_indexer_mir_value.h
-        mir-values/values/negation_mir_value.h
+        mir-values/values/not_mir_value.h
         mir-values/values/function_mir_value.h
         mir-types/types/backtick_mir_type.h
         mir-types/types/string_mir_type.h
@@ -110,6 +110,9 @@ add_executable(SolanaVerifier
         mir-values/values/division_mir_value.h
         mir-values/values/number_operator_mir_value.h
         mir-values/values/equal_mir_value.h
+        mir-values/values/negation_mir_value.h
+        mir-values/values/const_number_max_mir_value.h
+        mir-values/values/const_number_min_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

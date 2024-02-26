@@ -4,6 +4,8 @@
 #include "values/borrow_mir_value.h"
 #include "values/borrow_mutable_mir_value.h"
 #include "values/addition_mir_value.h"
+#include "values/const_number_max_mir_value.h"
+#include "values/const_number_min_mir_value.h"
 #include "values/division_mir_value.h"
 #include "values/multiplication_mir_value.h"
 #include "values/subtraction_mir_value.h"
@@ -25,6 +27,7 @@
 #include "values/move_mir_value.h"
 #include "values/mutable_mir_value.h"
 #include "values/negation_mir_value.h"
+#include "values/not_mir_value.h"
 #include "values/next_mir_value.h"
 #include "values/not_equal_mir_value.h"
 #include "values/ok_result_mir_value.h"
@@ -57,7 +60,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     variable_mir_value(),
     move_mir_value(),
     tuple_indexer_mir_value(),
-    negation_mir_value(),
+    not_mir_value(),
     print_mir_value(),
     iter_mir_value(),
     borrow_mir_value(),
@@ -81,6 +84,9 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     less_than_equal_mir_value(),
     greater_than_equal_mir_value(),
     equal_mir_value(),
+    negation_mir_value(),
+    const_number_max_mir_value(),
+    const_number_min_mir_value(),
 
     // KEEP LAST
     function_mir_value()
