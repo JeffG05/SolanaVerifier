@@ -45,7 +45,9 @@ pub fn process_instruction(
     // Deserialize the greeting information from the account, modify
     // it, and then write it back.
     let mut greeting = GreetingAccount::try_from_slice(&account.data.borrow())?;
-    greeting.counter += 1;
+    if (greeting.counter < u32::MAX - 1) {
+        greeting.counter += 1;
+    }
     greeting.serialize(&mut &mut account.data.borrow_mut()[..])?;
     Ok(())
 }
