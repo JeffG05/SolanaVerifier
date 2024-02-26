@@ -21,7 +21,7 @@ public:
 
 private:
     std::filesystem::path _contract_dir;
-    config _globals;
+    config _globals{};
 };
 
 

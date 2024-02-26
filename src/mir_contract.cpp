@@ -13,7 +13,7 @@ CMRC_DECLARE(SolanaVerifierAssets);
 
 mir_contract::mir_contract(const std::string &contract_name, const std::filesystem::path &path, const mir_statements &structs, const config globals) {
     _contract_name = contract_name;
-    _path = path;
+    _path = absolute(path);
     _structs = structs;
     _globals = globals;
 }
@@ -448,6 +448,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     if (
         value.starts_with("u_addition(") ||
         value.starts_with("i_addition(") ||
+        value.starts_with("u_subtraction(") ||
+        value.starts_with("i_subtraction(") ||
         value.starts_with("u_multiplication(") ||
         value.starts_with("i_multiplication(")
     ) {

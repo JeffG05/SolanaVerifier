@@ -8,7 +8,7 @@
 #include "utils.h"
 
 hir_contract::hir_contract(const std::filesystem::path &path) {
-    _path = path;
+    _path = absolute(path);
 }
 
 hir_contract::hir_contract(const std::string &path) : hir_contract(std::filesystem::path(path)) {}

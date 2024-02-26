@@ -83,6 +83,8 @@ bool controller::run(const int argc, char *argv[]) {
 
     if (vm.contains("contract")) {
         std::cout << "Running SolanaVerifier on Rust contract" << std::endl;
+        std::cout << std::endl;
+
         if (!is_directory(_contract_dir)) {
             std::cerr << "error: not a directory" << std::endl;
             return false;
@@ -98,23 +100,32 @@ bool controller::run(const int argc, char *argv[]) {
         const auto contract = solana_contract(_contract_dir, _globals);
         auto t_contract_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded solana contract: took " << get_millis(t_contract_start, t_contract_end) << std::endl;
+        std::cout << "-- Path: " << contract.get_path() << std::endl;
+        std::cout << std::endl;
 
+        std::cout << "Converting to HIR" << std::endl;
         auto t_to_hir_start = std::chrono::high_resolution_clock::now();
         hir = contract.convert_to_hir(temp_dir);
         auto t_to_hir_end = std::chrono::high_resolution_clock::now();
-        std::cout << "Converted to HIR: took " << get_millis(t_to_hir_start, t_to_hir_end) << std::endl;
-
         if (!hir.has_value()) {
             std::cerr << "error: failed to generate hir file" << std::endl;
             return false;
         }
+        std::cout << "Converted to HIR: took " << get_millis(t_to_hir_start, t_to_hir_end) << std::endl;
+        std::cout << "-- Path: " << hir->get_path() << std::endl;
+        std::cout << std::endl;
 
+        std::cout << "Converting to MIR" << std::endl;
         auto t_to_mir_start = std::chrono::high_resolution_clock::now();
         mir = contract.convert_to_mir(temp_dir, hir->extract_structs());
         auto t_to_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Converted to MIR: took " << get_millis(t_to_mir_start, t_to_mir_end) << std::endl;
+        std::cout << "-- Path: " << mir->get_path() << std::endl;
+        std::cout << std::endl;
     } else if (vm.contains("mir") && vm.contains("hir")) {
         std::cout << "Running SolanaVerifier on MIR file" << std::endl;
+        std::cout << std::endl;
+
         if (!is_mir(_mir_file)) {
             if (is_directory(_mir_file)) {
                 std::cerr << "error: expected .mir file not directory" << std::endl;
@@ -127,18 +138,21 @@ bool controller::run(const int argc, char *argv[]) {
         auto t_hir_start = std::chrono::high_resolution_clock::now();
         hir = hir_contract(_hir_file);
         auto t_hir_end = std::chrono::high_resolution_clock::now();
-        std::cout << "Loaded HIR: took " << get_millis(t_hir_start, t_hir_end) << std::endl;
-
         if (!hir.has_value()) {
             std::cerr << "error: failed to generate hir file" << std::endl;
             return false;
         }
+        std::cout << "Loaded HIR: took " << get_millis(t_hir_start, t_hir_end) << std::endl;
+        std::cout << "-- Path: " << hir->get_path() << std::endl;
+        std::cout << std::endl;
 
         auto t_mir_start = std::chrono::high_resolution_clock::now();
         std::string contract_name = std::filesystem::path(_mir_file).stem().string();
         mir = mir_contract(contract_name, _mir_file, hir->extract_structs(), _globals);
         auto t_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded MIR: took " << get_millis(t_mir_start, t_mir_end) << std::endl;
+        std::cout << "-- Path: " << mir->get_path() << std::endl;
+        std::cout << std::endl;
     } else {
         std::cerr << "error: expected contract or mir & hir file" << std::endl;
         return false;
@@ -153,30 +167,22 @@ bool controller::run(const int argc, char *argv[]) {
     c_program solana_c = mir.value().convert_to_c(temp_dir, _target_function);
     auto t_to_c_end = std::chrono::high_resolution_clock::now();
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
+    std::cout << "-- Path: " << solana_c.get_path() << std::endl;
+    std::cout << std::endl;
 
-    std::cout << solana_c.get_path() << std::endl;
-    // system(("cat " + solana_c.get_path()).data());
-    // return true;
+    std::cout << "Running Verification using Boolector" << std::endl;
+    const auto t_boolector_start = std::chrono::high_resolution_clock::now();
+    const verification_result boolector_result = solana_c.verify_boolector(temp_dir, _esbmc_path);
+    const auto t_boolector_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Completed Verification: took " << get_millis(t_boolector_start, t_boolector_end) << std::endl;
+    std::cout << std::endl;
 
-    auto t_boolector_start = std::chrono::high_resolution_clock::now();
-    verification_result boolector_result = solana_c.verify_boolector(temp_dir, std::filesystem::path(_esbmc_path));
-    auto t_boolector_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Verification using Boolector: took " << get_millis(t_boolector_start, t_boolector_end) << std::endl;
     if (boolector_result.get_is_sat()) {
-        std::cout << "\tNo vulnerability found" << std::endl;
+        std::cout << "Result: No Vulnerability Found" << std::endl;
     } else {
-        std::cout << "\tContains vulnerability: " << boolector_result.get_vulnerability() << std::endl;
+        std::cout << "Result: Vulnerability Found" << std::endl;
+        std::cout << "-- Vulnerability: " << boolector_result.get_vulnerability() << std::endl;
     }
-
-    // auto t_z3_start = std::chrono::high_resolution_clock::now();
-    // verification_result z3_result = solana_c.verify_z3(temp_dir, std::filesystem::path(_esbmc_path));
-    // auto t_z3_end = std::chrono::high_resolution_clock::now();
-    // std::cout << "Verification using Z3: took " << get_millis(t_z3_start, t_z3_end) << std::endl;
-    // if (z3_result.get_is_sat()) {
-    //     std::cout << "\tNo vulnerability found" << std::endl;
-    // } else {
-    //     std::cout << "\tContains vulnerability: " << z3_result.get_vulnerability() << std::endl;
-    // }
 
     return true;
 }
