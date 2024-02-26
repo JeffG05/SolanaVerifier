@@ -38,6 +38,12 @@ public:
                 c = static_cast<char>(toupper(c));
             }
 
+            if (match[1].str() == "const _") {
+                a_value = "MAX_" + var_type;
+            }
+            if (match[2].str() == "const _") {
+                b_value = "MAX_" + var_type;
+            }
 
             std::string func = "addition(" + a_value + ", " + b_value + ", MAX_" + var_type;
 

@@ -1,16 +1,17 @@
-#ifndef CHECKED_MUL_MIR_VALUE_H
-#define CHECKED_MUL_MIR_VALUE_H
+#ifndef CHECKED_SUB_MIR_VALUE_H
+#define CHECKED_SUB_MIR_VALUE_H
 
+#include <iostream>
 #include <regex>
 
 #include "mir-types/mir_type_converter.h"
 #include "mir-values/mir_value.h"
 #include "mir-values/mir_value_converter.h"
 
-class checked_mul_mir_value : public mir_value {
+class checked_sub_mir_value : public mir_value {
 public:
-    checked_mul_mir_value() : mir_value(
-        std::regex (R"(^CheckedMul\((.+), (.+)\)$)"),
+    checked_sub_mir_value() : mir_value(
+        std::regex (R"(^CheckedSub\((.+), (.+)\)$)"),
         [](const std::smatch &match, const std::list<mir_statement>& variables) {
 
             auto [a_value, a_returns, a_add, a_remove] = mir_value_converter::convert(match[1].str(), variables);
@@ -41,10 +42,10 @@ public:
                 a_value = "MAX_" + var_type;
             }
             if (match[2].str() == "const _") {
-                b_value = "MAX_" + var_type;
+                b_value = "MIN_" + var_type;
             }
 
-            std::string func = "multiplication(" + a_value + ", " + b_value + ", MAX_" + var_type;
+            std::string func = "subtraction(" + a_value + ", " + b_value + ", MAX_" + var_type;
 
             std::string add_refs;
             if (!a_add.empty() && !b_add.empty()) {
@@ -66,9 +67,11 @@ public:
             if (var_type.starts_with("I")) {
                 return std::make_tuple("i_" + func + ", MIN_" + var_type + ")", true, add_refs, remove_refs);
             }
-            std::throw_with_nested(std::runtime_error("Unsupported multiplication: " + var_type));
+
+            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
+            std::throw_with_nested(std::runtime_error("Unsupported addition: " + var_type));
         }
     ) {}
 };
 
-#endif //CHECKED_MUL_MIR_VALUE_H
+#endif //CHECKED_SUB_MIR_VALUE_H

@@ -127,6 +127,27 @@ signed_math_result i_addition(signed long long int a, signed long long int b, si
     return result;
 }
 
+unsigned_math_result u_subtraction(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
+    unsigned_math_result result;
+    result.value = a - b;
+    result.errors = a < b;
+    __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Underflow");
+    return result;
+}
+
+signed_math_result i_subtraction(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
+    signed_math_result result;
+    result.value = a - b;
+    if (b < 0) {
+        result.errors = a > max + b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Overflow");
+    } else {
+        result.errors = a < min + b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Underflow");
+    }
+    return result;
+}
+
 unsigned_math_result u_multiplication(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
     unsigned_math_result result;
     result.value = a * b;
