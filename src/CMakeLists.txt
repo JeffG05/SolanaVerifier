@@ -115,6 +115,9 @@ add_executable(SolanaVerifier
         mir-values/values/const_number_min_mir_value.h
         vulnerability.cpp
         vulnerability.h
+        mir-values/values/bitand_mir_value.h
+        mir-values/values/bitor_mir_value.h
+        mir-values/values/bitxor_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
