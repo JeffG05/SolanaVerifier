@@ -555,7 +555,7 @@ void mir_contract::generate_reference_assignments(std::ostream *out, const std::
     }
 
     for (const auto& ref: referenced_variables) {
-        *out << "\t" << ref << " = " << variable << std::endl;
+        *out << "\t" << ref << " = state." << variable << ";" << std::endl;
     }
 }
 
