@@ -46,7 +46,7 @@ usize nondet_usize() {
 
 // SIGNED INTEGERS
 typedef signed long long int i64;
-i64 MIN_I64 = -9223372036854775808LL;
+i64 MIN_I64 = -9223372036854775807LL - 1;
 i64 MAX_I64 = 9223372036854775807LL;
 i64 nondet_i64() {
     i64 x;
@@ -86,7 +86,7 @@ i8 nondet_i8() {
 }
 
 typedef i64 isize;
-isize MIN_ISIZE = -9223372036854775808LL;
+isize MIN_ISIZE = -9223372036854775807LL - 1;
 isize MAX_ISIZE = 9223372036854775807LL;
 isize nondet_isize() {
     isize x;
@@ -110,7 +110,7 @@ unsigned_math_result u_addition(unsigned long long int a, unsigned long long int
     unsigned_math_result result;
     result.value = a + b;
     result.errors = a > max - b;
-    __ESBMC_assert(!result.errors, "Vulnerability Found: Addition Overflow");
+    __ESBMC_assert(!result.errors, "Vulnerability Found: 0");
     return result;
 }
 
@@ -119,10 +119,10 @@ signed_math_result i_addition(signed long long int a, signed long long int b, si
     result.value = a + b;
     if (b < 0) {
         result.errors = a < min - b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Addition Underflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 1");
     } else {
         result.errors = a > max - b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Addition Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 0");
     }
     return result;
 }
@@ -131,7 +131,7 @@ unsigned_math_result u_subtraction(unsigned long long int a, unsigned long long 
     unsigned_math_result result;
     result.value = a - b;
     result.errors = a < b;
-    __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Underflow");
+    __ESBMC_assert(!result.errors, "Vulnerability Found: 3");
     return result;
 }
 
@@ -140,10 +140,10 @@ signed_math_result i_subtraction(signed long long int a, signed long long int b,
     result.value = a - b;
     if (b < 0) {
         result.errors = a > max + b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 2");
     } else {
         result.errors = a < min + b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Subtraction Underflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 3");
     }
     return result;
 }
@@ -155,7 +155,7 @@ unsigned_math_result u_multiplication(unsigned long long int a, unsigned long lo
         result.errors = false;
     } else {
         result.errors = a > max / b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Multiplication Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 4");
     }
     return result;
 }
@@ -167,16 +167,16 @@ signed_math_result i_multiplication(signed long long int a, signed long long int
         result.errors = false;
     } else if ((b > 0) && (a > 0)) {
         result.errors = a > max / b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Multiplication Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 4");
     } else if ((b < 0) && (a < 0)) {
         result.errors = a < max / b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Multiplication Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 4");
     } else if ((b > 0) && (a < 0)) {
         result.errors = a < min / b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Multiplication Underflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 5");
     } else if ((b < 0) && (a > 0)) {
         result.errors = a > min / b;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Multiplication Underflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 5");
     }
     return result;
 }
@@ -186,7 +186,7 @@ unsigned_math_result u_division(unsigned long long int a, unsigned long long int
     result.value = a / b;
     if (b == 0) {
         result.errors = true;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Division by Zero");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 7");
     } else {
         result.errors = false;
     }
@@ -198,10 +198,10 @@ signed_math_result i_division(signed long long int a, signed long long int b, si
     result.value = a / b;
     if (b == 0) {
         result.errors = true;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Division by Zero");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 7");
     } else if (b == -1) {
         result.errors = a == min;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Division Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 6");
     } else {
         result.errors = false;
     }
@@ -220,7 +220,7 @@ signed_math_result i_negation(signed long long int a, signed long long int max, 
     result.value = -a;
     if (a == min) {
         result.errors = true;
-        __ESBMC_assert(!result.errors, "Vulnerability Found: Negation Overflow");
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 8");
     } else {
         result.errors = false;
     }

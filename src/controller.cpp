@@ -179,9 +179,16 @@ bool controller::run(const int argc, char *argv[]) {
 
     if (boolector_result.get_is_sat()) {
         std::cout << "Result: No Vulnerability Found" << std::endl;
-    } else {
+    } else if (boolector_result.get_vulnerability().has_value()) {
+        vulnerability v = boolector_result.get_vulnerability().value();
+        auto [v_name, v_description] = v.get_details();
         std::cout << "Result: Vulnerability Found" << std::endl;
-        std::cout << "-- Vulnerability: " << boolector_result.get_vulnerability() << std::endl;
+        std::cout << "-- Vulnerability: " << v_name << std::endl;
+        std::cout << "-- Description: " << v_description << std::endl;
+    } else {
+        std::string error = boolector_result.get_error().value_or("Unknown error");
+        std::cout << "Error: Unable to run verification" << std::endl;
+        std::cout << "-- Reason: " << error << std::endl;
     }
 
     return true;

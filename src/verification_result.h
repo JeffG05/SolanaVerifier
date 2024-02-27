@@ -2,29 +2,26 @@
 #define VERIFICATION_RESULT_H
 
 #include <filesystem>
+#include "vulnerability.h"
 
-typedef std::tuple<bool, std::string> result;
-
-enum class verifier {
-    z3
-};
+typedef std::tuple<bool, std::optional<vulnerability>, std::optional<std::string>> result;
 
 class verification_result {
 public:
-    explicit verification_result(verifier v, const std::filesystem::path &path);
-    explicit verification_result(verifier v, const std::string &path);
+    explicit verification_result(const std::filesystem::path &path);
+    explicit verification_result(const std::string &path);
 
     [[nodiscard]] bool get_is_sat() const;
-    [[nodiscard]] std::string get_vulnerability() const;
+    [[nodiscard]] std::optional<vulnerability> get_vulnerability() const;
+    [[nodiscard]] std::optional<std::string> get_error() const;
 
     [[nodiscard]] result parse_log() const;
-    [[nodiscard]] result parse_z3() const;
 private:
     std::filesystem::path _log_path;
-    verifier _verifier;
 
     bool _is_sat;
-    std::string _vulnerability;
+    std::optional<vulnerability> _vulnerability;
+    std::optional<std::string> _error;
 };
 
 

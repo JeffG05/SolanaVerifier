@@ -22,13 +22,13 @@ verification_result c_program::verify_z3(const std::filesystem::path& target, co
 }
 
 verification_result c_program::verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const {
-    const std::filesystem::path log_out = target / (_contract_name + "_z3_log.txt");
+    const std::filesystem::path log_out = target / (_contract_name + "_" + smt_solver + "_log.txt");
 
     std::stringstream cmd;
     cmd << esbmc_path << " " << get_path() << " --" << smt_solver << " --file-output " << log_out << " > /dev/null 2>&1";
     system(cmd.str().data());
 
-    return verification_result(verifier::z3, log_out);
+    return verification_result(log_out);
 }
 
 

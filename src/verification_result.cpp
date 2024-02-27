@@ -2,37 +2,33 @@
 #include "verification_result.h"
 #include "utils.h"
 
-verification_result::verification_result(const verifier v, const std::filesystem::path &path) {
-    _verifier = v;
+verification_result::verification_result(const std::filesystem::path &path) {
     _log_path = path;
 
-    auto [is_sat, vulnerability] = parse_log();
+    auto [is_sat, vulnerability, error] = parse_log();
     _is_sat = is_sat;
     _vulnerability = vulnerability;
+    _error = error;
 }
 
-verification_result::verification_result(const verifier v, const std::string &path) : verification_result(v, std::filesystem::path(path)) {}
+verification_result::verification_result(const std::string &path) : verification_result(std::filesystem::path(path)) {}
 
 bool verification_result::get_is_sat() const {
     return _is_sat;
 }
 
-std::string verification_result::get_vulnerability() const {
+std::optional<vulnerability> verification_result::get_vulnerability() const {
     return _vulnerability;
 }
 
-result verification_result::parse_log() const {
-    switch (_verifier) {
-        case verifier::z3:
-            return parse_z3();
-    }
-
-    std::throw_with_nested(std::runtime_error("Unknown verifier used"));
+std::optional<std::string> verification_result::get_error() const {
+    return _error;
 }
 
-result verification_result::parse_z3() const {
+result verification_result::parse_log() const {
     bool is_sat;
-    std::string vulnerability;
+    std::optional<vulnerability> vulnerability_found = std::nullopt;
+    std::optional<std::string> error_found = std::nullopt;
 
     std::fstream file;
     file.open(_log_path, std::ios::in);
@@ -42,6 +38,10 @@ result verification_result::parse_z3() const {
 
     std::string line;
     while (getline(file, line)) {
+        if (utils::trim(line).starts_with("ERROR: ")) {
+            error_found = utils::trim(line).substr(7);
+        }
+
         if (line == "VERIFICATION SUCCESSFUL") {
             is_sat = true;
         } else if (line == "VERIFICATION FAILED") {
@@ -49,11 +49,18 @@ result verification_result::parse_z3() const {
         }
 
         if (utils::trim(line).starts_with("Vulnerability Found: ")) {
-            vulnerability = utils::trim(line).substr(21);
+            std::string vulnerability_id = utils::trim(line).substr(21);
+            if (std::ranges::all_of(vulnerability_id, ::isdigit)) {
+                int vulnerability_enum = std::stoi(vulnerability_id);
+                const auto type = static_cast<vulnerability_type>(vulnerability_enum);
+                vulnerability_found = vulnerability(type);
+            } else {
+                vulnerability_found = std::nullopt;
+            }
         }
     }
 
-    return std::make_tuple(is_sat, vulnerability);
+    return std::make_tuple(is_sat, vulnerability_found, error_found);
 }
 
 
