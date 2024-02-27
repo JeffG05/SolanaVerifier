@@ -19,6 +19,8 @@ public:
     [[nodiscard]] hir_contract convert_to_hir(const std::filesystem::path& target) const;
     [[nodiscard]] mir_contract convert_to_mir(const std::filesystem::path& target, const mir_statements& structs) const;
 
+    static void edit_rust_files(const std::filesystem::path& target);
+    static void edit_rust_file(const std::filesystem::path& file_path);
 private:
     std::filesystem::path _contract_dir;
     config _globals{};
