@@ -1,6 +1,7 @@
 #include "mir_type_converter.h"
 #include "mir-types/mir_type.h"
 #include "types/account_info_mir_type.h"
+#include "types/account_meta_mir_type.h"
 #include "types/array_mir_type.h"
 #include "types/backtick_mir_type.h"
 #include "types/borrow_mir_type.h"
@@ -52,5 +53,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     error_mir_type(),
     control_flow_mir_type(),
     iter_mir_type(),
-    vec_mir_type()
+    vec_mir_type(),
+    account_meta_mir_type()
 };

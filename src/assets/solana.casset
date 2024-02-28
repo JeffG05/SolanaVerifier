@@ -307,6 +307,20 @@ account_info nondet_account_info() {
     return info;
 }
 
+// ACCOUNT META
+typedef struct account_meta_struct {
+    pubkey get0;
+    bool get1;
+    bool get2;
+} account_meta;
+account_meta nondet_account_meta() {
+    account_meta meta;
+    return meta;
+}
+
+// INSTRUCTION
+
+
 // INFALLIBLE
 typedef enum { unreachable } infallible;
 infallible nondet_infallible() {

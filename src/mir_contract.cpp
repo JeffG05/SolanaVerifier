@@ -178,6 +178,9 @@ std::string mir_contract::get_c_value(const std::string &value) {
     if (value.starts_with("copy_result<")) {
         return get_c_value(value.substr(12, value.size() - 13));
     }
+    if (value.starts_with("copy_account_meta<")) {
+        return get_c_value(value.substr(18, value.size() - 19));
+    }
     return value;
 }
 
@@ -500,6 +503,15 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + info_value + ".get" + std::to_string(i) + ">", true);
             } else {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true);
+            }
+        }
+    } else if (value.starts_with("copy_account_meta<")) {
+        const std::string meta_value = value.substr(18, value.size() - 19);
+        for (int i = 0; i < 3; i++) {
+            if (i == 0) {
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + meta_value + ".get" + std::to_string(i) + ">", true);
+            } else {
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), meta_value + ".get" + std::to_string(i), true);
             }
         }
     } else if (value.starts_with("copy_void_result<")) {

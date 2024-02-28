@@ -119,6 +119,7 @@ add_executable(SolanaVerifier
         mir-values/values/bitor_mir_value.h
         mir-values/values/bitxor_mir_value.h
         mir-types/types/vec_mir_type.h
+        mir-types/types/account_meta_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier
