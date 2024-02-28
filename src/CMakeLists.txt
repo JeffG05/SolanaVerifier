@@ -123,6 +123,7 @@ add_executable(SolanaVerifier
         mir-types/types/solana_instruction_mir_type.h
         mir-types/types/deref_mir_type.h
         mir-types/types/box_mir_type.h
+        mir-types/types/const_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier
