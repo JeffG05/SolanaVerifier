@@ -8,7 +8,7 @@
 class function_mir_value : public mir_value {
 public:
     function_mir_value() : mir_value(
-        std::regex (R"(^(?:.+::)*(.+)\((.*)\)$)"),
+        std::regex (R"(^(.+)\((.*)\)$)"),
         [](const std::smatch &match, const std::list<mir_statement>& variables) {
             const std::list<std::string> params = utils::split(match[2].str(), ", ");
             std::list<std::string> converted_params;
@@ -25,9 +25,12 @@ public:
                 }
             }
 
+            std::string function_name = match[1].str();
+            std::ranges::replace(function_name, ':', '_');
+            std::cout << match[1].str() << " --> " << function_name << std::endl;
 
             return std::make_tuple(
-                match[1].str() + "(" + utils::join(converted_params, ", ") + ")",
+                function_name + "(" + utils::join(converted_params, ", ") + ")",
                 true,
                 utils::join(add_refs, ", "),
                 utils::join(remove_refs, ", ")

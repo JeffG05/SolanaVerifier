@@ -208,9 +208,6 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines, const 
     }
 
     mir_statements all_variables = get_all_variables(function_header, structs);
-    // for (auto var: all_variables) {
-    //     std::cout << var.get_ast_data().at("variable") << " = " << var.get_ast_data().at("variable_type") << std::endl;
-    // }
 
     // Create blocks
     auto current_block_lines = std::list<std::string>();
@@ -246,9 +243,13 @@ mir_statement mir_statement::parse_function_header(const std::string& line) {
     nlohmann::json function_data;
     std::string parameters;
     std::smatch match;
-    if (regex_match(line, match, imported_lib_function_regex) || regex_match(line, match, imported_local_function_regex)) {
+    if (regex_match(line, match, imported_lib_function_regex)) {
         function_data["source"] = match[1].str();
         function_data["name"] = match[2].str();
+        function_data["return_type"] = convert_type(match[4].str());
+        parameters = match[3].str();
+    } else if (regex_match(line, match, imported_local_function_regex)) {
+        function_data["name"] = match[1].str() + "__" + match[2].str();
         function_data["return_type"] = convert_type(match[4].str());
         parameters = match[3].str();
     } else if (regex_match(line, match, local_function_regex)) {
