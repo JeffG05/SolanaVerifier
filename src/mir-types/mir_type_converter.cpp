@@ -5,6 +5,7 @@
 #include "types/array_mir_type.h"
 #include "types/backtick_mir_type.h"
 #include "types/borrow_mir_type.h"
+#include "types/box_mir_type.h"
 #include "types/control_flow_mir_type.h"
 #include "types/deref_mir_type.h"
 #include "types/error_mir_type.h"
@@ -58,5 +59,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     vec_mir_type(),
     account_meta_mir_type(),
     solana_instruction_mir_type(),
-    deref_mir_type()
+    deref_mir_type(),
+    box_mir_type()
 };
