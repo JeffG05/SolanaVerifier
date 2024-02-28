@@ -17,6 +17,7 @@
 #include "types/ref_mut_mir_type.h"
 #include "types/ref_mir_type.h"
 #include "types/result_mir_type.h"
+#include "types/solana_instruction_mir_type.h"
 #include "types/string_mir_type.h"
 #include "types/tuple_mir_type.h"
 #include "types/uint_mir_type.h"
@@ -54,5 +55,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     control_flow_mir_type(),
     iter_mir_type(),
     vec_mir_type(),
-    account_meta_mir_type()
+    account_meta_mir_type(),
+    solana_instruction_mir_type()
 };

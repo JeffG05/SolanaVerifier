@@ -319,7 +319,15 @@ account_meta nondet_account_meta() {
 }
 
 // INSTRUCTION
-
+typedef struct solana_instruction_struct {
+    pubkey get0;
+    account_meta get1[{{ARRAY_SIZE}}];
+    u8 get2[{{ARRAY_SIZE}}];
+} solana_instruction;
+solana_instruction nondet_solana_instruction() {
+    solana_instruction instruction;
+    return instruction;
+}
 
 // INFALLIBLE
 typedef enum { unreachable } infallible;

@@ -373,6 +373,8 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
                 data["value"] = "copy_account_info<" + data.at("value").get<std::string>() + ">";
             } else if (variable_type == "account_meta") {
                 data["value"] = "copy_account_meta<" + data.at("value").get<std::string>() + ">";
+            } else if (variable_type == "solana_instruction") {
+                data["value"] = "copy_solana_instruction<" + data.at("value").get<std::string>() + ">";
             } else if (variable_type.starts_with("result<")) {
                 if (variable_type == "result<void>") {
                     data["value"] = "copy_void_result<" + data.at("value").get<std::string>() + ">";
@@ -589,6 +591,16 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
         const mir_statement get0 = new_variable(name + ".get0", "pubkey");
         const mir_statement get1 = new_variable(name + ".get1", "bool");
         const mir_statement get2 = new_variable(name + ".get2", "bool");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        utils::extend(&subvariables, get_subvariables(get2, structs));
+        return subvariables;
+    }
+    if (type == "solana_instruction") {
+        const mir_statement get0 = new_variable(name + ".get0", "pubkey");
+        const mir_statement get1 = new_variable(name + ".get1", "array<account_meta>");
+        const mir_statement get2 = new_variable(name + ".get2", "array<u8>");
 
         utils::extend(&subvariables, get_subvariables(get0, structs));
         utils::extend(&subvariables, get_subvariables(get1, structs));

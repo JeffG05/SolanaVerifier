@@ -181,6 +181,9 @@ std::string mir_contract::get_c_value(const std::string &value) {
     if (value.starts_with("copy_account_meta<")) {
         return get_c_value(value.substr(18, value.size() - 19));
     }
+    if (value.starts_with("copy_solana_instruction<")) {
+        return get_c_value(value.substr(24, value.size() - 25));
+    }
     return value;
 }
 
@@ -528,6 +531,15 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             generate_block_assignment(out, variable + ".value", result_value + ".value", true);
         } else {
             generate_block_assignment(out, variable, result_value, true);
+        }
+    } else if (value.starts_with("copy_solana_instruction<")) {
+        const std::string instruction_value = value.substr(18, value.size() - 19);
+        for (int i = 0; i < 3; i++) {
+            if (i == 0) {
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + instruction_value + ".get" + std::to_string(i) + ">", true);
+            } else {
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + instruction_value + ".get" + std::to_string(i) + ">", true);
+            }
         }
     } else if (!variable.empty()) {
         if (returns) {
