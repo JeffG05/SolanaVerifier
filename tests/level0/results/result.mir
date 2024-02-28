@@ -1893,23 +1893,19 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
     let mut _69: std::cell::RefMut<'_, &mut u64>;
     let _70: &std::cell::RefCell<&mut u64>;
     let mut _71: &std::rc::Rc<std::cell::RefCell<&mut u64>>;
-    let mut _72: (u64, bool);
-    let mut _73: &mut &mut u64;
-    let mut _74: &mut std::cell::RefMut<'_, &mut u64>;
-    let mut _75: std::cell::RefMut<'_, &mut u64>;
-    let _76: &std::cell::RefCell<&mut u64>;
-    let mut _77: &std::rc::Rc<std::cell::RefCell<&mut u64>>;
-    let mut _78: (u64, bool);
-    let mut _79: &mut [u8];
-    let mut _80: &solana_program::pubkey::Pubkey;
-    let mut _81: &solana_program::pubkey::Pubkey;
+    let mut _72: &mut &mut u64;
+    let mut _73: &mut std::cell::RefMut<'_, &mut u64>;
+    let mut _74: std::cell::RefMut<'_, &mut u64>;
+    let _75: &std::cell::RefCell<&mut u64>;
+    let mut _76: &std::rc::Rc<std::cell::RefCell<&mut u64>>;
+    let mut _77: &mut [u8];
+    let mut _78: &solana_program::pubkey::Pubkey;
+    let mut _79: &solana_program::pubkey::Pubkey;
+    let mut _80: &mut u64;
+    let mut _81: &mut u64;
     let mut _82: &mut u64;
     let mut _83: &mut u64;
     let mut _84: &mut u64;
-    let mut _85: &mut u64;
-    let mut _86: &mut u64;
-    let mut _87: &mut u64;
-    let mut _88: &mut u64;
     scope 1 {
         debug account_info_iter => _4;
         let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
@@ -2025,7 +2021,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb3: {
         _8 = discriminant(_6);
-        switchInt(move _8) -> [0: bb4, 1: bb5, otherwise: bb59];
+        switchInt(move _8) -> [0: bb4, 1: bb5, otherwise: bb57];
     }
 
     bb4: {
@@ -2035,7 +2031,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb5: {
         _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb53, unwind continue];
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb51, unwind continue];
     }
 
     bb6: {
@@ -2044,7 +2040,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb7: {
         _13 = discriminant(_11);
-        switchInt(move _13) -> [0: bb8, 1: bb9, otherwise: bb59];
+        switchInt(move _13) -> [0: bb8, 1: bb9, otherwise: bb57];
     }
 
     bb8: {
@@ -2054,7 +2050,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb9: {
         _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb53, unwind continue];
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb51, unwind continue];
     }
 
     bb10: {
@@ -2063,7 +2059,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb11: {
         _18 = discriminant(_16);
-        switchInt(move _18) -> [0: bb12, 1: bb13, otherwise: bb59];
+        switchInt(move _18) -> [0: bb12, 1: bb13, otherwise: bb57];
     }
 
     bb12: {
@@ -2073,7 +2069,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb13: {
         _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb53, unwind continue];
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb51, unwind continue];
     }
 
     bb14: {
@@ -2082,7 +2078,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb15: {
         _23 = discriminant(_21);
-        switchInt(move _23) -> [0: bb16, 1: bb17, otherwise: bb59];
+        switchInt(move _23) -> [0: bb16, 1: bb17, otherwise: bb57];
     }
 
     bb16: {
@@ -2093,7 +2089,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb17: {
         _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb53, unwind continue];
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb51, unwind continue];
     }
 
     bb18: {
@@ -2102,28 +2098,28 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb19: {
         _34 = &_35;
-        _33 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _34) -> [return: bb20, unwind: bb57];
+        _33 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _34) -> [return: bb20, unwind: bb55];
     }
 
     bb20: {
-        _79 = deref_copy (*_33);
-        _32 = &(*_79);
-        _31 = <[u8] as Index<RangeFull>>::index(move _32, const RangeFull) -> [return: bb21, unwind: bb57];
+        _77 = deref_copy (*_33);
+        _32 = &(*_77);
+        _31 = <[u8] as Index<RangeFull>>::index(move _32, const RangeFull) -> [return: bb21, unwind: bb55];
     }
 
     bb21: {
         _30 = _31;
         _29 = &mut _30;
-        _28 = <Wallet as BorshDeserialize>::deserialize(_29) -> [return: bb22, unwind: bb57];
+        _28 = <Wallet as BorshDeserialize>::deserialize(_29) -> [return: bb22, unwind: bb55];
     }
 
     bb22: {
-        _27 = <Result<Wallet, std::io::Error> as Try>::branch(move _28) -> [return: bb23, unwind: bb57];
+        _27 = <Result<Wallet, std::io::Error> as Try>::branch(move _28) -> [return: bb23, unwind: bb55];
     }
 
     bb23: {
         _38 = discriminant(_27);
-        switchInt(move _38) -> [0: bb24, 1: bb25, otherwise: bb59];
+        switchInt(move _38) -> [0: bb24, 1: bb25, otherwise: bb57];
     }
 
     bb24: {
@@ -2134,11 +2130,11 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb25: {
         _39 = move ((_27 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _39) -> [return: bb26, unwind: bb57];
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _39) -> [return: bb26, unwind: bb55];
     }
 
     bb26: {
-        drop(_35) -> [return: bb53, unwind continue];
+        drop(_35) -> [return: bb51, unwind continue];
     }
 
     bb27: {
@@ -2152,8 +2148,8 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb29: {
         _44 = &(_26.0: solana_program::pubkey::Pubkey);
-        _80 = deref_copy ((*_20).0: &solana_program::pubkey::Pubkey);
-        _43 = (move _44, _80);
+        _78 = deref_copy ((*_20).0: &solana_program::pubkey::Pubkey);
+        _43 = (move _44, _78);
         _45 = (_43.0: &solana_program::pubkey::Pubkey);
         _46 = (_43.1: &solana_program::pubkey::Pubkey);
         _47 = <Pubkey as PartialEq>::eq(_45, _46) -> [return: bb30, unwind continue];
@@ -2165,8 +2161,8 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb31: {
         _52 = &(_26.1: solana_program::pubkey::Pubkey);
-        _81 = deref_copy ((*_15).0: &solana_program::pubkey::Pubkey);
-        _51 = (move _52, _81);
+        _79 = deref_copy ((*_15).0: &solana_program::pubkey::Pubkey);
+        _51 = (move _52, _79);
         _53 = (_51.0: &solana_program::pubkey::Pubkey);
         _54 = (_51.1: &solana_program::pubkey::Pubkey);
         _55 = <Pubkey as PartialEq>::eq(_53, _54) -> [return: bb33, unwind continue];
@@ -2199,12 +2195,12 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb37: {
         _62 = &_63;
-        _61 = <RefMut<'_, &mut u64> as Deref>::deref(move _62) -> [return: bb38, unwind: bb56];
+        _61 = <RefMut<'_, &mut u64> as Deref>::deref(move _62) -> [return: bb38, unwind: bb54];
     }
 
     bb38: {
-        _82 = deref_copy (*_61);
-        _60 = (*_82);
+        _80 = deref_copy (*_61);
+        _60 = (*_80);
         _59 = Gt(_3, move _60);
         switchInt(move _59) -> [0: bb41, otherwise: bb39];
     }
@@ -2216,7 +2212,7 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
     bb40: {
         _66 = solana_program::program_error::ProgramError::InsufficientFunds;
         _0 = Result::<(), ProgramError>::Err(move _66);
-        goto -> bb53;
+        goto -> bb51;
     }
 
     bb41: {
@@ -2234,79 +2230,67 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb44: {
         _68 = &mut _69;
-        _67 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _68) -> [return: bb45, unwind: bb55];
+        _67 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _68) -> [return: bb45, unwind: bb53];
     }
 
     bb45: {
-        _83 = deref_copy (*_67);
-        _72 = CheckedSub((*_83), _3);
-        _84 = deref_copy (*_67);
-        assert(!move (_72.1: bool), "attempt to compute `{} - {}`, which would overflow", (*_84), _3) -> [success: bb46, unwind: bb55];
+        _81 = deref_copy (*_67);
+        _82 = deref_copy (*_67);
+        (*_81) = Sub((*_82), _3);
+        drop(_69) -> [return: bb46, unwind continue];
     }
 
     bb46: {
-        _85 = deref_copy (*_67);
-        (*_85) = move (_72.0: u64);
-        drop(_69) -> [return: bb47, unwind continue];
+        _76 = &((*_25).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
+        _75 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _76) -> [return: bb47, unwind continue];
     }
 
     bb47: {
-        _77 = &((*_25).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
-        _76 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _77) -> [return: bb48, unwind continue];
+        _74 = RefCell::<&mut u64>::borrow_mut(_75) -> [return: bb48, unwind continue];
     }
 
     bb48: {
-        _75 = RefCell::<&mut u64>::borrow_mut(_76) -> [return: bb49, unwind continue];
+        _73 = &mut _74;
+        _72 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _73) -> [return: bb49, unwind: bb52];
     }
 
     bb49: {
-        _74 = &mut _75;
-        _73 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _74) -> [return: bb50, unwind: bb54];
+        _83 = deref_copy (*_72);
+        _84 = deref_copy (*_72);
+        (*_83) = Add((*_84), _3);
+        drop(_74) -> [return: bb50, unwind continue];
     }
 
     bb50: {
-        _86 = deref_copy (*_73);
-        _78 = CheckedAdd((*_86), _3);
-        _87 = deref_copy (*_73);
-        assert(!move (_78.1: bool), "attempt to compute `{} + {}`, which would overflow", (*_87), _3) -> [success: bb51, unwind: bb54];
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb51;
     }
 
     bb51: {
-        _88 = deref_copy (*_73);
-        (*_88) = move (_78.0: u64);
-        drop(_75) -> [return: bb52, unwind continue];
-    }
-
-    bb52: {
-        _0 = Result::<(), ProgramError>::Ok(const ());
-        goto -> bb53;
-    }
-
-    bb53: {
         return;
     }
 
+    bb52 (cleanup): {
+        drop(_74) -> [return: bb56, unwind terminate(cleanup)];
+    }
+
+    bb53 (cleanup): {
+        drop(_69) -> [return: bb56, unwind terminate(cleanup)];
+    }
+
     bb54 (cleanup): {
-        drop(_75) -> [return: bb58, unwind terminate(cleanup)];
+        drop(_63) -> [return: bb56, unwind terminate(cleanup)];
     }
 
     bb55 (cleanup): {
-        drop(_69) -> [return: bb58, unwind terminate(cleanup)];
+        drop(_35) -> [return: bb56, unwind terminate(cleanup)];
     }
 
     bb56 (cleanup): {
-        drop(_63) -> [return: bb58, unwind terminate(cleanup)];
-    }
-
-    bb57 (cleanup): {
-        drop(_35) -> [return: bb58, unwind terminate(cleanup)];
-    }
-
-    bb58 (cleanup): {
         resume;
     }
 
-    bb59: {
+    bb57: {
         unreachable;
     }
 }
@@ -2513,12 +2497,6 @@ fn initialize(_1: Pubkey, _2: Pubkey) -> Instruction {
         scope 2 {
             debug vault_address => _4;
             let mut _21: &WalletInstruction;
-            let mut _23: *const ();
-            let mut _24: usize;
-            let mut _25: usize;
-            let mut _26: usize;
-            let mut _27: usize;
-            let mut _28: bool;
             scope 3 {
             }
         }
@@ -2569,13 +2547,10 @@ fn initialize(_1: Pubkey, _2: Pubkey) -> Instruction {
 
     bb10: {
         _22 = (((_11.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 5]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 5]>).0: *const [solana_program::instruction::AccountMeta; 5]);
-        _23 = _22 as *const () (PtrToPtr);
-        _24 = _23 as usize (Transmute);
-        _25 = AlignOf([solana_program::instruction::AccountMeta; 5]);
-        _26 = Sub(_25, const 1_usize);
-        _27 = BitAnd(_24, _26);
-        _28 = Eq(_27, const 0_usize);
-        assert(_28, "misaligned pointer dereference: address must be a multiple of {} but is {}", _25, _24) -> [success: bb17, unwind unreachable];
+        (*_22) = [move _12, move _13, move _14, move _15, move _17];
+        _7 = move _11;
+        _6 = move _7 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _5 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _6) -> [return: bb11, unwind continue];
     }
 
     bb11: {
@@ -2602,13 +2577,6 @@ fn initialize(_1: Pubkey, _2: Pubkey) -> Instruction {
 
     bb16 (cleanup): {
         resume;
-    }
-
-    bb17: {
-        (*_22) = [move _12, move _13, move _14, move _15, move _17];
-        _7 = move _11;
-        _6 = move _7 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
-        _5 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _6) -> [return: bb11, unwind continue];
     }
 }
 
@@ -2652,12 +2620,6 @@ fn deposit(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
         let _6: solana_program::pubkey::Pubkey;
         scope 2 {
             debug vault_address => _6;
-            let mut _24: *const ();
-            let mut _25: usize;
-            let mut _26: usize;
-            let mut _27: usize;
-            let mut _28: usize;
-            let mut _29: bool;
             scope 3 {
             }
         }
@@ -2700,13 +2662,10 @@ fn deposit(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
 
     bb8: {
         _23 = (((_13.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 4]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 4]>).0: *const [solana_program::instruction::AccountMeta; 4]);
-        _24 = _23 as *const () (PtrToPtr);
-        _25 = _24 as usize (Transmute);
-        _26 = AlignOf([solana_program::instruction::AccountMeta; 4]);
-        _27 = Sub(_26, const 1_usize);
-        _28 = BitAnd(_25, _27);
-        _29 = Eq(_28, const 0_usize);
-        assert(_29, "misaligned pointer dereference: address must be a multiple of {} but is {}", _26, _25) -> [success: bb15, unwind unreachable];
+        (*_23) = [move _14, move _15, move _16, move _17];
+        _9 = move _13;
+        _8 = move _9 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _7 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _8) -> [return: bb9, unwind continue];
     }
 
     bb9: {
@@ -2734,13 +2693,6 @@ fn deposit(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
 
     bb14 (cleanup): {
         resume;
-    }
-
-    bb15: {
-        (*_23) = [move _14, move _15, move _16, move _17];
-        _9 = move _13;
-        _8 = move _9 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
-        _7 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _8) -> [return: bb9, unwind continue];
     }
 }
 
@@ -2774,12 +2726,6 @@ fn withdraw(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
         let _6: solana_program::pubkey::Pubkey;
         scope 2 {
             debug vault_address => _6;
-            let mut _25: *const ();
-            let mut _26: usize;
-            let mut _27: usize;
-            let mut _28: usize;
-            let mut _29: usize;
-            let mut _30: bool;
             scope 3 {
             }
         }
@@ -2826,13 +2772,10 @@ fn withdraw(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
 
     bb9: {
         _24 = (((_13.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 5]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 5]>).0: *const [solana_program::instruction::AccountMeta; 5]);
-        _25 = _24 as *const () (PtrToPtr);
-        _26 = _25 as usize (Transmute);
-        _27 = AlignOf([solana_program::instruction::AccountMeta; 5]);
-        _28 = Sub(_27, const 1_usize);
-        _29 = BitAnd(_26, _28);
-        _30 = Eq(_29, const 0_usize);
-        assert(_30, "misaligned pointer dereference: address must be a multiple of {} but is {}", _27, _26) -> [success: bb16, unwind unreachable];
+        (*_24) = [move _14, move _15, move _16, move _17, move _18];
+        _9 = move _13;
+        _8 = move _9 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _7 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _8) -> [return: bb10, unwind continue];
     }
 
     bb10: {
@@ -2860,12 +2803,5 @@ fn withdraw(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: u64) -> Instruction {
 
     bb15 (cleanup): {
         resume;
-    }
-
-    bb16: {
-        (*_24) = [move _14, move _15, move _16, move _17, move _18];
-        _9 = move _13;
-        _8 = move _9 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
-        _7 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _8) -> [return: bb10, unwind continue];
     }
 }
