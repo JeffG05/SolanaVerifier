@@ -63,3 +63,14 @@ std::string utils::add_item(const std::string &s, const std::string &item, const
 
     return s + delim + item;
 }
+
+std::string utils::clean(const std::string &s) {
+    std::string clean;
+    for (const char c : s) {
+        if (isalnum(c)) {
+            clean += static_cast<char>(tolower(c));
+        }
+    }
+    return clean;
+}
+

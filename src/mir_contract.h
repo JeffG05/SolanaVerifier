@@ -57,15 +57,15 @@ private:
     void generate_function(std::ostream* out, const mir_statements &state_statements, const std::string& function_name, const std::string& function_return) const;
     void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name) const;
 
-    void generate_nondet(std::ostream* out, const mir_statement& statement, const std::string& function_name, bool in_main = false) const;
-    void generate_nondet_array(std::ostream* out, const mir_statement& statement, bool in_main = false) const;
+    void generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name, bool force_copy = false) const;
+    void generate_nondet_from_statement(std::ostream* out, const mir_statement& statement, const std::string& function_name, bool in_main = false) const;
+    void generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type, bool force_copy = false) const;
 
     static void generate_serialization(std::ostream* out, const std::string &variable_name, const std::string& variable_type, unsigned int* counter);
     static void generate_deserialization(std::ostream* out, const std::string &variable_name, const std::string& variable_type, unsigned int* counter);
 
     static mir_statement get_target_function(mir_statements function_statements, const std::string &function_name);
     static std::string trim_line(const std::string& line);
-    static std::string clean_type(const std::string &type);
 };
 
 #endif //MIR_CONTRACT_H

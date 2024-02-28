@@ -229,7 +229,7 @@ void mir_contract::generate_struct_struct(std::ostream *out, const mir_statement
     for (const auto& variable : state_statements) {
         std::string var_name = variable.get_ast_data().at("variable");
         std::string var_type = variable.get_ast_data().at("variable_type");
-        *out << "\tx." << var_name << " = nondet_" << get_return_c_type(var_type, struct_name) << "();" << std::endl;
+        generate_nondet_from_name(out, "x." + var_name, var_type, struct_name);
     }
     *out << "\treturn x;" << std::endl;
     *out << "}" << std::endl;
@@ -306,7 +306,7 @@ void mir_contract::generate_tuple_struct(std::ostream *out, const std::string &t
     *out << "\t" << struct_name << " t;" << std::endl;
     unsigned int tuple_i2 = 0;
     for (const auto& value_type: value_types) {
-        *out << "\tt.get" << tuple_i2 << " = nondet_" << get_return_c_type(value_type, function_name) << "();" << std::endl;
+        generate_nondet_from_name(out, "t.get" + std::to_string(tuple_i2), value_type, function_name);
         tuple_i2++;
     }
     *out << "\treturn t;" << std::endl;
@@ -324,15 +324,15 @@ void mir_contract::generate_result_struct(std::ostream *out, const std::string &
     *out << "typedef struct " << struct_name << "_struct {" << std::endl;
     *out << "\tbool is_success;" << std::endl;
     if (success_type != "void") {
-        *out << "\t" << success_type << " value;" << std::endl;
+        *out << "\t" << get_c_type(success_type, "value", function_name) << ";" << std::endl;
     }
     *out << "} " << struct_name << ";" << std::endl;
 
     *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
     *out << "\t" << struct_name << " r;" << std::endl;
-    *out << "\tr.is_success = nondet_bool();" << std::endl;
+    generate_nondet_from_name(out, "r.is_success", "bool", function_name);
     if (success_type != "void") {
-        *out << "\tr.value = nondet_" << get_return_c_type(success_type, function_name) << "();" << std::endl;
+        generate_nondet_from_name(out, "r.value", success_type, function_name);
     }
     *out << "\treturn r;" << std::endl;
     *out << "}" << std::endl;
@@ -360,12 +360,12 @@ void mir_contract::generate_controlflow_struct(std::ostream *out, const std::str
 
     *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
     *out << "\t" << struct_name << " c;" << std::endl;
-    *out << "\tc.type = nondet_controlflow();" << std::endl;
+    generate_nondet_from_name(out, "c.type", "controlflow", function_name);
     if (break_value != "void") {
-        *out << "\tc.break_value = nondet_" << get_return_c_type(break_value, function_name) << "();" << std::endl;
+        generate_nondet_from_name(out, "c.break_value", break_value, function_name);
     }
     if (continue_value != "void") {
-        *out << "\tc.continue_value = nondet_" << get_return_c_type(continue_value, function_name) << "();" << std::endl;
+        generate_nondet_from_name(out, continue_value, continue_value, function_name);
     }
     *out << "\treturn c;" << std::endl;
     *out << "}" << std::endl;
@@ -483,8 +483,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << "\t}" << std::endl;
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
-        *out << "\tfor (int i_" << clean_type(variable) << " = 0; i_" << clean_type(variable) << " < " << _globals.ARRAY_SIZE << "; i_" << clean_type(variable) << "++) {" << std::endl;
-        *out << "\t\tstate." << variable << "[i_" << clean_type(variable) << "] = " << array_value << "[i_" << clean_type(variable) << "];" << std::endl;
+        *out << "\tfor (int i_" << utils::clean(variable) << " = 0; i_" << utils::clean(variable) << " < " << _globals.ARRAY_SIZE << "; i_" << utils::clean(variable) << "++) {" << std::endl;
+        *out << "\t\tstate." << variable << "[i_" << utils::clean(variable) << "] = " << array_value << "[i_" << utils::clean(variable) << "];" << std::endl;
         *out << "\t}" << std::endl;
     } else if (value.starts_with("copy_pubkey<")) {
         const std::string pubkey_value = value.substr(12, value.size() - 13);
@@ -593,7 +593,7 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
     *out << "\t" << function_name << "_state state;" << std::endl;
     for (const auto& statement: state_statements) {
         if (statement.get_ast_data()["variable_type"].get<std::string>() != "void") {
-            generate_nondet(out, statement, function_name);
+            generate_nondet_from_statement(out, statement, function_name);
         }
     }
     *out << std::endl;
@@ -608,43 +608,43 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
     *out << std::endl;
 }
 
-void mir_contract::generate_nondet(std::ostream *out, const mir_statement &statement, const std::string &function_name, bool in_main) const {
-    nlohmann::json parameter_data = statement.get_ast_data();
-    const std::string parameter_name = parameter_data.at("variable").get<std::string>();
-    const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
-
-    if (parameter_type.starts_with("array<")) {
-        generate_nondet_array(out, statement, in_main);
+void mir_contract::generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name, const bool force_copy) const {
+    if (type.starts_with("array<")) {
+        generate_nondet_array(out, name, type, force_copy);
     } else {
-        if (in_main) {
-            *out << "\t" << parameter_name << " = ";
+        *out << "\t" << name << " = ";
+        if (force_copy) {
+            *out << name << ";" << std::endl;
         } else {
-            *out << "\tstate." << parameter_name << " = ";
-        }
-        if (in_main || statement.get_type() == statement_type::variable) {
-            *out << "nondet_" << get_return_c_type(parameter_type, function_name) << "();" << std::endl;
-        } else {
-            *out << parameter_name << ";" << std::endl;
+            *out << "nondet_" << get_return_c_type(type, function_name) << "();" << std::endl;
         }
     }
-
 }
 
-void mir_contract::generate_nondet_array(std::ostream *out, const mir_statement& statement, const bool in_main) const {
+void mir_contract::generate_nondet_from_statement(std::ostream *out, const mir_statement &statement, const std::string &function_name, const bool in_main) const {
     nlohmann::json parameter_data = statement.get_ast_data();
     const std::string parameter_name = parameter_data.at("variable").get<std::string>();
     const std::string parameter_type = parameter_data.at("variable_type").get<std::string>();
 
-    *out << "\tfor (int i" << parameter_name << " = 0; i" << parameter_name << " < " << _globals.ARRAY_SIZE << "; i" << parameter_name << "++) {" << std::endl;
+    std::string nondet_name;
     if (in_main) {
-        *out << "\t\t" << parameter_name << "[i" << parameter_name << "] = ";
+        nondet_name = parameter_name;
     } else {
-        *out << "\t\tstate." << parameter_name << "[i" << parameter_name << "] = ";
+        nondet_name = "state." + parameter_name;
     }
-    if (in_main || statement.get_type() == statement_type::variable) {
-        *out << "nondet_" << get_c_subtype(parameter_type) << "();" << std::endl;
+    const bool force_copy = !in_main && statement.get_type() == statement_type::parameter;
+
+    generate_nondet_from_name(out, nondet_name, parameter_type, function_name, force_copy);
+}
+
+void mir_contract::generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type, const bool force_copy) const {
+    const std::string indexer = "i_" + utils::clean(name);
+    *out << "\tfor (int " << indexer << " = 0; " << indexer << " < " << _globals.ARRAY_SIZE << "; " << indexer << "++) {" << std::endl;
+    *out << "\t\t" << name << "[" << indexer << "] = ";
+    if (force_copy) {
+        *out << name << "[" << indexer << "];" << std::endl;
     } else {
-        *out << parameter_name << "[i" << parameter_name << "];" << std::endl;
+        *out << "nondet_" << get_c_subtype(type) << "();" << std::endl;
     }
     *out << "\t}" << std::endl;
 }
@@ -698,7 +698,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
     *out << std::endl;
 
     for (const auto& parameter_statement: target_function_parameters) {
-        generate_nondet(out, parameter_statement, target_function_name, true);
+        generate_nondet_from_statement(out, parameter_statement, target_function_name, true);
     }
     *out << std::endl;
 
@@ -735,21 +735,11 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
     }
 }
 
-std::string mir_contract::clean_type(const std::string &type) {
-    std::string clean;
-    for (const char c : type) {
-        if (isalnum(c)) {
-            clean += static_cast<char>(tolower(c));
-        }
-    }
-    return clean;
-}
-
 std::string mir_contract::get_tuple_name(const std::string &type, const std::string &function_name) {
     const std::string raw_types = type.substr(6, type.size() - 7);
     std::list<std::string> types_list = utils::split(raw_types, ", ");
     for (auto & raw_type : types_list) {
-        raw_type = clean_type(raw_type);
+        raw_type = utils::clean(raw_type);
     }
     const std::string clean_types = utils::join(types_list, "_");
     return function_name + "_" + clean_types + "_tuple";
@@ -757,13 +747,13 @@ std::string mir_contract::get_tuple_name(const std::string &type, const std::str
 
 std::string mir_contract::get_result_name(const std::string &type, const std::string &function_name) {
     const std::string raw_type = type.substr(7, type.size() - 8);
-    return function_name + "_" + clean_type(raw_type) + "_result";
+    return function_name + "_" + utils::clean(raw_type) + "_result";
 }
 
 std::string mir_contract::get_controlflow_name(const std::string &type, const std::string &function_name) {
     const std::string raw_types = type.substr(12, type.size() - 13);
     const auto [break_type, continue_type] = mir_statement::get_argument_pair(raw_types);
-    return function_name + "_" + clean_type(break_type) + "_" + clean_type(continue_type) + "_controlflow";
+    return function_name + "_" + utils::clean(break_type) + "_" + utils::clean(continue_type) + "_controlflow";
 }
 
 
