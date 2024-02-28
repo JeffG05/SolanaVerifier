@@ -19,6 +19,7 @@
 #include "types/string_mir_type.h"
 #include "types/tuple_mir_type.h"
 #include "types/uint_mir_type.h"
+#include "types/vec_mir_type.h"
 #include "types/void_mir_type.h"
 
 std::string mir_type_converter::convert(const std::string& mir) {
@@ -50,5 +51,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     infallible_mir_type(),
     error_mir_type(),
     control_flow_mir_type(),
-    iter_mir_type()
+    iter_mir_type(),
+    vec_mir_type()
 };
