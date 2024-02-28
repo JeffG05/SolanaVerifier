@@ -38,6 +38,7 @@
 #include "values/program_error_mir_value.h"
 #include "values/result_error_mir_value.h"
 #include "values/serialize_mir_value.h"
+#include "values/solana_instruction_mir_value.h"
 #include "values/try_branch_result_mir_value.h"
 #include "values/tuple_indexer_mir_value.h"
 #include "values/variable_mir_value.h"
@@ -93,6 +94,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     bitand_mir_value(),
     bitor_mir_value(),
     bitxor_mir_value(),
+    solana_instruction_mir_value(),
 
     // KEEP LAST
     function_mir_value()

@@ -533,7 +533,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             generate_block_assignment(out, variable, result_value, true);
         }
     } else if (value.starts_with("copy_solana_instruction<")) {
-        const std::string instruction_value = value.substr(18, value.size() - 19);
+        const std::string instruction_value = value.substr(24, value.size() - 25);
         for (int i = 0; i < 3; i++) {
             if (i == 0) {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + instruction_value + ".get" + std::to_string(i) + ">", true);
@@ -541,6 +541,16 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + instruction_value + ".get" + std::to_string(i) + ">", true);
             }
         }
+    } else if (value.starts_with("init_solana_instruction<")) {
+        const std::string instruction_value = value.substr(24, value.size() - 25);
+        const auto instruction_values = utils::split(instruction_value, ", ");
+        auto instruction_values_itr = instruction_values.begin();
+
+        generate_block_assignment(out, variable + ".get0", "copy_pubkey<" + *instruction_values_itr + ">", true);
+        ++instruction_values_itr;
+        generate_block_assignment(out, variable + ".get1", "copy_array<" + *instruction_values_itr + ">", true);
+        ++instruction_values_itr;
+        generate_block_assignment(out, variable + ".get2", "copy_array<" + *instruction_values_itr + ">", true);
     } else if (!variable.empty()) {
         if (returns) {
             *out << "\tstate." << variable << " = " << value << ";" << std::endl;

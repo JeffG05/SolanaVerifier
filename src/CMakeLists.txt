@@ -124,6 +124,7 @@ add_executable(SolanaVerifier
         mir-types/types/deref_mir_type.h
         mir-types/types/box_mir_type.h
         mir-types/types/const_mir_type.h
+        mir-values/values/solana_instruction_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

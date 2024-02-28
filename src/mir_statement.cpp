@@ -374,7 +374,9 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
             } else if (variable_type == "account_meta") {
                 data["value"] = "copy_account_meta<" + data.at("value").get<std::string>() + ">";
             } else if (variable_type == "solana_instruction") {
-                data["value"] = "copy_solana_instruction<" + data.at("value").get<std::string>() + ">";
+                if (!data.at("value").get<std::string>().starts_with("init_solana_instruction<")) {
+                    data["value"] = "copy_solana_instruction<" + data.at("value").get<std::string>() + ">";
+                }
             } else if (variable_type.starts_with("result<")) {
                 if (variable_type == "result<void>") {
                     data["value"] = "copy_void_result<" + data.at("value").get<std::string>() + ">";
