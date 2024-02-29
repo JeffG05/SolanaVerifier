@@ -27,7 +27,6 @@ public:
 
             std::string function_name = match[1].str();
             std::ranges::replace(function_name, ':', '_');
-            std::cout << match[1].str() << " --> " << function_name << std::endl;
 
             return std::make_tuple(
                 function_name + "(" + utils::join(converted_params, ", ") + ")",
