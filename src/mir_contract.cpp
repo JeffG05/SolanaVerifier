@@ -371,7 +371,7 @@ void mir_contract::generate_controlflow_struct(std::ostream *out, const std::str
         generate_nondet_from_name(out, "c.break_value", break_value, function_name);
     }
     if (continue_value != "void") {
-        generate_nondet_from_name(out, continue_value, continue_value, function_name);
+        generate_nondet_from_name(out, "c.continue_value", continue_value, function_name);
     }
     *out << "\treturn c;" << std::endl;
     *out << "}" << std::endl;
