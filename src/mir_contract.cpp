@@ -764,7 +764,7 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
     if (target_return_type.starts_with("result<")) {
         // Check owner is calling function
         // LOGIC: A successful return implies that the owner called the function
-        *out << "\t__ESBMC_assert(!result.is_success || is_equal(_1, _2[0].get3), \"Vulnerability Found: Missing Ownership Checks\");" << std::endl;
+        *out << "\t__ESBMC_assert(!result.is_success || is_equal(_1, _2[0].get3), \"Vulnerability Found: 9\");" << std::endl;
         *out << std::endl;
     }
 }
