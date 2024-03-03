@@ -33,7 +33,7 @@ pub fn process_instruction(
 ) -> entrypoint::ProgramResult {
     // Get the account that stores greeting count information.
     let accounts_iter = &mut accounts.iter();
-    let account = next_account_info(accounts_iter)?;
+    let protected_account = next_account_info(accounts_iter)?;
 
     // The account must be owned by the program in order for the
     // program to write to it. If that is not the case then the
@@ -44,7 +44,7 @@ pub fn process_instruction(
 
     // Deserialize the greeting information from the account, modify
     // it, and then write it back.
-    let mut greeting = GreetingAccount::try_from_slice(&account.data.borrow())?;
+    let mut greeting = GreetingAccount::try_from_slice(&protected_account.data.borrow())?;
     if (greeting.counter <= i32::MAX - 1 && greeting.counter > i32::MIN) {
         greeting.counter = -greeting.counter;
     } else if (greeting.counter >= i32::MAX) {
@@ -52,6 +52,6 @@ pub fn process_instruction(
     } else {
         greeting.counter += 203;
     }
-    greeting.serialize(&mut &mut account.data.borrow_mut()[..])?;
+    greeting.serialize(&mut &mut protected_account.data.borrow_mut()[..])?;
     Ok(())
 }
