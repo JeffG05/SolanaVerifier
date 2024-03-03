@@ -72,6 +72,9 @@ impl ::core::fmt::Debug for GreetingAccount {
 // The account must be owned by the program in order for the
 // program to write to it. If that is not the case then the
 // program has been invoked incorrectly and we report as much.
+// if account.owner != program_id {
+//     return Err(ProgramError::IncorrectProgramId);
+// }
 
 // Deserialize the greeting information from the account, modify
 // it, and then write it back.
@@ -109,28 +112,30 @@ fn process_instruction<'_, '_, '_,
                         #[allow(unreachable_code)]
                         val,
                 };
-        if account.owner != program_id
-                { return Err(ProgramError::IncorrectProgramId); }
-                let mut greeting =
-                    match #[lang = "branch"](GreetingAccount::try_from_slice(&account.data.borrow()))
-                                {
-                            #[lang = "Break"] {  0: residual } =>
-                                #[allow(unreachable_code)]
-                                return #[lang = "from_residual"](residual),
-                            #[lang = "Continue"] {  0: val } =>
-                                #[allow(unreachable_code)]
-                                val,
-                        };
-                if greeting.counter < i32::MAX - 1
-                        { greeting.counter = -greeting.counter; }
-                        match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
-                                    {
-                                #[lang = "Break"] {  0: residual } =>
-                                    #[allow(unreachable_code)]
-                                    return #[lang = "from_residual"](residual),
-                                #[lang = "Continue"] {  0: val } =>
-                                    #[allow(unreachable_code)]
-                                    val,
-                            };
-                        Ok(())
-                    }
+        let mut greeting =
+            match #[lang = "branch"](GreetingAccount::try_from_slice(&account.data.borrow()))
+                        {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        if greeting.counter <= 2147483647i32 - 1 &&
+                    greeting.counter > -2147483648i32
+                {
+                        greeting.counter = -greeting.counter;
+                    } else if greeting.counter >= 2147483647i32
+                   { greeting.counter /= 2; } else { greeting.counter += 203; }
+                   match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                               {
+                           #[lang = "Break"] {  0: residual } =>
+                               #[allow(unreachable_code)]
+                               return #[lang = "from_residual"](residual),
+                           #[lang = "Continue"] {  0: val } =>
+                               #[allow(unreachable_code)]
+                               val,
+                       };
+                   Ok(())
+               }

@@ -9,12 +9,22 @@
 
 hir_contract::hir_contract(const std::filesystem::path &path) {
     _path = absolute(path);
+    _structs = extract_structs();
+    _target = extract_target();
 }
 
 hir_contract::hir_contract(const std::string &path) : hir_contract(std::filesystem::path(path)) {}
 
 std::string hir_contract::get_path() const {
     return _path.string();
+}
+
+mir_statements hir_contract::get_structs() const {
+    return _structs;
+}
+
+std::string hir_contract::get_target() const {
+    return _target;
 }
 
 mir_statements hir_contract::extract_structs() const {
@@ -69,8 +79,34 @@ mir_statements hir_contract::extract_structs() const {
     }
 
     file.close();
-
     return structs;
+}
+
+std::string hir_contract::extract_target() const {
+    std::fstream file;
+    file.open(_path, std::ios::in);
+    if (!file.is_open()) {
+        std::throw_with_nested(std::runtime_error("Unable to read HIR file"));
+    }
+
+    std::string line;
+    bool entrypoint_found = false;
+    while (getline(file, line)) {
+        std::string trimmed_line = trim_line(line);
+        if (trimmed_line == "unsafe extern \"C\" fn entrypoint(input: *mut u8)") {
+            entrypoint_found = true;
+            std::cout << "Entrypoint start" << std::endl;
+        }
+
+        const std::regex entrypoint_def (R"(^match (.+)\(.+, .+, .+\) \{$)");
+        std::smatch match;
+        if (entrypoint_found && std::regex_match(trimmed_line, match, entrypoint_def)) {
+            return match[1].str();
+        }
+    }
+
+    file.close();
+    std::throw_with_nested(std::runtime_error("No entrypoint found"));
 }
 
 std::string hir_contract::trim_line(const std::string &line) {

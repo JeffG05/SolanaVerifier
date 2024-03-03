@@ -7,7 +7,7 @@
 
 class mir_statement;
 typedef std::list<mir_statement> mir_statements;
-enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, add_ref, remove_ref, data_struct };
+enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, add_ref, remove_ref, data_struct, debug };
 
 class mir_statement {
 public:
@@ -33,6 +33,9 @@ public:
     static bool line_is_statement_start(const std::string &line);
     static std::string convert_type(const std::string& type);
 
+    static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
+    static std::string reformat_value_by_type(const std::string& value, const std::string& type);
+
 private:
     statement_type _type;
     nlohmann::json _ast_tree;
@@ -44,6 +47,7 @@ private:
     static mir_statement parse_block_header(const std::string& line);
     static std::optional<mir_statements> parse_assignment(const std::string& line, const mir_statements& variables);
     static mir_statement parse_variable(const std::string& line);
+    static std::optional<mir_statement> parse_debug(const std::string& line);
     static std::optional<mir_statement> parse_branch(const std::string& line);
 
     static std::tuple<std::string, bool, std::string, std::string> convert_value(const std::string& value, const mir_statements& variables);
@@ -51,7 +55,6 @@ private:
     static bool line_is_function(const std::string &line);
     static bool line_is_block(const std::string& line);
 
-    static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
     static mir_statements get_subvariables(const mir_statement& variable, const mir_statements& structs);
 };
 

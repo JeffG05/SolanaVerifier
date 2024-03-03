@@ -63,7 +63,6 @@ bool controller::run(const int argc, char *argv[]) {
         ("contract", boost::program_options::value<std::string>(&_contract_dir), "Directory of Solana smart contract")
         ("mir", boost::program_options::value<std::string>(&_mir_file), "MIR representation of Solana smart contract")
         ("hir", boost::program_options::value<std::string>(&_hir_file), "HIR representation of Solana smart contract")
-        ("target", boost::program_options::value<std::string>(&_target_function)->default_value("entrypoint"), "The target function to verify")
         ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
         ("array-size", boost::program_options::value<int>(&_globals.ARRAY_SIZE)->default_value(10), "Max size of arrays in SMT model")
     ;
@@ -117,7 +116,7 @@ bool controller::run(const int argc, char *argv[]) {
 
         std::cout << "Converting to MIR" << std::endl;
         auto t_to_mir_start = std::chrono::high_resolution_clock::now();
-        mir = contract.convert_to_mir(temp_dir, hir->extract_structs());
+        mir = contract.convert_to_mir(temp_dir, hir->get_structs());
         auto t_to_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Converted to MIR: took " << get_millis(t_to_mir_start, t_to_mir_end) << std::endl;
         std::cout << "-- Path: " << mir->get_path() << std::endl;
@@ -148,7 +147,7 @@ bool controller::run(const int argc, char *argv[]) {
 
         auto t_mir_start = std::chrono::high_resolution_clock::now();
         std::string contract_name = std::filesystem::path(_mir_file).stem().string();
-        mir = mir_contract(contract_name, _mir_file, hir->extract_structs(), _globals);
+        mir = mir_contract(contract_name, _mir_file, hir->get_structs(), _globals);
         auto t_mir_end = std::chrono::high_resolution_clock::now();
         std::cout << "Loaded MIR: took " << get_millis(t_mir_start, t_mir_end) << std::endl;
         std::cout << "-- Path: " << mir->get_path() << std::endl;
@@ -164,7 +163,7 @@ bool controller::run(const int argc, char *argv[]) {
     }
 
     auto t_to_c_start = std::chrono::high_resolution_clock::now();
-    c_program solana_c = mir.value().convert_to_c(temp_dir, _target_function);
+    c_program solana_c = mir.value().convert_to_c(temp_dir, hir->get_target());
     auto t_to_c_end = std::chrono::high_resolution_clock::now();
     std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
     std::cout << "-- Path: " << solana_c.get_path() << std::endl;

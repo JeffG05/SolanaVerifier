@@ -53,6 +53,8 @@ std::string mir_statement::get_string_type() const {
             return "Remove Reference";
         case statement_type::data_struct:
             return "Struct";
+        case statement_type::debug:
+            return "Debug";
         default:
             return "Unknown Statement";
     }
@@ -147,6 +149,8 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::remove_ref;
     } else if (string_type == "Struct") {
         type = statement_type::data_struct;
+    } else if (string_type == "Debug") {
+        type = statement_type::debug;
     } else {
         type = statement_type::unknown;
     }
@@ -203,6 +207,11 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines, const 
         if (lines.front().starts_with("let")) {
             mir_statement variable_statement = parse_variable(lines.front());
             function_header.add_child(variable_statement);
+        } else if (lines.front().starts_with("debug")) {
+            std::optional<mir_statement> debug_statement = parse_debug(lines.front());
+            if (debug_statement.has_value()) {
+                function_header.add_child(debug_statement.value());
+            }
         }
         lines.pop_front();
     }
@@ -366,25 +375,7 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
         std::optional<mir_statement> variable_statement = get_statement(variables, variable_name);
         if (variable_statement.has_value()) {
             std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
-            if (variable_type.starts_with("array<")) {
-                data["value"] = "copy_array<" + data.at("value").get<std::string>() + ">";
-            } else if (variable_type == "pubkey") {
-                data["value"] = "copy_pubkey<" + data.at("value").get<std::string>() + ">";
-            } else if (variable_type == "account_info") {
-                data["value"] = "copy_account_info<" + data.at("value").get<std::string>() + ">";
-            } else if (variable_type == "account_meta") {
-                data["value"] = "copy_account_meta<" + data.at("value").get<std::string>() + ">";
-            } else if (variable_type == "solana_instruction") {
-                if (!data.at("value").get<std::string>().starts_with("init_solana_instruction<")) {
-                    data["value"] = "copy_solana_instruction<" + data.at("value").get<std::string>() + ">";
-                }
-            } else if (variable_type.starts_with("result<")) {
-                if (variable_type == "result<void>") {
-                    data["value"] = "copy_void_result<" + data.at("value").get<std::string>() + ">";
-                } else {
-                    data["value"] = "copy_result<" + data.at("value").get<std::string>() + ">";
-                }
-            }
+            data["value"] = reformat_value_by_type(data.at("value"), variable_type);
         }
     }
 
@@ -441,9 +432,35 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     return all_statements;
 }
 
-mir_statement mir_statement::parse_variable(const std::string &line) {
-    nlohmann::json data;
+std::string mir_statement::reformat_value_by_type(const std::string &value, const std::string &type) {
+    if (type.starts_with("array<")) {
+        return "copy_array<" + value + ">";
+    }
+    if (type == "pubkey") {
+        return "copy_pubkey<" + value + ">";
+    }
+    if (type == "account_info") {
+        return "copy_account_info<" + value + ">";
+    }
+    if (type == "account_meta") {
+        return "copy_account_meta<" + value + ">";
+    }
+    if (type == "solana_instruction") {
+        if (!value.starts_with("init_solana_instruction<")) {
+            return "copy_solana_instruction<" + value + ">";
+        }
+        return value;
+    }
+    if (type.starts_with("result<")) {
+        if (type == "result<void>") {
+            return "copy_void_result<" + value + ">";
+        }
+        return "copy_result<" + value + ">";
+    }
+    return value;
+}
 
+mir_statement mir_statement::parse_variable(const std::string &line) {
     std::smatch match;
     const std::regex var_regex ("^let(?: mut)? (_\\d+): (.+?);$");
     const std::regex param_regex ("^(_\\d+): (.+?)$");
@@ -452,6 +469,7 @@ mir_statement mir_statement::parse_variable(const std::string &line) {
         return new_variable(match[1].str(), convert_type(match[2].str()));
     }
 
+    nlohmann::json data;
     if (std::regex_match(line, match, param_regex)) {
         data["variable"] = match[1].str();
         data["variable_type"] = convert_type(match[2].str());
@@ -459,6 +477,20 @@ mir_statement mir_statement::parse_variable(const std::string &line) {
     }
 
     return {statement_type::variable, data};
+}
+
+std::optional<mir_statement> mir_statement::parse_debug(const std::string &line) {
+    std::smatch match;
+    const std::regex debug_regex ("^debug (.+) => (_\\d+);$");
+
+    if (std::regex_match(line, match, debug_regex)) {
+        nlohmann::json data;
+        data["name"] = match[1].str();
+        data["variable"] = match[2].str();
+        return mir_statement(statement_type::debug, data);
+    }
+
+    return std::nullopt;
 }
 
 std::optional<mir_statement> mir_statement::parse_branch(const std::string &line) {
@@ -535,9 +567,16 @@ std::pair<std::string, std::string> mir_statement::get_argument_pair(const std::
 }
 
 std::optional<mir_statement> mir_statement::get_statement(const mir_statements &variables, const std::string &name) {
+    std::string search_name = name;
+
+    const std::regex indexed_regex (R"(^(.+)\[.+\]$)");
+    if (std::smatch match; std::regex_match(name, match, indexed_regex)) {
+        search_name = match[1].str() + ".t";
+    }
+
     for (const auto& variable: variables) {
         std::string var_name = variable.get_ast_data().at("variable");
-        if (var_name == name) {
+        if (var_name == search_name) {
             return variable;
         }
     }
@@ -546,7 +585,7 @@ std::optional<mir_statement> mir_statement::get_statement(const mir_statements &
 
 mir_statements mir_statement::get_all_variables(mir_statement function_header, const mir_statements& structs) {
     mir_statements all_variables;
-    for (const auto& variable: function_header.get_children()) {
+    for (const auto& variable: function_header.get_children({statement_type::variable, statement_type::parameter})) {
         utils::extend(&all_variables, get_subvariables(variable, structs));
     }
     return all_variables;
@@ -642,6 +681,11 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
             i++;
         }
         return subvariables;
+    }
+    if (type.starts_with("array<")) {
+        std::string array_type = type.substr(6, type.size() - 7);
+        const mir_statement array_item = new_variable(name + ".t", array_type);
+        utils::extend(&subvariables, get_subvariables(array_item, structs));
     }
 
     return subvariables;

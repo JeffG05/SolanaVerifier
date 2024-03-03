@@ -15,7 +15,6 @@ private:
     std::string _contract_dir;
     std::string _mir_file;
     std::string _hir_file;
-    std::string _target_function;
     std::string _esbmc_path;
     config _globals{};
 
