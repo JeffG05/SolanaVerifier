@@ -44,19 +44,36 @@ result verification_result::parse_log() const {
 
         if (line == "VERIFICATION SUCCESSFUL") {
             is_sat = true;
-        } else if (line == "VERIFICATION FAILED") {
+            continue;
+        }
+        if (line == "VERIFICATION FAILED") {
             is_sat = false;
+            continue;
         }
 
         if (utils::trim(line).starts_with("Vulnerability Found: ")) {
-            std::string vulnerability_id = utils::trim(line).substr(21);
+            std::list<std::string> result_infos = utils::split(utils::trim(line), "; ");
+            auto result_itr = result_infos.begin();
+
+            std::optional<vulnerability_type> vulnerability_type_found;
+            std::optional<std::string> vulnerability_reason_found;
+
+            std::string vulnerability_id = result_itr->substr(21);
             if (std::ranges::all_of(vulnerability_id, ::isdigit)) {
                 int vulnerability_enum = std::stoi(vulnerability_id);
-                const auto type = static_cast<vulnerability_type>(vulnerability_enum);
-                vulnerability_found = vulnerability(type);
-            } else {
+                vulnerability_type_found = static_cast<vulnerability_type>(vulnerability_enum);
+            }
+            if (!vulnerability_type_found.has_value()) {
                 vulnerability_found = std::nullopt;
             }
+
+            if (++result_itr == result_infos.end()) {
+                vulnerability_found = vulnerability(vulnerability_type_found.value(), std::nullopt);
+                continue;
+            }
+
+            vulnerability_reason_found = result_itr->substr(8);
+            vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found);
         }
     }
 

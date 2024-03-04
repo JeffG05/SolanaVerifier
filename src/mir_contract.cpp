@@ -776,7 +776,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
 }
 
 void mir_contract::generate_verification_statements(std::ostream *out, const mir_statements& state_statements, const mir_statements& debug_statements, const std::string& function_return) {
-    std::set<std::string> protected_account_infos;
+    std::set<std::tuple<std::string, std::string>> protected_account_infos;
 
     for (const auto& debug_statement: debug_statements) {
         std::string debug_name = debug_statement.get_ast_data().at("name");
@@ -788,15 +788,16 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
 
         std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
         if (variable_type == "account_info" && debug_name.starts_with("protected_")) {
-            protected_account_infos.insert(debug_variable);
+            protected_account_infos.insert(std::make_tuple(debug_variable, debug_name));
         }
     }
     std::cout << std::endl;
     if (function_return.starts_with("result<")) {
         // Check owner is calling function
         // LOGIC: A successful return implies that the owner called the function
-        for (const auto& account_info: protected_account_infos) {
-            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << account_info << ".get3), \"Vulnerability Found: 9\");" << std::endl;
+        for (auto account_info: protected_account_infos) {
+            std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
+            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "\");" << std::endl;
         }
         *out << std::endl;
     }

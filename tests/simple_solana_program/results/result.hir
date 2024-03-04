@@ -103,7 +103,7 @@ fn process_instruction<'_, '_, '_,
     ->
         entrypoint::ProgramResult {
         let accounts_iter = &mut accounts.iter();
-        let account =
+        let protected_account =
             match #[lang = "branch"](next_account_info(accounts_iter)) {
                     #[lang = "Break"] {  0: residual } =>
                         #[allow(unreachable_code)]
@@ -113,7 +113,7 @@ fn process_instruction<'_, '_, '_,
                         val,
                 };
         let mut greeting =
-            match #[lang = "branch"](GreetingAccount::try_from_slice(&account.data.borrow()))
+            match #[lang = "branch"](GreetingAccount::try_from_slice(&protected_account.data.borrow()))
                         {
                     #[lang = "Break"] {  0: residual } =>
                         #[allow(unreachable_code)]
@@ -128,7 +128,7 @@ fn process_instruction<'_, '_, '_,
                         greeting.counter = -greeting.counter;
                     } else if greeting.counter >= 2147483647i32
                    { greeting.counter /= 2; } else { greeting.counter += 203; }
-                   match #[lang = "branch"](greeting.serialize(&mut &mut account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                   match #[lang = "branch"](greeting.serialize(&mut &mut protected_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
                                {
                            #[lang = "Break"] {  0: residual } =>
                                #[allow(unreachable_code)]

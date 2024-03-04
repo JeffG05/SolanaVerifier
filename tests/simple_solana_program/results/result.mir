@@ -272,7 +272,7 @@ fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result
         let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
         let _10: &solana_program::account_info::AccountInfo<'_>;
         scope 2 {
-            debug account => _10;
+            debug protected_account => _10;
             let mut _11: GreetingAccount;
             let _21: std::result::Result<std::convert::Infallible, std::io::Error>;
             let _22: GreetingAccount;
