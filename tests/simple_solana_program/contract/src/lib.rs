@@ -38,16 +38,16 @@ pub fn process_instruction(
     // The account must be owned by the program in order for the
     // program to write to it. If that is not the case then the
     // program has been invoked incorrectly and we report as much.
-    // if account.owner != program_id {
-    //     return Err(ProgramError::IncorrectProgramId);
-    // }
+    if protected_account.owner != program_id {
+        return Err(ProgramError::IncorrectProgramId);
+    }
 
     // Deserialize the greeting information from the account, modify
     // it, and then write it back.
     let mut greeting = GreetingAccount::try_from_slice(&protected_account.data.borrow())?;
-    if (greeting.counter <= i32::MAX - 1 && greeting.counter > i32::MIN) {
+    if greeting.counter <= i32::MAX - 1 && greeting.counter > i32::MIN {
         greeting.counter = -greeting.counter;
-    } else if (greeting.counter >= i32::MAX) {
+    } else if greeting.counter >= i32::MAX {
         greeting.counter /= 2;
     } else {
         greeting.counter += 203;

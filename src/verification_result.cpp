@@ -57,6 +57,7 @@ result verification_result::parse_log() const {
 
             std::optional<vulnerability_type> vulnerability_type_found;
             std::optional<std::string> vulnerability_reason_found;
+            std::optional<std::string> vulnerability_solution_found;
 
             std::string vulnerability_id = result_itr->substr(21);
             if (std::ranges::all_of(vulnerability_id, ::isdigit)) {
@@ -68,12 +69,17 @@ result verification_result::parse_log() const {
             }
 
             if (++result_itr == result_infos.end()) {
-                vulnerability_found = vulnerability(vulnerability_type_found.value(), std::nullopt);
+                vulnerability_found = vulnerability(vulnerability_type_found.value(), std::nullopt, std::nullopt);
                 continue;
             }
 
             vulnerability_reason_found = result_itr->substr(8);
-            vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found);
+            if (++result_itr == result_infos.end()) {
+                vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found, std::nullopt);
+            }
+
+            vulnerability_solution_found = result_itr->substr(10);
+            vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found, vulnerability_solution_found);
         }
     }
 

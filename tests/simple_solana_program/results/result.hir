@@ -72,7 +72,7 @@ impl ::core::fmt::Debug for GreetingAccount {
 // The account must be owned by the program in order for the
 // program to write to it. If that is not the case then the
 // program has been invoked incorrectly and we report as much.
-// if account.owner != program_id {
+// if protected_account.owner != program_id {
 //     return Err(ProgramError::IncorrectProgramId);
 // }
 

@@ -186,6 +186,9 @@ bool controller::run(const int argc, char *argv[]) {
         if (v.get_reason().has_value()) {
             std::cout << "-- Reason: " << v.get_reason().value() << std::endl;
         }
+        if (v.get_solution().has_value()) {
+            std::cout << "-- Solution: " << v.get_solution().value() << std::endl;
+        }
     } else {
         std::string error = boolector_result.get_error().value_or("Unknown error");
         std::cout << "Error: Unable to run verification" << std::endl;

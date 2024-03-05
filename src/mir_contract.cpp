@@ -561,6 +561,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         generate_block_assignment(out, variable + ".get1", "copy_array<" + *instruction_values_itr + ">", true, all_variables, indents);
         ++instruction_values_itr;
         generate_block_assignment(out, variable + ".get2", "copy_array<" + *instruction_values_itr + ">", true, all_variables, indents);
+    } else if (value.starts_with("init_array<")) {
+        const std::string array_value = value.substr(11, value.size() - 12);
+        const auto array_values = utils::split(array_value, ", ");
+        auto array_values_itr = array_values.begin();
+        for (int i = 0; i < array_values.size(); i++) {
+            generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", *array_values_itr, true, all_variables, indents);
+            ++array_values_itr;
+        }
     } else if (!variable.empty()) {
         const std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, value.starts_with("state.") ? value.substr(6) : value);
         std::string formatted_value = value;
@@ -776,6 +784,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
 }
 
 void mir_contract::generate_verification_statements(std::ostream *out, const mir_statements& state_statements, const mir_statements& debug_statements, const std::string& function_return) {
+    std::string program_id_name;
     std::set<std::tuple<std::string, std::string>> protected_account_infos;
 
     for (const auto& debug_statement: debug_statements) {
@@ -789,6 +798,8 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
         if (variable_type == "account_info" && debug_name.starts_with("protected_")) {
             protected_account_infos.insert(std::make_tuple(debug_variable, debug_name));
+        } else if (variable_type == "pubkey" && debug_variable == "_1") {
+            program_id_name = debug_name;
         }
     }
     std::cout << std::endl;
@@ -797,7 +808,8 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         // LOGIC: A successful return implies that the owner called the function
         for (auto account_info: protected_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
-            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "\");" << std::endl;
+            std::string solution = "Check '" + std::get<1>(account_info) + ".owner == " + program_id_name + "'";
+            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
         *out << std::endl;
     }

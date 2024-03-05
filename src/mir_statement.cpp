@@ -434,7 +434,10 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
 
 std::string mir_statement::reformat_value_by_type(const std::string &value, const std::string &type) {
     if (type.starts_with("array<")) {
-        return "copy_array<" + value + ">";
+        if (!value.starts_with("init_array<")) {
+            return "copy_array<" + value + ">";
+        }
+        return value;
     }
     if (type == "pubkey") {
         return "copy_pubkey<" + value + ">";

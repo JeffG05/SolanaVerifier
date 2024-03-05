@@ -24,6 +24,7 @@
 #include "values/greater_than_equal_mir_value.h"
 #include "values/greater_than_mir_value.h"
 #include "values/index_mut_range_full_mir_value.h"
+#include "values/init_array_mir_value.h"
 #include "values/iter_mir_value.h"
 #include "values/less_than_equal_mir_value.h"
 #include "values/less_than_mir_value.h"
@@ -95,6 +96,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     bitor_mir_value(),
     bitxor_mir_value(),
     solana_instruction_mir_value(),
+    init_array_mir_value(),
 
     // KEEP LAST
     function_mir_value()
