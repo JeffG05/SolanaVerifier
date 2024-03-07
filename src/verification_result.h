@@ -2,6 +2,8 @@
 #define VERIFICATION_RESULT_H
 
 #include <filesystem>
+#include <optional>
+
 #include "vulnerability.h"
 
 typedef std::tuple<bool, std::optional<vulnerability>, std::optional<std::string>> result;

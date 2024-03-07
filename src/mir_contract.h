@@ -27,9 +27,10 @@ private:
     std::string _contract_name;
     std::filesystem::path _path;
     mir_statements _structs;
+    std::set<std::string> _function_names;
     config _globals{};
 
-    mir_statement create_ast_tree(std::istream& file) const;
+    mir_statement create_ast_tree(std::istream& file);
 
     [[nodiscard]] static std::string get_c_subtype(const std::string& type);
     [[nodiscard]] std::string get_c_type(const std::string& type, const std::string& name, const std::string& function_name) const;
@@ -53,7 +54,7 @@ private:
     void generate_block_assignment(std::ostream* out, const std::string &variable, const std::string &value, bool returns, const mir_statements& all_variables, int indents=1);
     static void generate_reference_assignments(std::ostream* out, const std::string &variable, const reference_map &references);
     static void generate_branch(std::ostream* out, const mir_statement &branch_statement, const std::string& function_name, const std::string& variable, const std::string& value);
-    void generate_function(std::ostream* out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string& function_name, const std::string& function_return, const mir_statements &all_variables);
+    void generate_function(std::ostream* out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string& function_name, const std::string& function_return, const mir_statements &all_variables, bool forward_decl = false);
     void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name);
 
     void generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const;

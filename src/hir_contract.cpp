@@ -95,7 +95,6 @@ std::string hir_contract::extract_target() const {
         std::string trimmed_line = trim_line(line);
         if (trimmed_line == "unsafe extern \"C\" fn entrypoint(input: *mut u8)") {
             entrypoint_found = true;
-            std::cout << "Entrypoint start" << std::endl;
         }
 
         const std::regex entrypoint_def (R"(^match (.+)\(.+, .+, .+\) \{$)");

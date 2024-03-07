@@ -1,0 +1,184 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use std::ops::Deref;
+use borsh::{};
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use solana_program::{};
+use solana_program::account_info::{};
+use solana_program::account_info::next_account_info;
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::program_error::ProgramError;
+use solana_program::pubkey::Pubkey;
+
+struct ConfigAccount {
+    admin: Pubkey,
+}
+impl borsh::ser::BorshSerialize for ConfigAccount {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::io::Error> where
+        W: borsh::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.admin,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for ConfigAccount {
+    fn deserialize_reader<R, '_>(reader: &'_ mut R)
+        -> ::core::result::Result<Self, borsh::io::Error> where
+        R: borsh::io::Read {
+            Ok(Self{
+                    admin:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize_reader(reader))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+
+struct ProgramInstructionData {
+    withdraw_amount: u64,
+}
+impl borsh::ser::BorshSerialize for ProgramInstructionData {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::io::Error> where
+        W: borsh::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.withdraw_amount,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for ProgramInstructionData {
+    fn deserialize_reader<R, '_>(reader: &'_ mut R)
+        -> ::core::result::Result<Self, borsh::io::Error> where
+        R: borsh::io::Read {
+            Ok(Self{
+                    withdraw_amount:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize_reader(reader))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+
+
+
+
+// ...
+// Transfer funds from vault to admin using vault_authority
+// ...
+
+
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+fn withdraw_token_restricted<'_, '_,
+    '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>], amount: u64)
+    ->
+        ProgramResult {
+        let account_iter = &mut accounts.iter();
+        let vault =
+            match #[lang = "branch"](next_account_info(account_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let admin =
+            match #[lang = "branch"](next_account_info(account_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let config__owner =
+            match #[lang = "branch"](next_account_info(account_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let config_account =
+            match #[lang = "branch"](ConfigAccount::try_from_slice(&config__owner.data.borrow()))
+                        {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let vault_authority =
+            match #[lang = "branch"](next_account_info(account_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        if config_account.admin != *admin.key
+                { return Err(ProgramError::InvalidAccountOwner); }
+                Ok(())
+            }
+        fn process_instruction<'_, '_, '_,
+            '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+            instruction_data: &'_ [u8])
+            ->
+                ProgramResult {
+                let program_instruction_data =
+                    match #[lang = "branch"](ProgramInstructionData::try_from_slice(instruction_data))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                withdraw_token_restricted(program_id, accounts,
+                    program_instruction_data.withdraw_amount)
+            }

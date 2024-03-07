@@ -48,7 +48,7 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
 
 }
 
-mir_statement mir_contract::create_ast_tree(std::istream& file) const {
+mir_statement mir_contract::create_ast_tree(std::istream& file) {
     // Init statement tree
     auto root = mir_statement::create_root(_contract_name);
 
@@ -57,6 +57,17 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) const {
     }
 
     std::string line;
+    while (getline(file, line)) {
+        std::string trimmed_line = trim_line(line);
+        if (mir_statement::line_is_function(trimmed_line)) {
+            mir_statement func = mir_statement::parse_function_header(trimmed_line);
+            _function_names.insert(func.get_ast_data().at("name"));
+        }
+    }
+
+    file.clear();
+    file.seekg(0);
+
     auto current_statement_lines = std::list<std::string>();
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
@@ -107,8 +118,27 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
     mir_statements functions = ast_tree.get_children({statement_type::function});
     for (auto function_statement : std::ranges::reverse_view(functions)) {
         nlohmann::json function_data = function_statement.get_ast_data();
-        const std::string function_name = function_data.at("name").get<std::string>();
-        const std::string function_return = function_data.at("return_type").get<std::string>();
+        const std::string function_name = function_data.at("name");
+        const std::string function_return = function_data.at("return_type");
+
+        mir_statements function_parameters = function_statement.get_children({statement_type::parameter});
+        mir_statements function_variables = function_statement.get_children({statement_type::variable});
+        mir_statements function_debugs = function_statement.get_children({statement_type::debug});
+        mir_statements function_blocks = function_statement.get_children({statement_type::block});
+        mir_statements function_all_variables = mir_statement::get_all_variables(function_statement, _structs);
+
+        mir_statements function_states;
+        std::ranges::copy(function_parameters, std::back_insert_iterator(function_states));
+        std::ranges::copy(function_variables, std::back_insert_iterator(function_states));
+
+        generate_structs(&file, function_states, function_name);
+        generate_function(&file, function_states, function_debugs, function_name, function_return, function_all_variables, true);
+    }
+
+    for (auto function_statement : std::ranges::reverse_view(functions)) {
+        nlohmann::json function_data = function_statement.get_ast_data();
+        const std::string function_name = function_data.at("name");
+        const std::string function_return = function_data.at("return_type");
         
         mir_statements function_parameters = function_statement.get_children({statement_type::parameter});
         mir_statements function_variables = function_statement.get_children({statement_type::variable});
@@ -122,7 +152,6 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
         reference_map references;
 
-        generate_structs(&file, function_states, function_name);
         for (const auto& block_statement : std::ranges::reverse_view(function_blocks)) {
             file << function_name << "_state " << function_name << "_" << block_statement.get_ast_data().at("name").get<std::string>() << "(" << function_name << "_state state);" << std::endl;
         }
@@ -491,7 +520,6 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "state." << variable << ".is_success = false;" << std::endl;
     } else if (value.starts_with("next<")) {
         const std::string iter_value = value.substr(5, value.size() - 6);
-        const std::string indexer = "i_" + utils::clean(variable);
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
         generate_block_assignment(out, variable + ".value", get_c_value(iter_value) + "[0]", true, all_variables, indents);
         for (int i = 0; i < _globals.ARRAY_SIZE-1; i++) {
@@ -529,14 +557,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("copy_void_result<")) {
         const std::string result_value = value.substr(17, value.size() - 18);
-        if (result_value.starts_with("state.")) {
+        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(").front())) {
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
         } else {
             generate_block_assignment(out, variable, result_value, true, all_variables, indents);
         }
     } else if (value.starts_with("copy_result<")) {
         const std::string result_value = value.substr(12, value.size() - 13);
-        if (result_value.starts_with("state.")) {
+        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(").front())) {
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
             generate_block_assignment(out, variable + ".value", result_value + ".value", true, all_variables, indents);
         } else {
@@ -639,7 +667,8 @@ void mir_contract::generate_branch(std::ostream *out, const mir_statement &branc
     *out << "\t} else ";
 }
 
-void mir_contract::generate_function(std::ostream *out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string &function_name, const std::string &function_return, const mir_statements &all_variables) {
+void mir_contract::generate_function(std::ostream *out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string &
+                                     function_name, const std::string &function_return, const mir_statements &all_variables, bool forward_decl) {
     std::list<std::string> parameters;
     for (const auto& statement: state_statements) {
         if (statement.get_type() != statement_type::parameter) {
@@ -651,7 +680,13 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
         parameters.push_back(get_c_type(parameter_type, parameter_name, function_name));
     }
     const std::string return_type = get_return_c_type(function_return, function_name);
-    *out << return_type << " " << function_name << "(" << utils::join(parameters, ", ") << ") {" << std::endl;
+    *out << return_type << " " << function_name << "(" << utils::join(parameters, ", ") << ")";
+
+    if (forward_decl) {
+        *out << ";" << std::endl;
+        return;
+    }
+    *out << " {" << std::endl;
 
     // Init function state
     *out << "\t" << function_name << "_state state;" << std::endl;
@@ -785,7 +820,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
 
 void mir_contract::generate_verification_statements(std::ostream *out, const mir_statements& state_statements, const mir_statements& debug_statements, const std::string& function_return) {
     std::string program_id_name;
-    std::set<std::tuple<std::string, std::string>> protected_account_infos;
+    std::set<std::tuple<std::string, std::string>> owner_account_infos;
 
     for (const auto& debug_statement: debug_statements) {
         std::string debug_name = debug_statement.get_ast_data().at("name");
@@ -796,17 +831,17 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         }
 
         std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
-        if (variable_type == "account_info" && debug_name.starts_with("protected_")) {
-            protected_account_infos.insert(std::make_tuple(debug_variable, debug_name));
+        if (variable_type == "account_info" && debug_name.find("__owner") != std::string::npos) {
+            owner_account_infos.insert(std::make_tuple(debug_variable, debug_name));
         } else if (variable_type == "pubkey" && debug_variable == "_1") {
             program_id_name = debug_name;
         }
     }
-    std::cout << std::endl;
+
     if (function_return.starts_with("result<")) {
         // Check owner is calling function
         // LOGIC: A successful return implies that the owner called the function
-        for (auto account_info: protected_account_infos) {
+        for (auto account_info: owner_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
             std::string solution = "Check '" + std::get<1>(account_info) + ".owner == " + program_id_name + "'";
             *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
