@@ -172,7 +172,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
 std::string mir_contract::get_c_type(const std::string &type, const std::string &name, const std::string &function_name) const {
     if (type.starts_with("array<")) {
-        return get_c_subtype(type) + " " + name + "[" + std::to_string(_globals.ARRAY_SIZE) + "]";
+        return get_c_type(get_c_subtype(type), name + "[" + std::to_string(_globals.ARRAY_SIZE) + "]", function_name);
     }
     if (type.starts_with("tuple<")) {
         const std::string tuple_name = get_tuple_name(type, function_name);
