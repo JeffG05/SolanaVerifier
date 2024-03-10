@@ -394,3 +394,10 @@ controlflow nondet_controlflow() {
     controlflow c;
     return c;
 }
+
+// PANIC ASSERT KIND
+typedef enum { _panic_assert_kind_eq, _panic_assert_kind_ne, _panic_assert_kind_match } panic_assert_kind;
+panic_assert_kind nondet_panic_assert_kind() {
+    panic_assert_kind x;
+    return x;
+}

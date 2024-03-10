@@ -14,6 +14,7 @@
 #include "types/int_mir_type.h"
 #include "types/iter_mir_type.h"
 #include "types/mutable_mir_type.h"
+#include "types/panic_assert_kind_mir_type.h"
 #include "types/pubkey_mir_type.h"
 #include "types/rc_mir_type.h"
 #include "types/ref_cell_mir_type.h"
@@ -62,5 +63,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     solana_instruction_mir_type(),
     deref_mir_type(),
     box_mir_type(),
-    const_mir_type()
+    const_mir_type(),
+    panic_assert_kind_mir_type()
 };

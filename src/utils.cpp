@@ -74,3 +74,10 @@ std::string utils::clean(const std::string &s) {
     return clean;
 }
 
+std::string utils::to_lower(const std::string &s) {
+    std::string new_s = s;
+    for (auto& c: new_s) {
+        c = static_cast<char>(tolower(c));
+    }
+    return new_s;
+}

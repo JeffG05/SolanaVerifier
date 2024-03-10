@@ -3,25 +3,20 @@
 #include "controller.h"
 #include "mir_contract.h"
 #include "solana_contract.h"
+#include "utils.h"
 
 controller::controller() {
     _globals = config();
 }
 
 bool controller::is_mir(const std::filesystem::path &path) {
-    std::string extension = path.extension().string();
-    for (auto& c: extension) {
-        c = static_cast<char>(tolower(c));
-    }
-    return extension == ".mir";
+    const std::string extension = path.extension().string();
+    return utils::to_lower(extension) == ".mir";
 }
 
 bool controller::is_hir(const std::filesystem::path &path) {
-    std::string extension = path.extension().string();
-    for (auto& c: extension) {
-        c = static_cast<char>(tolower(c));
-    }
-    return extension == ".hir";
+    const std::string extension = path.extension().string();
+    return utils::to_lower(extension) == ".hir";
 }
 
 bool controller::is_directory(const std::filesystem::path &path) {

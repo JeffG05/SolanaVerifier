@@ -35,6 +35,7 @@
 #include "values/next_mir_value.h"
 #include "values/not_equal_mir_value.h"
 #include "values/ok_result_mir_value.h"
+#include "values/panic_assert_kind_mir_value.h"
 #include "values/print_mir_value.h"
 #include "values/program_error_mir_value.h"
 #include "values/result_error_mir_value.h"
@@ -97,6 +98,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     bitxor_mir_value(),
     solana_instruction_mir_value(),
     init_array_mir_value(),
+    panic_assert_kind_mir_value(),
 
     // KEEP LAST
     function_mir_value()
