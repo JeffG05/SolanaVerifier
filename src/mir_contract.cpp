@@ -821,6 +821,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
 void mir_contract::generate_verification_statements(std::ostream *out, const mir_statements& state_statements, const mir_statements& debug_statements, const std::string& function_return) {
     std::string program_id_name;
     std::set<std::tuple<std::string, std::string>> owner_account_infos;
+    std::set<std::tuple<std::string, std::string>> signer_account_infos;
 
     for (const auto& debug_statement: debug_statements) {
         std::string debug_name = debug_statement.get_ast_data().at("name");
@@ -831,8 +832,13 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         }
 
         std::string variable_type = variable_statement.value().get_ast_data().at("variable_type");
-        if (variable_type == "account_info" && debug_name.find("__owner") != std::string::npos) {
-            owner_account_infos.insert(std::make_tuple(debug_variable, debug_name));
+        if (variable_type == "account_info") {
+            if (debug_name.find("__owner") != std::string::npos) {
+                owner_account_infos.insert(std::make_tuple(debug_variable, debug_name));
+            }
+            if (debug_name.find("__signer") != std::string::npos) {
+                signer_account_infos.insert(std::make_tuple(debug_variable, debug_name));
+            }
         } else if (variable_type == "pubkey" && debug_variable == "_1") {
             program_id_name = debug_name;
         }
@@ -845,6 +851,14 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
             std::string solution = "Check '" + std::get<1>(account_info) + ".owner == " + program_id_name + "'";
             *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
+        }
+
+        // Check signers have signed the instruction
+        // LOGIC: A successul return implies that the signer has signed the instruction
+        for (auto account_info : signer_account_infos) {
+            std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing signer checks";
+            std::string solution = "Check '" + std::get<1>(account_info) + ".is_signer'";
+            *out << "\t__ESBMC_assert(!state._0.is_success || state." << std::get<0>(account_info) << ".get5, \"Vulnerability Found: 10; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
         *out << std::endl;
     }

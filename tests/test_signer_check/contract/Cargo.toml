@@ -1,0 +1,15 @@
+[package]
+name = "test_signer_check"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+exclude_entrypoint = []
+
+[dependencies]
+solana-program = "1.18.4"
+borsh = "1.3.1"
+
+[lib]
+name = "test_signer_check"
+crate-type = ["cdylib", "lib"]

@@ -1,8 +1,6 @@
-use std::ops::Deref;
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
-    entrypoint,
     entrypoint::ProgramResult,
     program_error::ProgramError,
     pubkey::Pubkey,
