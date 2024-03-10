@@ -91,16 +91,24 @@ std::string hir_contract::extract_target() const {
 
     std::string line;
     bool entrypoint_found = false;
+    bool target_line_found = false;
+    std::string target_line;
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
         if (trimmed_line == "unsafe extern \"C\" fn entrypoint(input: *mut u8)") {
             entrypoint_found = true;
         }
 
-        const std::regex entrypoint_def (R"(^match (.+)\(.+, .+, .+\) \{$)");
-        std::smatch match;
-        if (entrypoint_found && std::regex_match(trimmed_line, match, entrypoint_def)) {
-            return match[1].str();
+        if (entrypoint_found && (target_line_found || trimmed_line.starts_with("match "))) {
+            target_line_found = true;
+            target_line += trimmed_line;
+            if (trimmed_line.ends_with(" {")) {
+                const std::regex entrypoint_def (R"(^match (.+)\(.+,\s?.+,\s?.+\) \{$)");
+                std::smatch match;
+                if (std::regex_match(target_line, match, entrypoint_def)) {
+                    return match[1].str();
+                }
+            }
         }
     }
 
