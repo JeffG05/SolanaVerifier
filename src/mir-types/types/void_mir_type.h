@@ -6,7 +6,7 @@
 class void_mir_type : public mir_type {
 public:
     void_mir_type() : mir_type(
-        std::regex (R"(^\(\)$)"),
+        std::regex (R"(^(?:\(\)|!)$)"),
         [](const std::smatch &match) {
             return "void";
         }
