@@ -255,7 +255,7 @@ fn update_admin(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), ProgramError>
             let _13: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
             let _14: &solana_program::account_info::AccountInfo<'_>;
             scope 7 {
-                debug config__owner => _14;
+                debug config => _14;
                 let mut _15: ConfigAccount;
                 let _25: std::result::Result<std::convert::Infallible, std::io::Error>;
                 let _26: ConfigAccount;

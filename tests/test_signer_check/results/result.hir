@@ -83,7 +83,7 @@ fn update_admin<'_, '_,
                         #[allow(unreachable_code)]
                         val,
                 };
-        let config__owner =
+        let config =
             match #[lang = "branch"](next_account_info(account_iter)) {
                     #[lang = "Break"] {  0: residual } =>
                         #[allow(unreachable_code)]
@@ -93,7 +93,7 @@ fn update_admin<'_, '_,
                         val,
                 };
         let mut config_account =
-            match #[lang = "branch"](ConfigAccount::try_from_slice(&config__owner.data.borrow()))
+            match #[lang = "branch"](ConfigAccount::try_from_slice(&config.data.borrow()))
                         {
                     #[lang = "Break"] {  0: residual } =>
                         #[allow(unreachable_code)]
@@ -111,12 +111,12 @@ fn update_admin<'_, '_,
                         #[allow(unreachable_code)]
                         val,
                 };
-        if config__owner.owner != program_id
+        if config.owner != program_id
                 { return Err(ProgramError::IncorrectProgramId); }
                 if config_account.admin != *admin__signer.key
                         { return Err(ProgramError::InvalidAccountOwner); }
                         config_account.admin = *new_admin.key;
-                        match #[lang = "branch"](config_account.serialize(&mut &mut config__owner.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                        match #[lang = "branch"](config_account.serialize(&mut &mut config.data.borrow_mut()[#[lang = "RangeFull"]{}]))
                                     {
                                 #[lang = "Break"] {  0: residual } =>
                                     #[allow(unreachable_code)]
