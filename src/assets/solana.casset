@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 // UNSIGNED INTEGERS
 typedef unsigned long long int u64;
@@ -229,13 +230,15 @@ signed_math_result i_negation(signed long long int a, signed long long int max, 
 
 // STRING
 typedef char* string;
-unsigned int MAX_STRING_LEN = 1024;
 string nondet_string() {
     char* str;
     return str;
 }
 void print(string s) {
     printf("%s\n", s);
+}
+bool is_equal(string lhs, string rhs) {
+    return strcmp(lhs, rhs) == 0
 }
 
 // PUBKEY
