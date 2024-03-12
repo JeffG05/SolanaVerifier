@@ -131,6 +131,7 @@ add_executable(SolanaVerifier
         mir-values/values/init_tuple_mir_value.h
         mir-values/values/promoted_mir_value.h
         mir-types/types/optional_mir_type.h
+        mir-values/values/none_optional_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

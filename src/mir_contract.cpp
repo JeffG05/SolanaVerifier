@@ -540,6 +540,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         if (ok_value != "void") {
             generate_block_assignment(out, variable + ".value", ok_value, true, all_variables, indents);
         }
+    } else if (value.starts_with("optional_none<")) {
+        *out << base_indent << "state." << variable << ".is_none = true;" << std::endl;
     } else if (value.starts_with("result_error<")) {
         *out << base_indent << "state." << variable << ".is_success = false;" << std::endl;
     } else if (value.starts_with("try_void_branch<")) {

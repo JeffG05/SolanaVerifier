@@ -34,6 +34,7 @@
 #include "values/negation_mir_value.h"
 #include "values/not_mir_value.h"
 #include "values/next_mir_value.h"
+#include "values/none_optional_mir_value.h"
 #include "values/not_equal_mir_value.h"
 #include "values/ok_result_mir_value.h"
 #include "values/panic_assert_kind_mir_value.h"
@@ -102,6 +103,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     init_array_mir_value(),
     panic_assert_kind_mir_value(),
     init_tuple_mir_value(),
+    none_optional_mir_value(),
 
     // KEEP LAST
     promoted_mir_value(),
