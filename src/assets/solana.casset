@@ -404,3 +404,78 @@ panic_assert_kind nondet_panic_assert_kind() {
     panic_assert_kind x;
     return x;
 }
+
+// ALIGNMENT
+typedef enum { _alignment_left, _alignment_right, _alignment_center, _alignment_unknown } alignment;
+alignment nondet_alignment() {
+    alignment x;
+    return x;
+}
+
+// COUNT
+typedef enum { _count_is, _count_param, _count_implied } count;
+count nondet_count() {
+    count x;
+    return x;
+}
+
+// PLACEHOLDER
+typedef struct placeholder_struct {
+    usize get0;
+    char get1;
+    alignment get2;
+    u32 get3;
+    count get4;
+    count get5;
+} placeholder;
+placeholder nondet_placeholder() {
+    placeholder x;
+    x.get0 = nondet_usize();
+    x.get1 = nondet_char();
+    x.get2 = nondet_alignment();
+    x.get3 = nondet_u32();
+    x.get4 = nondet_count();
+    x.get5 = nondet_count();
+    return x;
+}
+
+typedef struct solana_asset_placeholder_array_optional_struct {
+    bool is_none;
+    placeholder value[{{ARRAY_SIZE}}];
+} solana_asset_placeholder_array_optional;
+solana_asset_placeholder_array_optional nondet_solana_asset_placeholder_array_optional() {
+    solana_asset_placeholder_array_optional x;
+    x.is_none = nondet_bool();
+    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
+        x.value[i] = nondet_placeholder();
+    }
+    return x;
+}
+
+// ARGUMENT
+typedef struct argument_struct {
+    string get0;
+} argument;
+argument nondet_argument() {
+    argument x;
+    x.get0 = nondet_string();
+    return x;
+}
+
+// ARGUMENTS
+typedef struct arguments_struct {
+    string get0[{{ARRAY_SIZE}}];
+    solana_asset_placeholder_array_optional get1;
+    argument get2[{{ARRAY_SIZE}}];
+} arguments;
+arguments nondet_arguments() {
+    arguments x;
+    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
+        x.get0[i] = nondet_string();
+    }
+    x.get1 = nondet_solana_asset_placeholder_array_optional();
+    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
+        x.get2[i] = nondet_argument();
+    }
+    return x;
+}

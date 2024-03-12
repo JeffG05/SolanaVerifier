@@ -2,6 +2,7 @@
 #include "mir-types/mir_type.h"
 #include "types/account_info_mir_type.h"
 #include "types/account_meta_mir_type.h"
+#include "types/arguments_mir_type.h"
 #include "types/array_mir_type.h"
 #include "types/backtick_mir_type.h"
 #include "types/borrow_mir_type.h"
@@ -66,5 +67,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     box_mir_type(),
     const_mir_type(),
     panic_assert_kind_mir_type(),
-    optional_mir_type()
+    optional_mir_type(),
+    arguments_mir_type()
 };

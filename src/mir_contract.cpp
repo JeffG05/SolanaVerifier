@@ -36,7 +36,7 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     // Create AST tree
     mir_statement ast_tree = create_ast_tree(file);
     file.close();
-    ast_tree.print();
+    // ast_tree.print();
 
     // Export AST tree as C program
     const std::filesystem::path c_file_path = export_c_program(target, ast_tree, target_funtion);
