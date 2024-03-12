@@ -187,6 +187,10 @@ std::string mir_contract::get_c_type(const std::string &type, const std::string 
         const std::string controlflow_name = get_controlflow_name(type, function_name);
         return controlflow_name + " " + name;
     }
+    if (type.starts_with("optional<")) {
+        const std::string optional_name = get_optional_name(type, function_name);
+        return optional_name + " " + name;
+    }
     return type + " " + name;
 }
 
@@ -328,6 +332,9 @@ void mir_contract::generate_struct(std::ostream *out, const std::string &type, c
     } else if (type.starts_with("controlflow<")) {
         generate_controlflow_struct(out, type, function_name, generated_structs);
         generated_structs->insert(type);
+    } else if (type.starts_with("optional<")) {
+        generate_optional_struct(out, type, function_name, generated_structs);
+        generated_structs->insert(type);
     }
 }
 
@@ -414,6 +421,27 @@ void mir_contract::generate_controlflow_struct(std::ostream *out, const std::str
         generate_nondet_from_name(out, "c.continue_value", continue_value, function_name);
     }
     *out << "\treturn c;" << std::endl;
+    *out << "}" << std::endl;
+
+    *out << std::endl;
+}
+
+void mir_contract::generate_optional_struct(std::ostream *out, const std::string &type, const std::string &function_name, std::set<std::string> *generated_structs) {
+    const std::string struct_name = get_optional_name(type, function_name);
+    const std::string optional_type = type.substr(9, type.size() - 10);
+
+    generate_struct(out, optional_type, function_name, generated_structs);
+
+    *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+    *out << "\tbool is_none;" << std::endl;
+    *out << "\t" << get_c_type(optional_type, "value", function_name) << ";" << std::endl;
+    *out << "} " << struct_name << ";" << std::endl;
+
+    *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
+    *out << "\t" << struct_name << " x;" << std::endl;
+    generate_nondet_from_name(out, "x.is_none", "bool", function_name);
+    generate_nondet_from_name(out, "x.value", optional_type, function_name);
+    *out << "\treturn x;" << std::endl;
     *out << "}" << std::endl;
 
     *out << std::endl;
@@ -867,7 +895,7 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         for (auto account_info: owner_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
             std::string solution = "Check '" + std::get<1>(account_info) + ".owner == " + program_id_name + "'";
-            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
+            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal_pubkey(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
 
         // Check signers have signed the instruction
@@ -902,6 +930,7 @@ std::string mir_contract::get_controlflow_name(const std::string &type, const st
     return function_name + "_" + utils::clean(break_type) + "_" + utils::clean(continue_type) + "_controlflow";
 }
 
-
-
-
+std::string mir_contract::get_optional_name(const std::string &type, const std::string &function_name) {
+    const std::string raw_type = type.substr(9, type.size() - 10);
+    return function_name + "_" + utils::clean(raw_type) + "_optional";
+}

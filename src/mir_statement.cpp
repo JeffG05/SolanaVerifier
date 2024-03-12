@@ -696,6 +696,16 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
         const mir_statement array_item = new_variable(name + ".t", array_type);
         utils::extend(&subvariables, get_subvariables(array_item, structs));
     }
+    if (type.starts_with("optional<")) {
+        std::string optional_type = type.substr(9, type.size() - 10);
+
+        const mir_statement is_none = new_variable(name + ".is_none", "bool");
+        utils::extend(&subvariables, get_subvariables(is_none, structs));
+
+        const mir_statement value = new_variable(name + ".value", optional_type);
+        utils::extend(&subvariables, get_subvariables(value, structs));
+        return subvariables;
+    }
 
     return subvariables;
 }

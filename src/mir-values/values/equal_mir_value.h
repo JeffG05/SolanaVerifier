@@ -20,7 +20,7 @@ public:
 
             std::string value;
             if (equality_type == "pubkey" || equality_type == "string") {
-                value = "is_equal(" + value1 + ", " + value2 + ")";
+                value = "is_equal_" + equality_type + "(" + value1 + ", " + value2 + ")";
             } else {
                 value = "(" + value1 + " == " + value2 + ")";
             }

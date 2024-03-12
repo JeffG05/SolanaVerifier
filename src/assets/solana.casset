@@ -237,7 +237,7 @@ string nondet_string() {
 void print(string s) {
     printf("%s\n", s);
 }
-bool is_equal(string lhs, string rhs) {
+bool is_equal_string(string lhs, string rhs) {
     return strcmp(lhs, rhs) == 0;
 }
 
@@ -312,7 +312,7 @@ pubkey nondet_pubkey() {
     p.p31 = nondet_u8();
     return p;
 }
-bool is_equal(pubkey lhs, pubkey rhs) {
+bool is_equal_pubkey(pubkey lhs, pubkey rhs) {
     return lhs.p0 == rhs.p0 && lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2 &&
         lhs.p3 == rhs.p3 && lhs.p4 == rhs.p4 && lhs.p5 == rhs.p5 &&
         lhs.p6 == rhs.p6 && lhs.p7 == rhs.p7 && lhs.p8 == rhs.p8 &&
