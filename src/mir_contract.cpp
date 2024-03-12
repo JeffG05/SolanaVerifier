@@ -71,24 +71,25 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) {
     auto current_statement_lines = std::list<std::string>();
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
-        if (mir_statement::line_is_statement_start(trimmed_line)) {
-            if (!current_statement_lines.empty()) {
-                if (std::optional<mir_statement> statement = mir_statement::parse_lines(current_statement_lines, _structs); statement.has_value()) {
-                    root.add_child(statement.value());
+        if (mir_statement::line_is_function(trimmed_line)) {
+            if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
+                mir_statement statement = mir_statement::parse_function(current_statement_lines, _structs);
+                if (!statement.get_ast_data().contains("source") && statement.get_ast_data().at("name") != "entrypoint") {
+                    root.add_child(statement);
                 }
-                current_statement_lines.clear();
             }
+            current_statement_lines.clear();
         }
 
         current_statement_lines.push_back(trimmed_line);
     }
-    if (!current_statement_lines.empty()) {
-        if (const std::optional<mir_statement> statement = mir_statement::parse_lines(current_statement_lines, _structs);
-            statement.has_value()) {
-            root.add_child(statement.value());
+    if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
+        mir_statement statement = mir_statement::parse_function(current_statement_lines, _structs);
+        if (!statement.get_ast_data().contains("source") && statement.get_ast_data().at("name") != "entrypoint") {
+            root.add_child(statement);
         }
-        current_statement_lines.clear();
     }
+    current_statement_lines.clear();
 
     return root;
 }
@@ -200,6 +201,9 @@ std::string mir_contract::get_return_c_type(const std::string &type, const std::
 
 std::string mir_contract::get_c_value(const std::string &value) {
     if (value.starts_with("copy_array<")) {
+        return get_c_value(value.substr(11, value.size() - 12));
+    }
+    if (value.starts_with("copy_tuple<")) {
         return get_c_value(value.substr(11, value.size() - 12));
     }
     if (value.starts_with("copy_pubkey<")) {
@@ -530,6 +534,11 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
             generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", array_value + "[" + std::to_string(i) + "]", true, all_variables, indents);
         }
+    } else if (value.starts_with("copy_tuple<")) {
+        const std::string tuple_value = value.substr(11, value.size() - 12);
+        for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, indents);
+        }
     } else if (value.starts_with("copy_pubkey<")) {
         const std::string pubkey_value = value.substr(12, value.size() - 13);
         for (int i = 0; i < 32; i++) {
@@ -596,6 +605,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         for (int i = 0; i < array_values.size(); i++) {
             generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", *array_values_itr, true, all_variables, indents);
             ++array_values_itr;
+        }
+    } else if (value.starts_with("init_tuple<")) {
+        const std::string tuple_value = value.substr(11, value.size() - 12);
+        const auto tuple_values = utils::split(tuple_value, ", ");
+        auto tuple_values_itr = tuple_values.begin();
+        for (int i = 0; i < tuple_values.size(); i++) {
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), *tuple_values_itr, true, all_variables, indents);
+            ++tuple_values_itr;
         }
     } else if (!variable.empty()) {
         const std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, value.starts_with("state.") ? value.substr(6) : value);

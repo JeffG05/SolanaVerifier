@@ -9,7 +9,7 @@ class deref_mir_value : public mir_value {
 public:
     deref_mir_value() : mir_value(
         std::regex (R"(^(?:\(\*(.+)\)|\*(.+)|<.+ as Deref>::deref\((.+)\)|<.+ as DerefMut>::deref_mut\((.+)\)|deref_copy (\(.+\)))$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             std::string match_str;
             for (int i = 1; i <= 5; i++) {
                 if (!match[i].str().empty()) {

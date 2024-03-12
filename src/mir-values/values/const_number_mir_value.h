@@ -8,7 +8,7 @@ class const_number_mir_value : public mir_value {
 public:
     const_number_mir_value() : mir_value(
         std::regex (R"(^const (-?\d+)_[ui](?:8|16|32|64|size)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             return std::make_tuple(match[1].str(), true, "", "");
         }
     ) {}

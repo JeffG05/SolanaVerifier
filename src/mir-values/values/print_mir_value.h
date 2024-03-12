@@ -8,7 +8,7 @@ class print_mir_value : public mir_value {
 public:
     print_mir_value() : mir_value(
         std::regex (R"(^solana_program::log::sol_log\((.+)\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
             return std::make_tuple("print(" + value + ")", false, add_ref, remove_ref);
         }

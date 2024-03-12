@@ -8,7 +8,7 @@ class borrow_mir_value : public mir_value {
 public:
     borrow_mir_value() : mir_value(
         std::regex (R"(^(?:&(.+)|.+::borrow\((.+)\))$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             std::string mir_value;
             for(int i = 1; i <= 2; i++) {
                 if (!match[i].str().empty()) {

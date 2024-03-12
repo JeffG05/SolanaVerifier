@@ -128,6 +128,8 @@ add_executable(SolanaVerifier
         mir-values/values/init_array_mir_value.h
         mir-types/types/panic_assert_kind_mir_type.h
         mir-values/values/panic_assert_kind_mir_value.h
+        mir-values/values/init_tuple_mir_value.h
+        mir-values/values/promoted_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

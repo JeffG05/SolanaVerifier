@@ -25,6 +25,7 @@
 #include "values/greater_than_mir_value.h"
 #include "values/index_mut_range_full_mir_value.h"
 #include "values/init_array_mir_value.h"
+#include "values/init_tuple_mir_value.h"
 #include "values/iter_mir_value.h"
 #include "values/less_than_equal_mir_value.h"
 #include "values/less_than_mir_value.h"
@@ -38,6 +39,7 @@
 #include "values/panic_assert_kind_mir_value.h"
 #include "values/print_mir_value.h"
 #include "values/program_error_mir_value.h"
+#include "values/promoted_mir_value.h"
 #include "values/result_error_mir_value.h"
 #include "values/serialize_mir_value.h"
 #include "values/solana_instruction_mir_value.h"
@@ -45,7 +47,7 @@
 #include "values/tuple_indexer_mir_value.h"
 #include "values/variable_mir_value.h"
 
-std::tuple<std::string, bool, std::string, std::string> mir_value_converter::convert(const std::string& mir, const std::list<mir_statement>& variables) {
+std::tuple<std::string, bool, std::string, std::string> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
         if (auto parsed = value.try_parse(mir, variables); parsed.has_value()) {
             return parsed.value();
@@ -99,7 +101,9 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     solana_instruction_mir_value(),
     init_array_mir_value(),
     panic_assert_kind_mir_value(),
+    init_tuple_mir_value(),
 
     // KEEP LAST
+    promoted_mir_value(),
     function_mir_value()
 };

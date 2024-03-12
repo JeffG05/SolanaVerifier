@@ -8,7 +8,7 @@ class try_branch_mir_value : public mir_value {
 public:
     try_branch_mir_value() : mir_value(
         std::regex (R"(^<Result<.+> as Try>::branch\((.+)\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
 
             std::optional<mir_statement> try_value = mir_statement::get_statement(variables, value.substr(6) + ".value");

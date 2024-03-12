@@ -7,7 +7,7 @@
 
 class mir_value_converter {
 public:
-    static std::tuple<std::string, bool, std::string, std::string> convert(const std::string& mir, const std::list<mir_statement>& variables);
+    static std::tuple<std::string, bool, std::string, std::string> convert(const std::string& mir, const mir_statements& variables);
 private:
     static std::vector<mir_value> _all_values;
 };

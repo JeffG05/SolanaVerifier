@@ -8,7 +8,7 @@ class index_mut_range_full_mir_value : public mir_value {
 public:
     index_mut_range_full_mir_value() : mir_value(
         std::regex (R"(^<.+ as IndexMut<RangeFull>>::index_mut\((.+), const RangeFull\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
             std::string new_add_ref = utils::add_item(add_ref, value, ", ");
             return std::make_tuple(value, true, new_add_ref, remove_ref);

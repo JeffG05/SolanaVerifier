@@ -97,6 +97,13 @@ mir_statements mir_statement::get_children(const std::initializer_list<statement
     return children;
 }
 
+void mir_statement::update_ast_data(const std::string &key, const nlohmann::basic_json<>& new_value) {
+    if (!get_ast_data().contains(key)) {
+        std::throw_with_nested(std::runtime_error("Key does not exist in AST data: " + key));
+    }
+    _ast_tree[key] = new_value;
+}
+
 void mir_statement::add_child(const mir_statement& child) {
     _ast_tree["children"].push_back(child.get_ast());
 }
@@ -179,23 +186,6 @@ mir_statement mir_statement::create_root(const std::string &contract_name) {
     return {statement_type::root, data};
 }
 
-std::optional<mir_statement> mir_statement::parse_lines(const std::list<std::string> &lines, const mir_statements &structs, const mir_statements &variables) {
-    if (line_is_function(lines.front())) {
-        mir_statement function_statement = parse_function(lines, structs);
-        if (function_statement.get_ast_data().contains("source") || function_statement.get_ast_data().at("name") == "entrypoint") {
-            return std::nullopt;
-        }
-        return parse_function(lines, structs);
-    }
-
-    if (line_is_block(lines.front())) {
-        return parse_block(lines, variables);
-    }
-
-    return std::nullopt;
-}
-
-
 mir_statement mir_statement::parse_function(std::list<std::string> lines, const mir_statements& structs) {
     // Create function header
     const std::string header_line = lines.front();
@@ -219,35 +209,36 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines, const 
     mir_statements all_variables = get_all_variables(function_header, structs);
 
     // Create blocks
+    std::string function_name = function_header.get_ast_data().at("name");
+    int promoted_i = 0;
     auto current_block_lines = std::list<std::string>();
     while (!lines.empty()) {
         const std::string line = lines.front();
         if (line_is_block(line)) {
-            if (!current_block_lines.empty()) {
-                if (std::optional<mir_statement> statement = parse_lines(current_block_lines, structs, all_variables); statement.has_value()) {
-                    function_header.add_child(statement.value());
-                }
-                current_block_lines.clear();
+            if (!current_block_lines.empty() && line_is_block(current_block_lines.front())) {
+                mir_statement statement = parse_block(current_block_lines, all_variables, function_name, &promoted_i);
+                function_header.add_child(statement);
             }
+            current_block_lines.clear();
         }
         current_block_lines.push_back(line);
         lines.pop_front();
     }
 
-    if (!current_block_lines.empty()) {
-        if (const std::optional<mir_statement> statement = parse_lines(current_block_lines, structs, all_variables); statement.has_value()) {
-            function_header.add_child(statement.value());
-        }
-        current_block_lines.clear();
+    if (!current_block_lines.empty() && line_is_block(current_block_lines.front())) {
+        mir_statement statement = parse_block(current_block_lines, all_variables, function_name, &promoted_i);
+        function_header.add_child(statement);
     }
+    current_block_lines.clear();
 
     return function_header;
 }
 
 mir_statement mir_statement::parse_function_header(const std::string& line) {
-    const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)\((.*?)\) -> (.*?) \{$)");
-    const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)\((.*?)\) -> (.*?) \{$)");
+    const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)\((.*?)\) -> (.+?) \{$)");
+    const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)\((.*?)\) -> (.+?) \{$)");
     const std::regex local_function_regex (R"(^fn (.+?)\((.*?)\) -> (.*?) \{$)");
+    const std::regex promoted_function_regex (R"(^promoted\[(\d+)\] in (.+?): (.+?) = \{$)");
 
     nlohmann::json function_data;
     std::string parameters;
@@ -265,6 +256,10 @@ mir_statement mir_statement::parse_function_header(const std::string& line) {
         function_data["name"] = match[1].str();
         function_data["return_type"] = convert_type(match[3].str());
         parameters = match[2].str();
+    } else if (regex_match(line, match, promoted_function_regex)) {
+        function_data["name"] = "promoted_" + match[2].str() + "_" + match[1].str();
+        function_data["return_type"] = convert_type(match[3].str());
+        parameters = "";
     }
 
     auto function_statement = mir_statement(statement_type::function, function_data);
@@ -275,7 +270,7 @@ mir_statement mir_statement::parse_function_header(const std::string& line) {
     return function_statement;
 }
 
-std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> lines, const mir_statements &variables) {
+mir_statement mir_statement::parse_block(std::list<std::string> lines, const mir_statements &variables, const std::string& function_name, int *promoted_i) {
     // Create block header
     const std::string header_line = lines.front();
     mir_statement block = parse_block_header(header_line);
@@ -285,7 +280,12 @@ std::optional<mir_statement> mir_statement::parse_block(std::list<std::string> l
     while (!lines.empty()) {
         std::string line = lines.front();
         if (std::optional<mir_statements> assignments = parse_assignment(line, variables); assignments.has_value()) {
-            for (const auto& assignment: assignments.value()) {
+            for (auto& assignment: assignments.value()) {
+                if (assignment.get_type() == statement_type::assignment && assignment.get_ast_data().at("value") == "promoted<>") {
+                    std::string promoted_func = "promoted_" + function_name + "_" + std::to_string(*promoted_i) + "()";
+                    assignment.update_ast_data("value", promoted_func);
+                    *promoted_i += 1;
+                }
                 block.add_child(assignment);
             }
         }
@@ -439,6 +439,12 @@ std::string mir_statement::reformat_value_by_type(const std::string &value, cons
         }
         return value;
     }
+    if (type.starts_with("tuple<")) {
+        if (!value.starts_with("init_tuple<")) {
+            return "copy_tuple<" + value + ">";
+        }
+        return value;
+    }
     if (type == "pubkey") {
         return "copy_pubkey<" + value + ">";
     }
@@ -547,7 +553,7 @@ std::tuple<std::string, bool, std::string, std::string> mir_statement::convert_v
 }
 
 bool mir_statement::line_is_function(const std::string &line) {
-    return line.starts_with("fn");
+    return line.starts_with("fn ") || line.starts_with("promoted[");
 }
 
 bool mir_statement::line_is_block(const std::string &line) {

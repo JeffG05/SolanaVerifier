@@ -8,7 +8,7 @@ class tuple_indexer_mir_value : public mir_value {
 public:
     tuple_indexer_mir_value() : mir_value(
         std::regex (R"(^\((.+)\.(\d+): .+\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             auto [var, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
             std::string value;
             if (var.starts_with("continue<")) {

@@ -9,7 +9,7 @@ class function_mir_value : public mir_value {
 public:
     function_mir_value() : mir_value(
         std::regex (R"(^(.+)\((.*)\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             const std::list<std::string> params = utils::split(match[2].str(), ", ");
             std::list<std::string> converted_params;
             std::list<std::string> add_refs;

@@ -8,7 +8,7 @@ class program_error_mir_value : public mir_value {
 public:
     program_error_mir_value() : mir_value(
         std::regex (R"(^solana_program::program_error::ProgramError::(.+)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             return std::make_tuple("\"" + match[1].str() + "\"", true, "", "");
         }
     ) {}

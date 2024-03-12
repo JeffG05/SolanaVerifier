@@ -12,7 +12,7 @@ class number_operator_mir_value : public mir_value {
 public:
     explicit number_operator_mir_value(const std::string &regex_name, const std::string &full_name, bool is_reducing) : mir_value(
         std::regex (R"(^(?:Checked)?)" + regex_name + R"(\((.+), (.+)\)$)"),
-        [full_name, is_reducing](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [full_name, is_reducing](const std::smatch &match, const mir_statements& variables) {
 
             auto [a_value, a_returns, a_add, a_remove] = mir_value_converter::convert(match[1].str(), variables);
             auto [b_value, b_returns, b_add, b_remove] = mir_value_converter::convert(match[2].str(), variables);

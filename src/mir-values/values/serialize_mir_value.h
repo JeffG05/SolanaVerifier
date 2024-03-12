@@ -8,7 +8,7 @@ class serialize_mir_value : public mir_value {
 public:
     serialize_mir_value() : mir_value(
         std::regex (R"(^<(.+) as BorshSerialize>::serialize::<.+>\((.+), (.+)\)$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             auto [value1, returns1, add_ref1, remove_ref1] = mir_value_converter::convert(match[2].str(), variables);
             auto [value2, returns2, add_ref2, remove_ref2] = mir_value_converter::convert(match[3].str(), variables);
 

@@ -238,7 +238,7 @@ void print(string s) {
     printf("%s\n", s);
 }
 bool is_equal(string lhs, string rhs) {
-    return strcmp(lhs, rhs) == 0
+    return strcmp(lhs, rhs) == 0;
 }
 
 // PUBKEY

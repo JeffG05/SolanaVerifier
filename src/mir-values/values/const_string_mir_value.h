@@ -8,7 +8,7 @@ class const_string_mir_value : public mir_value {
 public:
     const_string_mir_value() : mir_value(
         std::regex (R"(^const (\".+\")$)"),
-        [](const std::smatch &match, const std::list<mir_statement>& variables) {
+        [](const std::smatch &match, const mir_statements& variables) {
             return std::make_tuple(match[1].str(), true, "", "");
         }
     ) {}
