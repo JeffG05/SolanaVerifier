@@ -136,6 +136,7 @@ add_executable(SolanaVerifier
         mir-values/values/assert_failed_mir_value.h
         mir-types/types/float_mir_type.h
         mir-values/values/conversion_mir_value.h
+        mir-types/types/rent_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier

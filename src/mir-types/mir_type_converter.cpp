@@ -23,6 +23,7 @@
 #include "types/ref_cell_mir_type.h"
 #include "types/ref_mut_mir_type.h"
 #include "types/ref_mir_type.h"
+#include "types/rent_mir_type.h"
 #include "types/result_mir_type.h"
 #include "types/solana_instruction_mir_type.h"
 #include "types/string_mir_type.h"
@@ -71,4 +72,5 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     optional_mir_type(),
     arguments_mir_type(),
     float_mir_type(),
+    rent_mir_type(),
 };

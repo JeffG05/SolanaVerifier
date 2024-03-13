@@ -575,3 +575,17 @@ arguments nondet_arguments() {
     }
     return x;
 }
+
+// RENT
+typedef struct rent_struct {
+    u64 get0;
+    f64 get1;
+    u8 get2;
+} rent;
+rent nondet_rent() {
+    rent x;
+    x.get0 = nondet_u64();
+    x.get1 = nondet_f64();
+    x.get2 = nondet_u8();
+    return x;
+}
