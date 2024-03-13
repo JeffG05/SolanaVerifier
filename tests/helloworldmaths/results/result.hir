@@ -1,0 +1,46 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use solana_program::{};
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::pubkey::Pubkey;
+use solana_program::program_error::ProgramError;
+
+// declare and export the program's entrypoint
+
+// program entrypoint's implementation
+
+
+
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+fn process_instruction<'_, '_, '_,
+    '_>(_program_id: &'_ Pubkey, _accounts: &'_ [AccountInfo<>],
+    _instruction_data: &'_ [u8])
+    ->
+        ProgramResult {
+        let a = 5;
+        let b = 3;
+        let c = calculate(a, b);
+        let d = 30.0 / 4.0;
+        let e = 2.0;
+        let f = calculate_f(d, e);
+        if c == f as u64
+                { Ok(()) } else { Err(ProgramError::InvalidArgument) }
+            }
+        fn calculate(a: u64, b: u64)
+            -> u64 { let result = (a + b) * (1 + 1); result }
+        fn calculate_f(a: f64, b: f64) -> f64 { let result = a * b; result }

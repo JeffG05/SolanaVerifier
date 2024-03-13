@@ -605,7 +605,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "helloworld"
+name = "helloworldmaths"
 version = "0.1.0"
 dependencies = [
  "solana-program",
