@@ -16,6 +16,7 @@
 #include "values/const_number_mir_value.h"
 #include "values/const_string_mir_value.h"
 #include "values/const_void_mir_value.h"
+#include "values/conversion_mir_value.h"
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
 #include "values/discriminant_mir_value.h"
@@ -106,6 +107,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     init_tuple_mir_value(),
     none_optional_mir_value(),
     assert_failed_mir_value(),
+    conversion_mir_value(),
 
     // KEEP LAST
     promoted_mir_value(),

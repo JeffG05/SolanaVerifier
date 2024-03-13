@@ -548,7 +548,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         std::optional<mir_statement> return_statement = mir_statement::get_statement(all_variables, "_0");
         if (return_statement.has_value() && return_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("result<")) {
             generate_block_assignment(out, "_0", "result_error<>", true, all_variables, indents);
-            *out << base_indent << "return state;";
+            *out << base_indent << "return state;" << std::endl;
         } else {
             *out << base_indent << "assert(false);" << std::endl;
         }
