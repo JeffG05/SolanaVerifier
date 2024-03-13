@@ -133,6 +133,7 @@ add_executable(SolanaVerifier
         mir-types/types/optional_mir_type.h
         mir-values/values/none_optional_mir_value.h
         mir-types/types/arguments_mir_type.h
+        mir-values/values/assert_failed_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

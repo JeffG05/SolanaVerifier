@@ -4,6 +4,7 @@
 #include "values/borrow_mir_value.h"
 #include "values/borrow_mutable_mir_value.h"
 #include "values/addition_mir_value.h"
+#include "values/assert_failed_mir_value.h"
 #include "values/bitand_mir_value.h"
 #include "values/bitor_mir_value.h"
 #include "values/bitxor_mir_value.h"
@@ -104,6 +105,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     panic_assert_kind_mir_value(),
     init_tuple_mir_value(),
     none_optional_mir_value(),
+    assert_failed_mir_value(),
 
     // KEEP LAST
     promoted_mir_value(),

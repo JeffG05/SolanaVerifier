@@ -544,6 +544,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "state." << variable << ".is_none = true;" << std::endl;
     } else if (value.starts_with("result_error<")) {
         *out << base_indent << "state." << variable << ".is_success = false;" << std::endl;
+    } else if (value.starts_with("return_error<")) {
+        std::optional<mir_statement> return_statement = mir_statement::get_statement(all_variables, "_0");
+        if (return_statement.has_value() && return_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("result<")) {
+            generate_block_assignment(out, "_0", "result_error<>", true, all_variables, indents);
+            *out << base_indent << "return state;";
+        } else {
+            *out << base_indent << "assert(false);" << std::endl;
+        }
     } else if (value.starts_with("try_void_branch<")) {
         *out << base_indent << "state." << variable << ".type = _continue;" << std::endl;
     } else if (value.starts_with("try_branch<")) {
@@ -896,7 +904,7 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         // LOGIC: A successful return implies that the owner called the function
         for (auto account_info: owner_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
-            std::string solution = "Check '" + std::get<1>(account_info) + ".owner == " + program_id_name + "'";
+            std::string solution = "Add 'assert_eq!(" + std::get<1>(account_info) + ".owner, " + program_id_name + ")'";
             *out << "\t__ESBMC_assert(!state._0.is_success || is_equal_pubkey(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
 
