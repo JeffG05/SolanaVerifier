@@ -186,10 +186,14 @@ mir_statement mir_statement::create_root(const std::string &contract_name) {
     return {statement_type::root, data};
 }
 
-mir_statement mir_statement::parse_function(std::list<std::string> lines, const mir_statements& structs) {
+std::optional<mir_statement> mir_statement::parse_function(std::list<std::string> lines, const mir_statements& structs) {
     // Create function header
     const std::string header_line = lines.front();
-    mir_statement function_header = parse_function_header(header_line);
+    std::optional<mir_statement> function_header_maybe = parse_function_header(header_line);
+    if (!function_header_maybe.has_value()) {
+        return std::nullopt;
+    }
+    mir_statement function_header = function_header_maybe.value();
     lines.pop_front();
 
     // Create variables
@@ -234,11 +238,11 @@ mir_statement mir_statement::parse_function(std::list<std::string> lines, const 
     return function_header;
 }
 
-mir_statement mir_statement::parse_function_header(const std::string& line) {
+std::optional<mir_statement> mir_statement::parse_function_header(const std::string& line) {
     const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)\((.*?)\) -> (.+?) \{$)");
     const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)\((.*?)\) -> (.+?) \{$)");
     const std::regex local_function_regex (R"(^fn (.+?)\((.*?)\) -> (.*?) \{$)");
-    const std::regex promoted_function_regex (R"(^promoted\[(\d+)\] in (.+?): (.+?) = \{$)");
+    const std::regex promoted_function_regex (R"(^promoted\[(\d+)\] in (.+): (.+?) = \{$)");
 
     nlohmann::json function_data;
     std::string parameters;
@@ -257,6 +261,9 @@ mir_statement mir_statement::parse_function_header(const std::string& line) {
         function_data["return_type"] = convert_type(match[3].str());
         parameters = match[2].str();
     } else if (regex_match(line, match, promoted_function_regex)) {
+        if (match[2].str().starts_with("<")) {
+            return std::nullopt;
+        }
         function_data["name"] = "promoted_" + match[2].str() + "_" + match[1].str();
         function_data["return_type"] = convert_type(match[3].str());
         parameters = "";

@@ -30,14 +30,14 @@ public:
     static std::pair<std::string, std::string> get_argument_pair(const std::string &raw);
     static std::optional<mir_statement> get_statement(const mir_statements& variables, const std::string& name);
 
-    static mir_statement parse_function(std::list<std::string> lines, const mir_statements& structs);
+    static std::optional<mir_statement> parse_function(std::list<std::string> lines, const mir_statements& structs);
     static mir_statement create_root(const std::string &contract_name);
     static bool line_is_statement_start(const std::string &line);
     static bool line_is_function(const std::string &line);
     static bool line_is_block(const std::string& line);
     static std::string convert_type(const std::string& type);
 
-    static mir_statement parse_function_header(const std::string& line);
+    static std::optional<mir_statement> parse_function_header(const std::string& line);
 
     static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
     static std::string reformat_value_by_type(const std::string& value, const std::string& type);
