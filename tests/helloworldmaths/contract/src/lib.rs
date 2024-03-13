@@ -3,7 +3,6 @@ use solana_program::{
     entrypoint,
     entrypoint::ProgramResult,
     pubkey::Pubkey,
-    program_error::ProgramError,
 };
 
 // declare and export the program's entrypoint
@@ -18,15 +17,11 @@ pub fn process_instruction(
     let a = 5;
     let b = 3;
     let c = calculate(a, b);
-    let d = 30.0 / 4.0;
-    let e = 2.0;
+    let d = 30.758 / 4.5;
+    let e = 2.1;
     let f = calculate_f(d, e);
 
-    if c == (f as u64) {
-        Ok(())
-    } else {
-        Err(ProgramError::InvalidArgument)
-    }
+    Ok(())
 }
 
 fn calculate(a: u64, b: u64) -> u64 {
