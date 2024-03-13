@@ -86,7 +86,7 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
     }
 
     std::string line;
-    std::regex num_const_regex (R"((.*?)([ui](?:8|16|32|64|size))::(MAX|MIN)(.*))");
+    std::regex num_const_regex (R"((.*?)((?:[ui](?:8|16|32|64|size)|f(?:8|16|32|64)))::(MAX|MIN)(.*))");
     std::smatch match;
     while (getline(file, line)) {
         std::string updated_line;
@@ -114,6 +114,10 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
                     updated_line += "9223372036854775807i64";
                 } else if (t == "isize") {
                     updated_line += "9223372036854775807isize";
+                } else if (t == "f64") {
+                    updated_line += "1.7976931348623157E+308f64";
+                } else if (t == "f32") {
+                    updated_line += "3.40282347E+38f32";
                 } else {
                     updated_line += match[2].str() + "::" + match[3].str();
                 }
@@ -139,6 +143,10 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
                     updated_line += "-9223372036854775808i64";
                 } else if (t == "isize") {
                     updated_line += "-9223372036854775808isize";
+                } else if (t == "f64") {
+                    updated_line += "-1.7976931348623157E+308f64";
+                } else if (t == "f32") {
+                    updated_line += "-3.40282347E+38f32";
                 } else {
                     updated_line += match[2].str() + "::" + match[3].str();
                 }

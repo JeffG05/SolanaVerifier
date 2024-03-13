@@ -14,7 +14,7 @@ public:
             const std::optional<mir_statement> var = mir_statement::get_statement(variables, value.starts_with("state.") ? value.substr(6) : value);
             const std::string var_name = match[1].str();
 
-            const std::regex num_const (R"(^const \d+_(.+)$)");
+            const std::regex num_const (R"(^const -?(?:\d+\.)?\d+(?:E[+-]\d+)?_?((?:[ui](?:8|16|32|64|size)|f(?:32|64)))$)");
             std::string var_type;
             if (var.has_value()) {
                 var_type = var.value().get_ast_data().at("variable_type");

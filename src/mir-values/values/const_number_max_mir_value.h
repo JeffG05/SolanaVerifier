@@ -7,7 +7,7 @@
 class const_number_max_mir_value : public mir_value {
 public:
     const_number_max_mir_value() : mir_value(
-        std::regex (R"(^const ([ui](?:8|16|32|64|size))::MAX$)"),
+        std::regex (R"(^const ((?:[ui](?:8|16|32|64|size)|f(?:8|16|32|64)))::MAX$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             std::string type = match[1].str();
             for (char& c : type) {

@@ -96,6 +96,27 @@ isize nondet_isize() {
     return x;
 }
 
+// FLOATING NUMBERS
+typedef double f64;
+f64 MIN_F64 = -1.7976931348623157E+308;
+f64 MAX_F64 = 1.7976931348623157E+308;
+f64 nondet_f64() {
+    f64 x;
+    __ESBMC_assume(x >= MIN_F64);
+    __ESBMC_assume(x <= MAX_F64);
+    return x;
+}
+
+typedef double f32;
+f32 MIN_F32 = -3.40282347E+38;
+f32 MAX_F32 = 3.40282347E+38;
+f32 nondet_f32() {
+    f32 x;
+    __ESBMC_assume(x >= MIN_F32);
+    __ESBMC_assume(x <= MAX_F32);
+    return x;
+}
+
 // MATH OPERATORS
 typedef struct unsigned_math_result_struct {
     unsigned long long int value;
@@ -107,6 +128,11 @@ typedef struct signed_math_result_struct {
     bool errors;
 } signed_math_result;
 
+typedef struct float_math_result_struct {
+    double value;
+    bool errors;
+} float_math_result;
+
 unsigned_math_result u_addition(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
     unsigned_math_result result;
     result.value = a + b;
@@ -117,6 +143,19 @@ unsigned_math_result u_addition(unsigned long long int a, unsigned long long int
 
 signed_math_result i_addition(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
     signed_math_result result;
+    result.value = a + b;
+    if (b < 0) {
+        result.errors = a < min - b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 1");
+    } else {
+        result.errors = a > max - b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 0");
+    }
+    return result;
+}
+
+float_math_result f_addition(double a, double b, double max, double min) {
+    float_math_result result;
     result.value = a + b;
     if (b < 0) {
         result.errors = a < min - b;
@@ -149,6 +188,19 @@ signed_math_result i_subtraction(signed long long int a, signed long long int b,
     return result;
 }
 
+float_math_result f_subtraction(double a, double b, double max, double min) {
+    float_math_result result;
+    result.value = a - b;
+    if (b < 0) {
+        result.errors = a > max + b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 2");
+    } else {
+        result.errors = a < min + b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 3");
+    }
+    return result;
+}
+
 unsigned_math_result u_multiplication(unsigned long long int a, unsigned long long int b, unsigned long long int max) {
     unsigned_math_result result;
     result.value = a * b;
@@ -163,6 +215,27 @@ unsigned_math_result u_multiplication(unsigned long long int a, unsigned long lo
 
 signed_math_result i_multiplication(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {
     signed_math_result result;
+    result.value = a * b;
+    if (b == 0) {
+        result.errors = false;
+    } else if ((b > 0) && (a > 0)) {
+        result.errors = a > max / b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 4");
+    } else if ((b < 0) && (a < 0)) {
+        result.errors = a < max / b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 4");
+    } else if ((b > 0) && (a < 0)) {
+        result.errors = a < min / b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 5");
+    } else if ((b < 0) && (a > 0)) {
+        result.errors = a > min / b;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 5");
+    }
+    return result;
+}
+
+float_math_result f_multiplication(double a, double b, double max, double min) {
+    float_math_result result;
     result.value = a * b;
     if (b == 0) {
         result.errors = false;
@@ -209,10 +282,26 @@ signed_math_result i_division(signed long long int a, signed long long int b, si
     return result;
 }
 
+float_math_result f_division(double a, double b, double max, double min) {
+    float_math_result result;
+    result.value = a / b;
+    if (b == 0) {
+        result.errors = true;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 7");
+    } else if (b == -1) {
+        result.errors = a == min;
+        __ESBMC_assert(!result.errors, "Vulnerability Found: 6");
+    } else {
+        result.errors = false;
+    }
+    return result;
+}
+
 unsigned_math_result u_negation(unsigned long long int a, unsigned long long int max) {
     unsigned_math_result result;
     result.value = -a;
-    result.errors = false;
+    result.errors = true;
+    __ESBMC_assert(!result.errors, "Vulnerability Found: 12");
     return result;
 }
 
@@ -225,6 +314,13 @@ signed_math_result i_negation(signed long long int a, signed long long int max, 
     } else {
         result.errors = false;
     }
+    return result;
+}
+
+float_math_result f_negation(double a, double max) {
+    float_math_result result;
+    result.value = -a;
+    result.errors = false;
     return result;
 }
 

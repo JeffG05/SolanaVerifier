@@ -22,7 +22,7 @@ public:
             const std::string var1_name = match[1].str();
             const std::string var2_name = match[2].str();
 
-            const std::regex num_const (R"(^const \d+_(.+)$)");
+            const std::regex num_const (R"(^const -?(?:\d+\.)?\d+(?:E[+-]\d+)?_?((?:[ui](?:8|16|32|64|size)|f(?:32|64)))$)");
             std::string var_type;
             if (var1.has_value()) {
                 var_type = var1.value().get_ast_data().at("variable_type");
@@ -80,7 +80,10 @@ public:
                 std::string full_func = wrapper + "<i_" + func + ", MIN_" + var_type + ")>";
                 return std::make_tuple(full_func, true, add_refs, remove_refs);
             }
-
+            if (var_type.starts_with("F")) {
+                std::string full_func = wrapper + "<f_" + func + ", MIN_" + var_type + ")>";
+                return std::make_tuple(full_func, true, add_refs, remove_refs);
+            }
             return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
         }
     ) {}

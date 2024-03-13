@@ -11,6 +11,7 @@
 #include "types/control_flow_mir_type.h"
 #include "types/deref_mir_type.h"
 #include "types/error_mir_type.h"
+#include "types/float_mir_type.h"
 #include "types/infallible_mir_type.h"
 #include "types/int_mir_type.h"
 #include "types/iter_mir_type.h"
@@ -68,5 +69,6 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     const_mir_type(),
     panic_assert_kind_mir_type(),
     optional_mir_type(),
-    arguments_mir_type()
+    arguments_mir_type(),
+    float_mir_type(),
 };
