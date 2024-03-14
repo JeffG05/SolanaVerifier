@@ -523,6 +523,22 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
     }
 }
 
+std::tuple<std::string, std::string> mir_contract::parse_indexed(const std::string& identifier, const std::string& indexed_variable) {
+    std::string value = indexed_variable;
+    std::string indexer;
+    if (value.ends_with("]")) {
+        indexer = value.substr(value.find_last_of('['));
+        value = value.substr(0, value.find_last_of('['));
+    }
+
+    if (value.starts_with(identifier + "<")) {
+        value = value.substr(identifier.size() + 1, value.size() - identifier.size() - 2);
+    }
+
+    return std::make_tuple(value, indexer);
+}
+
+
 void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents) {
     auto base_indent = std::string(indents, '\t');
 
@@ -549,6 +565,12 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "state." << variable << ".is_none = true;" << std::endl;
     } else if (value.starts_with("result_error<")) {
         *out << base_indent << "state." << variable << ".is_success = false;" << std::endl;
+    } else if (value.starts_with("result_unwrap<")) {
+        auto [result_value, indexer] = parse_indexed("result_unwrap", value);
+        *out << base_indent << "if (!" + result_value + ".is_success) {" << std::endl;
+        generate_block_assignment(out, variable, "return_error<>", true, all_variables, indents+1);
+        *out << base_indent << "}" << std::endl;
+        *out << base_indent << "state." << variable << " = " << result_value << ".value" + indexer + ";" << std::endl;
     } else if (value.starts_with("return_error<")) {
         std::optional<mir_statement> return_statement = mir_statement::get_statement(all_variables, "_0");
         if (return_statement.has_value() && return_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("result<")) {

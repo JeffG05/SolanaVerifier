@@ -70,6 +70,7 @@ private:
 
     static mir_statement get_target_function(mir_statements function_statements, const std::string &function_name);
     static std::string trim_line(const std::string& line);
+    static std::tuple<std::string, std::string> parse_indexed(const std::string& identifier, const std::string& indexed_variable);
 };
 
 #endif //MIR_CONTRACT_H
