@@ -20,6 +20,7 @@
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
 #include "values/discriminant_mir_value.h"
+#include "values/enum_mir_value.h"
 #include "values/equal_mir_value.h"
 #include "values/from_residual_mir_value.h"
 #include "values/function_mir_value.h"
@@ -113,5 +114,6 @@ std::vector<mir_value> mir_value_converter::_all_values = {
 
     // KEEP LAST
     promoted_mir_value(),
-    function_mir_value()
+    function_mir_value(),
+    enum_mir_value(),
 };

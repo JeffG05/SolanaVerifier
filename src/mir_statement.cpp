@@ -55,6 +55,10 @@ std::string mir_statement::get_string_type() const {
             return "Struct";
         case statement_type::debug:
             return "Debug";
+        case statement_type::data_enum:
+            return "Enum";
+        case statement_type::data_enum_struct:
+            return "Enum Struct";
         default:
             return "Unknown Statement";
     }
@@ -158,6 +162,10 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::data_struct;
     } else if (string_type == "Debug") {
         type = statement_type::debug;
+    } else if (string_type == "Enum") {
+        type = statement_type::data_enum;
+    } else if (string_type == "Enum Struct") {
+        type = statement_type::data_enum_struct;
     } else {
         type = statement_type::unknown;
     }

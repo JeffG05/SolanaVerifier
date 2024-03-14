@@ -118,6 +118,16 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
         generate_struct_struct(&file, struct_statement.get_children(), struct_statement.get_ast_data().at("name"));
     }
 
+    mir_statements enum_structs = ast_tree.get_children({statement_type::data_enum_struct});
+    for (auto struct_statement : std::ranges::reverse_view(enum_structs)) {
+        generate_enum_struct_struct(&file, struct_statement.get_children(), struct_statement.get_ast_data().at("name"));
+    }
+
+    mir_statements enums = ast_tree.get_children({statement_type::data_enum});
+    for (auto struct_statement : std::ranges::reverse_view(enums)) {
+        generate_enum_struct(&file, struct_statement.get_children(), struct_statement.get_ast_data().at("name"));
+    }
+
     mir_statements functions = ast_tree.get_children({statement_type::function});
     for (auto function_statement : std::ranges::reverse_view(functions)) {
         nlohmann::json function_data = function_statement.get_ast_data();
@@ -305,6 +315,52 @@ void mir_contract::generate_struct_struct(std::ostream *out, const mir_statement
         std::string var_name = variable.get_ast_data().at("variable");
         std::string var_type = variable.get_ast_data().at("variable_type");
         generate_deserialization(out, var_name, var_type, &d_counter);
+    }
+    *out << "\treturn x;" << std::endl;
+    *out << "}" << std::endl;
+
+    *out << std::endl;
+}
+
+void mir_contract::generate_enum_struct_struct(std::ostream *out, const mir_statements &state_statements, const std::string &struct_name) const {
+    *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        *out << "\t" << var_type << " " << var_name << ";" << std::endl;
+    }
+    *out << "} " << struct_name << ";" << std::endl;
+
+    *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
+    *out << "\t" << struct_name << " x;" << std::endl;
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        generate_nondet_from_name(out, "x." + var_name, var_type, struct_name);
+    }
+    *out << "\treturn x;" << std::endl;
+    *out << "}" << std::endl;
+
+    *out << std::endl;
+}
+
+void mir_contract::generate_enum_struct(std::ostream *out, const mir_statements &state_statements, const std::string &struct_name) const {
+    *out << "typedef struct " << struct_name << "_struct {" << std::endl;
+    *out << "\tstring value;" << std::endl;
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        *out << "\t" << var_type << " " << var_name << ";" << std::endl;
+    }
+    *out << "} " << struct_name << ";" << std::endl;
+
+    *out << struct_name << " nondet_" << struct_name << "() {" << std::endl;
+    *out << "\t" << struct_name << " x;" << std::endl;
+    generate_nondet_from_name(out, "x.value", "string", struct_name);
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        generate_nondet_from_name(out, "x." + var_name, var_type, struct_name);
     }
     *out << "\treturn x;" << std::endl;
     *out << "}" << std::endl;
@@ -678,6 +734,26 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         for (int i = 0; i < tuple_values.size(); i++) {
             generate_block_assignment(out, variable + ".get" + std::to_string(i), *tuple_values_itr, true, all_variables, indents);
             ++tuple_values_itr;
+        }
+    } else if (value.starts_with("init_enum<")) {
+        const std::string enum_value = value.substr(10, value.size() - 11);
+        auto enum_values = utils::split(enum_value, ", ");
+        const std::string enum_value_name = enum_values.front();
+        generate_block_assignment(out, variable + ".value", "\"" + enum_value_name + "\"", true, all_variables, indents);
+        enum_values.pop_front();
+
+        const std::optional<mir_statement> value_statement = mir_statement::get_statement(all_variables, variable + ".value_" + enum_value_name);
+        std::cout << value << std::endl;
+        std::cout << variable + ".value_" + enum_value_name << std::endl;
+        std::cout << value_statement.has_value() << std::endl;
+        if (value_statement.has_value()) {
+            int i = 0;
+            while (!enum_values.empty()) {
+                std::string enum_value_variable = variable + ".value_" += enum_value_name + ".get" + std::to_string(i);
+                generate_block_assignment(out, enum_value_variable, enum_values.front(), true, all_variables, indents);
+                ++i;
+                enum_values.pop_front();
+            }
         }
     } else if (!variable.empty()) {
         const std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, value.starts_with("state.") ? value.substr(6) : value);

@@ -7,7 +7,7 @@
 
 class mir_statement;
 typedef std::list<mir_statement> mir_statements;
-enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, add_ref, remove_ref, data_struct, debug };
+enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, add_ref, remove_ref, data_struct, debug, data_enum, data_enum_struct };
 
 class mir_statement {
 public:

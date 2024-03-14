@@ -50,6 +50,8 @@ private:
     void generate_function_struct(std::ostream* out, const mir_statements &state_statements, const std::string& function_name) const;
     void generate_optional_struct(std::ostream* out, const std::string& type, const std::string& function_name, std::set<std::string>* generated_structs);
     void generate_struct_struct(std::ostream* out, const mir_statements &state_statements, const std::string& struct_name) const;
+    void generate_enum_struct_struct(std::ostream* out, const mir_statements &state_statements, const std::string& struct_name) const;
+    void generate_enum_struct(std::ostream* out, const mir_statements &state_statements, const std::string& struct_name) const;
 
     void generate_block_function(std::ostream* out, mir_statement block_statement, const std::string& function_name, reference_map* references, const mir_statements &all_variables);
     void generate_block_statement(std::ostream* out, mir_statement statement, const std::string& function_name, reference_map* references, const mir_statements& all_variables);

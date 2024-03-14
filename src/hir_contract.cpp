@@ -35,13 +35,15 @@ mir_statements hir_contract::extract_structs() const {
     }
 
     mir_statements structs;
+    std::optional<mir_statement> subenum;
 
     std::string line;
     bool struct_active = false;
+    bool enum_active = false;
     unsigned int var_i = 0;
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
-        if (!struct_active) {
+        if (!struct_active && !enum_active) {
             if (trimmed_line.starts_with("struct ")) {
                 std::regex struct_regex (R"(^struct (.+) \{$)");
                 std::smatch match;
@@ -51,6 +53,16 @@ mir_statements hir_contract::extract_structs() const {
                     auto root = mir_statement(statement_type::data_struct, data);
                     structs.push_back(root);
                     struct_active = true;
+                }
+            } else if (trimmed_line.starts_with("enum ")) {
+                std::regex enum_regex (R"(^enum (.+) \{$)");
+                std::smatch match;
+                if (std::regex_match(trimmed_line, match, enum_regex)) {
+                    nlohmann::json data;
+                    data["name"] = match[1].str();
+                    auto root = mir_statement(statement_type::data_enum, data);
+                    structs.push_back(root);
+                    enum_active = true;
                 }
             }
             continue;
@@ -62,19 +74,53 @@ mir_statements hir_contract::extract_structs() const {
 
         if (trimmed_line == "}") {
             struct_active = false;
+            enum_active = false;
             var_i = 0;
             continue;
         }
 
-        std::regex field_regex (R"(^(.+): (.+),$)");
-        std::smatch match;
-        if (std::regex_match(trimmed_line, match, field_regex)) {
-            nlohmann::json data;
-            data["variable"] = "get" + std::to_string(var_i);
-            data["variable_type"] = mir_statement::convert_type(match[2].str());
-            auto field = mir_statement(statement_type::variable, data);
-            structs.back().add_child(field);
-            var_i++;
+        if (struct_active) {
+            std::regex field_regex (R"(^(.+): (.+),$)");
+            std::smatch match;
+            if (std::regex_match(trimmed_line, match, field_regex)) {
+                nlohmann::json data;
+                data["variable"] = "get" + std::to_string(var_i);
+                data["variable_type"] = mir_statement::convert_type(match[2].str());
+                auto field = mir_statement(statement_type::variable, data);
+                structs.back().add_child(field);
+                var_i++;
+            }
+        } else if (subenum.has_value()) {
+            std::regex field_regex (R"(^(.+): (.+),$)");
+            std::smatch match;
+            if (trimmed_line == "},") {
+                structs.push_front(subenum.value());
+                subenum = std::nullopt;
+            } else if (std::regex_match(trimmed_line, match, field_regex)) {
+                nlohmann::json data;
+                data["variable"] = "get" + std::to_string(var_i);
+                data["variable_type"] = mir_statement::convert_type(match[2].str());
+                auto field = mir_statement(statement_type::variable, data);
+                subenum->add_child(field);
+                var_i++;
+            }
+        } else {
+            std::regex complex_value_regex (R"(^([^}\s]+) \{$)");
+            std::smatch match;
+            if (std::regex_match(trimmed_line, match, complex_value_regex)) {
+                std::string subenum_name = structs.back().get_ast_data().at("name").get<std::string>() + "_" + match[1].str();
+
+                nlohmann::json data;
+                data["variable"] = "value_" + utils::to_lower(match[1].str());
+                data["variable_type"] = subenum_name;
+                auto field = mir_statement(statement_type::variable, data);
+                structs.back().add_child(field);
+
+                nlohmann::json subenum_data;
+                subenum_data["name"] = subenum_name;
+                auto subenum_field = mir_statement(statement_type::data_enum_struct, subenum_data);
+                subenum = subenum_field;
+            }
         }
     }
 
