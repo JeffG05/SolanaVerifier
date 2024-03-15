@@ -141,6 +141,7 @@ add_executable(SolanaVerifier
         mir-values/values/enum_mir_value.h
         mir-values/values/box_indexer_mir_value.h
         mir-values/values/as_box_mir_value.h
+        mir-values/values/into_vec_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
