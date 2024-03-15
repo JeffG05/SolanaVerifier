@@ -139,6 +139,7 @@ add_executable(SolanaVerifier
         mir-types/types/rent_mir_type.h
         mir-values/values/result_unwrap_mir_value.h
         mir-values/values/enum_mir_value.h
+        mir-values/values/box_indexer_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
