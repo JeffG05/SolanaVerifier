@@ -5,6 +5,7 @@
 #include "values/borrow_mutable_mir_value.h"
 #include "values/addition_mir_value.h"
 #include "values/assert_failed_mir_value.h"
+#include "values/as_box_mir_value.h"
 #include "values/bitand_mir_value.h"
 #include "values/bitor_mir_value.h"
 #include "values/bitxor_mir_value.h"
@@ -72,6 +73,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     subtraction_mir_value(),
     division_mir_value(),
     variable_mir_value(),
+    as_box_mir_value(),
     move_mir_value(),
     box_indexer_mir_value(),
     tuple_indexer_mir_value(),
@@ -111,10 +113,10 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     init_tuple_mir_value(),
     none_optional_mir_value(),
     assert_failed_mir_value(),
-    conversion_mir_value(),
     result_unwrap_mir_value(),
 
     // KEEP LAST
+    conversion_mir_value(),
     promoted_mir_value(),
     function_mir_value(),
     enum_mir_value(),
