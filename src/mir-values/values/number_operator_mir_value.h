@@ -14,8 +14,8 @@ public:
         std::regex (R"(^(?:Checked)?)" + regex_name + R"(\((.+), (.+)\)$)"),
         [full_name, is_reducing](const std::smatch &match, const mir_statements& variables) {
 
-            auto [a_value, a_returns, a_add, a_remove] = mir_value_converter::convert(match[1].str(), variables);
-            auto [b_value, b_returns, b_add, b_remove] = mir_value_converter::convert(match[2].str(), variables);
+            auto [a_value, a_returns] = mir_value_converter::convert(match[1].str(), variables);
+            auto [b_value, b_returns] = mir_value_converter::convert(match[2].str(), variables);
 
             const std::optional<mir_statement> var1 = mir_statement::get_statement(variables, a_value.starts_with("state.") ? a_value.substr(6) : a_value);
             const std::optional<mir_statement> var2 = mir_statement::get_statement(variables, b_value.starts_with("state.") ? b_value.substr(6) : b_value);
@@ -51,20 +51,6 @@ public:
 
             std::string func = full_name + "(" + a_value + ", " + b_value + ", MAX_" + var_type;
 
-            std::string add_refs;
-            if (!a_add.empty() && !b_add.empty()) {
-                add_refs = a_add + ", " + b_add;
-            } else {
-                add_refs = a_add + b_add;
-            }
-
-            std::string remove_refs;
-            if (!a_remove.empty() && !b_remove.empty()) {
-                remove_refs = a_remove + ", " + b_remove;
-            } else {
-                remove_refs = a_remove + b_remove;
-            }
-
             std::string wrapper;
             if (match[0].str().starts_with("Checked")) {
                 wrapper = "checked";
@@ -74,17 +60,17 @@ public:
 
             if (var_type.starts_with("U")) {
                 std::string full_func = wrapper + "<u_" + func + ")>";
-                return std::make_tuple(full_func, true, add_refs, remove_refs);
+                return std::make_tuple(full_func, true);
             }
             if (var_type.starts_with("I")) {
                 std::string full_func = wrapper + "<i_" + func + ", MIN_" + var_type + ")>";
-                return std::make_tuple(full_func, true, add_refs, remove_refs);
+                return std::make_tuple(full_func, true);
             }
             if (var_type.starts_with("F")) {
                 std::string full_func = wrapper + "<f_" + func + ", MIN_" + var_type + ")>";
-                return std::make_tuple(full_func, true, add_refs, remove_refs);
+                return std::make_tuple(full_func, true);
             }
-            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_refs, remove_refs);
+            return std::make_tuple("UNSUPPORTED_" + func + ")", true);
         }
     ) {}
 };

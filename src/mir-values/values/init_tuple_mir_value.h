@@ -11,25 +11,15 @@ public:
         [](const std::smatch &match, const mir_statements& variables) {
             const std::list<std::string> contents = utils::split(match[1].str(), ", ");
             std::list<std::string> converted_contents;
-            std::list<std::string> add_refs;
-            std::list<std::string> remove_refs;
 
             for (const auto& content : contents) {
-                auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(content, variables);
+                auto [value, returns] = mir_value_converter::convert(content, variables);
                 converted_contents.push_back(value);
-                if (!add_ref.empty()) {
-                    add_refs.push_back(add_ref);
-                }
-                if (!remove_ref.empty()) {
-                    remove_refs.push_back(remove_ref);
-                }
             }
 
             return std::make_tuple(
                 "init_tuple<" + utils::join(converted_contents, ", ") + ">",
-                true,
-                utils::join(add_refs, ", "),
-                utils::join(remove_refs, ", ")
+                true
             );
         }
     ) {}

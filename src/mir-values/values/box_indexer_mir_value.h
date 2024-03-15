@@ -9,8 +9,8 @@ public:
     box_indexer_mir_value() : mir_value(
         std::regex (R"(^\(\(\((.+?)\.0: std::ptr::Unique<.+?>\).0: std::ptr::NonNull<.+?>\).0: .+\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            return std::make_tuple(value, true, add_ref, remove_ref);
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
+            return std::make_tuple(value, true);
         }
     ) {}
 };

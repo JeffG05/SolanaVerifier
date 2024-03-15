@@ -9,7 +9,7 @@ public:
     const_void_mir_value() : mir_value(
         std::regex (R"(^const \(\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            return std::make_tuple("void", true, "", "");
+            return std::make_tuple("void", true);
         }
     ) {}
 };

@@ -9,7 +9,7 @@ public:
     negation_mir_value() : mir_value(
         std::regex (R"(^Neg\((.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
 
             const std::optional<mir_statement> var = mir_statement::get_statement(variables, value.starts_with("state.") ? value.substr(6) : value);
             const std::string var_name = match[1].str();
@@ -34,14 +34,14 @@ public:
 
             if (var_type.starts_with("U")) {
                 std::string full_func = "unchecked<u_" + func + ")>";
-                return std::make_tuple(full_func, true, add_ref, remove_ref);
+                return std::make_tuple(full_func, true);
             }
             if (var_type.starts_with("I")) {
                 std::string full_func = "unchecked<i_" + func + ", MIN_" + var_type + ")>";
-                return std::make_tuple(full_func, true, add_ref, remove_ref);
+                return std::make_tuple(full_func, true);
             }
 
-            return std::make_tuple("UNSUPPORTED_" + func + ")", true, add_ref, remove_ref);
+            return std::make_tuple("UNSUPPORTED_" + func + ")", true);
         }
     ) {}
 };

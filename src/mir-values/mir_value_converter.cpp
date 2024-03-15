@@ -53,13 +53,13 @@
 #include "values/tuple_indexer_mir_value.h"
 #include "values/variable_mir_value.h"
 
-std::tuple<std::string, bool, std::string, std::string> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
+std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
         if (auto parsed = value.try_parse(mir, variables); parsed.has_value()) {
             return parsed.value();
         }
     }
-    return std::make_tuple(mir, false, "", "");
+    return std::make_tuple(mir, false);
 }
 
 std::vector<mir_value> mir_value_converter::_all_values = {

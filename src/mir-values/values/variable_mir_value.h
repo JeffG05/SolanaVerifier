@@ -9,7 +9,7 @@ public:
     variable_mir_value() : mir_value(
         std::regex (R"(^_\d+$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            return std::make_tuple("state." + match[0].str(), true, "", "");
+            return std::make_tuple("state." + match[0].str(), true);
         }
     ) {}
 };

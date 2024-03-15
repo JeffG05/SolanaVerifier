@@ -9,12 +9,8 @@ public:
     move_mir_value() : mir_value(
         std::regex (R"(^move (.+)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            if (!remove_ref.empty()) {
-                remove_ref += ", ";
-            }
-            remove_ref += value;
-            return std::make_tuple(value, returns, add_ref, remove_ref);
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
+            return std::make_tuple(value, returns);
         }
     ) {}
 };

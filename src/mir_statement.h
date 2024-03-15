@@ -7,7 +7,7 @@
 
 class mir_statement;
 typedef std::list<mir_statement> mir_statements;
-enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, add_ref, remove_ref, data_struct, debug, data_enum, data_enum_struct };
+enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, data_struct, debug, data_enum, data_enum_struct };
 
 class mir_statement {
 public:
@@ -54,7 +54,7 @@ private:
     static std::optional<mir_statement> parse_debug(const std::string& line);
     static std::optional<mir_statement> parse_branch(const std::string& line);
 
-    static std::tuple<std::string, bool, std::string, std::string> convert_value(const std::string& value, const mir_statements& variables);
+    static std::tuple<std::string, bool> convert_value(const std::string& value, const mir_statements& variables);
 
     static mir_statements get_subvariables(const mir_statement& variable, const mir_statements& structs);
 };

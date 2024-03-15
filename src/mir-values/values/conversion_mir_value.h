@@ -9,11 +9,9 @@ public:
     conversion_mir_value() : mir_value(
         std::regex (R"(^(.+) as (.+?)(?: \(.+\))?$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            const std::string raw_type = match[2].str();
-
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
             std::string converted_value = "((" + match[2].str() + ") " + value + ")";
-            return std::make_tuple(converted_value, true, add_ref, remove_ref);
+            return std::make_tuple(converted_value, true);
         }
     ) {}
 };

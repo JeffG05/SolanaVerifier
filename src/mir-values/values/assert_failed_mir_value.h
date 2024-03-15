@@ -9,7 +9,7 @@ public:
     assert_failed_mir_value() : mir_value(
         std::regex (R"(^(?:core::panicking::)?assert_failed::<.+, .+>\(.+, .+, .+, .+\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            return std::make_tuple("return_error<>", false, "", "");
+            return std::make_tuple("return_error<>", false);
         }
     ) {}
 };

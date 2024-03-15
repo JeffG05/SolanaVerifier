@@ -18,8 +18,8 @@ public:
                 }
             }
 
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match_str, variables);
-            return std::make_tuple(value, true, add_ref, remove_ref);
+            auto [value, returns] = mir_value_converter::convert(match_str, variables);
+            return std::make_tuple(value, true);
         }
     ) {}
 };

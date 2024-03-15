@@ -9,8 +9,8 @@ public:
     tuple_indexer_mir_value() : mir_value(
         std::regex (R"(^\((.+)\.(\d+): .+\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [var, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            std::optional<mir_statement> var_statement = mir_statement::get_statement(variables, match[1].str());
+            auto [var, returns] = mir_value_converter::convert(match[1].str(), variables);
+            const std::optional<mir_statement> var_statement = mir_statement::get_statement(variables, match[1].str());
             std::string value;
             if (var.starts_with("continue<")) {
                 value = var.substr(9, var.size() - 10);
@@ -21,8 +21,7 @@ public:
             } else {
                 value = var + ".get" + match[2].str();
             }
-            const std::string new_add_ref = utils::add_item(add_ref, value, ", ");
-            return std::make_tuple(value, true, new_add_ref, remove_ref);
+            return std::make_tuple(value, true);
         }
     ) {}
 };

@@ -47,10 +47,6 @@ std::string mir_statement::get_string_type() const {
             return "Return";
         case statement_type::branch:
             return "Branch";
-        case statement_type::add_ref:
-            return "Add Reference";
-        case statement_type::remove_ref:
-            return "Remove Reference";
         case statement_type::data_struct:
             return "Struct";
         case statement_type::debug:
@@ -154,10 +150,6 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::return_type;
     } else if (string_type == "Branch") {
         type = statement_type::branch;
-    } else if (string_type == "Add Reference") {
-        type = statement_type::add_ref;
-    } else if (string_type == "Remove Reference") {
-        type = statement_type::remove_ref;
     } else if (string_type == "Struct") {
         type = statement_type::data_struct;
     } else if (string_type == "Debug") {
@@ -323,8 +315,6 @@ mir_statement mir_statement::parse_block_header(const std::string &line) {
 std::optional<mir_statements> mir_statement::parse_assignment(const std::string &line, const mir_statements& variables) {
     nlohmann::json data;
     std::string branching;
-    std::string add_ref_to;
-    std::string remove_ref_to;
     std::string assertion;
 
     const std::regex assignment_parts (R"(^(.+) = (.+?)(?: -> (.+))?;$)");
@@ -335,51 +325,39 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     const std::regex switchint_parts (R"(^switchInt\((.+)\) -> (.+);$)");
     std::smatch match;
     if (regex_match(line, match, assignment_parts)) {
-        auto [value1, returns1, add_ref1, remove_ref1] = convert_value(match[1].str(), variables);
+        auto [value1, returns1] = convert_value(match[1].str(), variables);
         data["variable"] = value1.starts_with("state.") ? value1.substr(6) : value1;
-        auto [value2, returns2, add_ref2, remove_ref2] = convert_value(match[2].str(), variables);
+        auto [value2, returns2] = convert_value(match[2].str(), variables);
         data["value"] = value2;
         data["returns"] = returns2;
-        add_ref_to = add_ref2;
-        remove_ref_to = remove_ref2;
         branching = match[3].str();
     } else if (regex_match(line, match, assert_parts)) {
         data["variable"] = "";
-        auto [value, returns, add_ref, remove_ref] = convert_value(match[1].str(), variables);
+        auto [value, returns] = convert_value(match[1].str(), variables);
         assertion = "__ESBMC_assert(" + value + ", \"Vulnerability Found: " + match[2].str() + "\")";
         data["value"] = "true";
         data["returns"] = true;
-        add_ref_to = add_ref;
-        remove_ref_to = remove_ref;
         branching = match[3].str();
     } else if (regex_match(line, match, goto_parts)) {
         data["variable"] = "";
         data["value"] = "true";
         data["returns"] = true;
-        add_ref_to = "";
-        remove_ref_to = "";
         branching = match[1].str();
     } else if (regex_match(line, match, drop_parts)) {
         data["variable"] = "";
         data["value"] = "true";
         data["returns"] = true;
-        add_ref_to = "";
-        remove_ref_to = "";
         branching = match[1].str();
     } else if (regex_match(line, match, unreachable_parts)) {
         data["variable"] = "";
         data["value"] = "assert(false)";
         data["returns"] = false;
-        add_ref_to = "";
-        remove_ref_to = "";
         branching = "";
     } else if (regex_match(line, match, switchint_parts)) {
         data["variable"] = "";
-        auto [value, returns, add_ref, remove_ref] = convert_value(match[1].str(), variables);
+        auto [value, returns] = convert_value(match[1].str(), variables);
         data["value"] = value;
         data["returns"] = returns;
-        add_ref_to = "";
-        remove_ref_to = "";
         branching = match[2].str();
     } else {
         return std::nullopt;
@@ -417,32 +395,6 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
         }
     }
     all_statements.push_back(assignment_statement);
-
-    if (!add_ref_to.empty()) {
-        for (const auto& add_ref : utils::split(add_ref_to, ", ")) {
-            nlohmann::json add_data;
-            add_data["variable1"] = std::get<0>(mir_value_converter::convert(data["variable"].get<std::string>(), variables));
-            add_data["variable2"] = add_ref;
-            if (add_data["variable1"].get<std::string>().empty() || add_data["variable2"].get<std::string>().empty()) {
-                continue;
-            }
-            auto add_ref_statement = mir_statement(statement_type::add_ref, add_data);
-            all_statements.push_back(add_ref_statement);
-        }
-    }
-
-    if (!remove_ref_to.empty()) {
-        for (const auto& remove_ref : utils::split(remove_ref_to, ", ")) {
-            nlohmann::json remove_data;
-            remove_data["variable1"] = std::get<0>(mir_value_converter::convert(data["variable"].get<std::string>(), variables));
-            remove_data["variable2"] = remove_ref;
-            if (remove_data["variable1"].get<std::string>().empty() || remove_data["variable2"].get<std::string>().empty()) {
-                continue;
-            }
-            auto remove_ref_statement = mir_statement(statement_type::remove_ref, remove_data);
-            all_statements.push_back(remove_ref_statement);
-        }
-    }
 
     return all_statements;
 }
@@ -563,7 +515,7 @@ std::string mir_statement::convert_type(const std::string &type) {
     return mir_type_converter::convert(type);
 }
 
-std::tuple<std::string, bool, std::string, std::string> mir_statement::convert_value(const std::string &value, const mir_statements &variables) {
+std::tuple<std::string, bool> mir_statement::convert_value(const std::string &value, const mir_statements &variables) {
     return mir_value_converter::convert(value, variables);
 }
 

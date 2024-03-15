@@ -9,7 +9,7 @@ public:
     const_string_mir_value() : mir_value(
         std::regex (R"(^const (\".+\")$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            return std::make_tuple(match[1].str(), true, "", "");
+            return std::make_tuple(match[1].str(), true);
         }
     ) {}
 };

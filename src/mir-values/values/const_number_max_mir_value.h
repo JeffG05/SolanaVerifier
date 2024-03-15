@@ -13,7 +13,7 @@ public:
             for (char& c : type) {
                 c = static_cast<char>(toupper(c));
             }
-            return std::make_tuple("MAX_" + type, true, "", "");
+            return std::make_tuple("MAX_" + type, true);
         }
     ) {}
 };

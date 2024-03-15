@@ -9,8 +9,8 @@ public:
     as_continue_mir_value() : mir_value(
         std::regex (R"(^\((.+) as Continue\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            return std::make_tuple("continue<" + value + ".continue_value>", true, add_ref, remove_ref);
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
+            return std::make_tuple("continue<" + value + ".continue_value>", true);
         }
     ) {}
 };

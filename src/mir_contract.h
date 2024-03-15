@@ -9,8 +9,6 @@
 #include "mir_statement.h"
 #include "c_program.h"
 
-typedef std::unordered_map<std::string, std::list<std::string>> reference_map;
-
 class mir_contract {
 public:
     mir_contract(const std::string &contract_name, const std::filesystem::path& path, const mir_statements &structs, config globals);
@@ -53,10 +51,9 @@ private:
     void generate_enum_struct_struct(std::ostream* out, const mir_statements &state_statements, const std::string& struct_name) const;
     void generate_enum_struct(std::ostream* out, const mir_statements &state_statements, const std::string& struct_name) const;
 
-    void generate_block_function(std::ostream* out, mir_statement block_statement, const std::string& function_name, reference_map* references, const mir_statements &all_variables);
-    void generate_block_statement(std::ostream* out, mir_statement statement, const std::string& function_name, reference_map* references, const mir_statements& all_variables);
+    void generate_block_function(std::ostream* out, mir_statement block_statement, const std::string& function_name, const mir_statements &all_variables);
+    void generate_block_statement(std::ostream* out, mir_statement statement, const std::string& function_name, const mir_statements& all_variables);
     void generate_block_assignment(std::ostream* out, const std::string &variable, const std::string &value, bool returns, const mir_statements& all_variables, int indents=1);
-    static void generate_reference_assignments(std::ostream* out, const std::string &variable, const reference_map &references);
     static void generate_branch(std::ostream* out, const mir_statement &branch_statement, const std::string& function_name, const std::string& variable, const std::string& value);
     void generate_function(std::ostream* out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string& function_name, const std::string& function_return, const mir_statements &all_variables, bool forward_decl = false);
     void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name);

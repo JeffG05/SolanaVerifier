@@ -9,8 +9,8 @@ public:
     as_break_mir_value() : mir_value(
         std::regex (R"(^\((.+) as Break\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(match[1].str(), variables);
-            return std::make_tuple("break<" + value + ".break_value>", true, add_ref, remove_ref);
+            auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
+            return std::make_tuple("break<" + value + ".break_value>", true);
         }
     ) {}
 };

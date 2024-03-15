@@ -9,8 +9,8 @@ public:
     ok_result_mir_value() : mir_value(
         std::regex (R"(^Result::<.*, .*>::Ok\((.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [ok_type, ok_returns, ok_type_add, ok_type_remove] = mir_value_converter::convert(match[1].str(), variables);
-            return std::make_tuple("ok<" + ok_type + ">", ok_returns, ok_type_add, ok_type_remove);
+            auto [ok_type, ok_returns] = mir_value_converter::convert(match[1].str(), variables);
+            return std::make_tuple("ok<" + ok_type + ">", ok_returns);
         }
     ) {}
 };

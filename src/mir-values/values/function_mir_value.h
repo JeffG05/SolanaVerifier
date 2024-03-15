@@ -12,17 +12,9 @@ public:
         [](const std::smatch &match, const mir_statements& variables) {
             const std::list<std::string> params = utils::split(match[2].str(), ", ");
             std::list<std::string> converted_params;
-            std::list<std::string> add_refs;
-            std::list<std::string> remove_refs;
             for (const auto& param : params) {
-                auto [value, returns, add_ref, remove_ref] = mir_value_converter::convert(param, variables);
+                auto [value, returns] = mir_value_converter::convert(param, variables);
                 converted_params.push_back(value);
-                if (!add_ref.empty()) {
-                    add_refs.push_back(add_ref);
-                }
-                if (!remove_ref.empty()) {
-                    remove_refs.push_back(remove_ref);
-                }
             }
 
             std::string function_name = match[1].str();
@@ -30,9 +22,7 @@ public:
 
             return std::make_tuple(
                 function_name + "(" + utils::join(converted_params, ", ") + ")",
-                true,
-                utils::join(add_refs, ", "),
-                utils::join(remove_refs, ", ")
+                true
             );
         }
     ) {}

@@ -163,15 +163,13 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
         std::ranges::copy(function_parameters, std::back_insert_iterator(function_states));
         std::ranges::copy(function_variables, std::back_insert_iterator(function_states));
 
-        reference_map references;
-
         for (const auto& block_statement : std::ranges::reverse_view(function_blocks)) {
             file << function_name << "_state " << function_name << "_" << block_statement.get_ast_data().at("name").get<std::string>() << "(" << function_name << "_state state);" << std::endl;
         }
         file << std::endl;
 
         for (const auto& block_statement : std::ranges::reverse_view(function_blocks)) {
-            generate_block_function(&file, block_statement, function_name, &references, function_all_variables);
+            generate_block_function(&file, block_statement, function_name, function_all_variables);
         }
 
         generate_function(&file, function_states, function_debugs, function_name, function_return, function_all_variables);
@@ -542,16 +540,16 @@ void mir_contract::generate_function_struct(std::ostream *out, const mir_stateme
     *out << std::endl;
 }
 
-void mir_contract::generate_block_function(std::ostream *out, mir_statement block_statement, const std::string &function_name, reference_map *references, const mir_statements &all_variables) {
+void mir_contract::generate_block_function(std::ostream *out, mir_statement block_statement, const std::string &function_name, const mir_statements &all_variables) {
     nlohmann::json block_data = block_statement.get_ast_data();
     const auto block_name = block_data.at("name").get<std::string>();
-    const mir_statements statements = block_statement.get_children({statement_type::assignment, statement_type::add_ref, statement_type::remove_ref});
+    const mir_statements statements = block_statement.get_children({statement_type::assignment});
 
     *out << function_name << "_state " << function_name << "_" << block_name << "(" << function_name << "_state state) {" << std::endl;
 
     // Add assignments
     for (const auto& statement : statements) {
-        generate_block_statement(out, statement, function_name, references, all_variables);
+        generate_block_statement(out, statement, function_name, all_variables);
     }
 
     *out << "\treturn state;" << std::endl;
@@ -559,25 +557,8 @@ void mir_contract::generate_block_function(std::ostream *out, mir_statement bloc
     *out << std::endl;
 }
  
-void mir_contract::generate_block_statement(std::ostream *out, mir_statement statement, const std::string &function_name, reference_map *references, const mir_statements& all_variables) {
+void mir_contract::generate_block_statement(std::ostream *out, mir_statement statement, const std::string &function_name, const mir_statements& all_variables) {
     nlohmann::json assignment_data = statement.get_ast_data();
-
-    if (statement.get_type() == statement_type::add_ref) {
-        const std::string variable1 = assignment_data.at("variable1").get<std::string>();
-        const std::string variable2 = assignment_data.at("variable2").get<std::string>();
-        (*references)[variable1].push_back(variable2);
-        (*references)[variable2].push_back(variable1);
-        return;
-    }
-
-    if (statement.get_type() == statement_type::remove_ref) {
-        const std::string variable1 = assignment_data.at("variable1").get<std::string>();
-        const std::string variable2 = assignment_data.at("variable2").get<std::string>();
-        (*references)[variable1].remove(variable2);
-        (*references)[variable2].remove(variable1);
-        return;
-    }
-
 
     const std::string assignment_variable = assignment_data.at("variable").get<std::string>();
     const std::string assignment_value = assignment_data.at("value").get<std::string>();
@@ -585,8 +566,6 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
     mir_statements assignment_branches = statement.get_children({statement_type::branch});
 
     generate_block_assignment(out, assignment_variable, assignment_value, assignment_returns, all_variables);
-
-    generate_reference_assignments(out, assignment_variable, *references);
 
     // Add branching logic
     if (!assignment_branches.empty()) {
@@ -813,35 +792,6 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         if (!returns) {
             *out << base_indent << value << ";" << std::endl;
         }
-    }
-}
-
-void mir_contract::generate_reference_assignments(std::ostream *out, const std::string &variable, const reference_map &references) {
-    std::set<std::string> referenced_variables;
-    std::set<std::string> queue;
-
-    if (!references.contains(variable)) {
-        return;
-    }
-
-    for (const auto& ref: references.at(variable)) {
-        queue.insert(ref);
-    }
-
-    while (!queue.empty()) {
-        auto ref = *queue.begin();
-        queue.erase(queue.begin());
-
-        if (!referenced_variables.contains(ref) && ref != variable) {
-            referenced_variables.insert(ref);
-            for (const auto& r: references.at(ref)) {
-                queue.insert(r);
-            }
-        }
-    }
-
-    for (const auto& ref: referenced_variables) {
-        *out << "\t" << ref << " = state." << variable << ";" << std::endl;
     }
 }
 

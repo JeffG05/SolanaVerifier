@@ -11,7 +11,7 @@ public:
         std::regex (R"(^core::panicking::AssertKind::(.+)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             const std::string enum_value = utils::to_lower(match[1].str());
-            return std::make_tuple("_panic_assert_kind_" + enum_value, true, "", "");
+            return std::make_tuple("_panic_assert_kind_" + enum_value, true);
         }
     ) {}
 };

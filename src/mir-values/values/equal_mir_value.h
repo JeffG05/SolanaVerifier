@@ -9,8 +9,8 @@ public:
     equal_mir_value() : mir_value(
         std::regex (R"(^(?:Eq|<.+ as PartialEq>::eq)\((.+), (.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            auto [value1, returns1, add_ref1, remove_ref1] = mir_value_converter::convert(match[1].str(), variables);
-            auto [value2, returns2, add_ref2, remove_ref2] = mir_value_converter::convert(match[2].str(), variables);
+            auto [value1, returns1] = mir_value_converter::convert(match[1].str(), variables);
+            auto [value2, returns2] = mir_value_converter::convert(match[2].str(), variables);
 
             std::string equality_type;
             std::optional<mir_statement> equality_var = mir_statement::get_statement(variables, value1.starts_with("state.") ? value1.substr(6) : value1);
@@ -24,9 +24,7 @@ public:
             } else {
                 value = "(" + value1 + " == " + value2 + ")";
             }
-            std::string add_ref = utils::add_item(add_ref1, add_ref2, ", ");
-            std::string remove_ref = utils::add_item(remove_ref1, remove_ref2, ", ");
-            return std::make_tuple(value, true, add_ref, remove_ref);
+            return std::make_tuple(value, true);
         }
     ) {}
 };
