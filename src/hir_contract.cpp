@@ -96,6 +96,7 @@ mir_statements hir_contract::extract_structs() const {
             if (trimmed_line == "},") {
                 structs.push_front(subenum.value());
                 subenum = std::nullopt;
+                var_i = 0;
             } else if (std::regex_match(trimmed_line, match, field_regex)) {
                 nlohmann::json data;
                 data["variable"] = "get" + std::to_string(var_i);
