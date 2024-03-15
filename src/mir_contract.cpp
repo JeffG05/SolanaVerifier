@@ -365,6 +365,26 @@ void mir_contract::generate_enum_struct(std::ostream *out, const mir_statements 
     *out << "\treturn x;" << std::endl;
     *out << "}" << std::endl;
 
+    *out << "void serialize_" << struct_name << "(" << struct_name << " x, u8* out) {" << std::endl;
+    unsigned int s_counter = 0;
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        generate_serialization(out, var_name, var_type, &s_counter);
+    }
+    *out << "}" << std::endl;
+
+    *out << struct_name << " deserialize_" << struct_name << "(u8* in) {" << std::endl;
+    *out << "\t" << struct_name << " x;" << std::endl;
+    unsigned int d_counter = 0;
+    for (const auto& variable : state_statements) {
+        std::string var_name = variable.get_ast_data().at("variable");
+        std::string var_type = variable.get_ast_data().at("variable_type");
+        generate_deserialization(out, var_name, var_type, &d_counter);
+    }
+    *out << "\treturn x;" << std::endl;
+    *out << "}" << std::endl;
+
     *out << std::endl;
 }
 
@@ -605,12 +625,31 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("unchecked<")) {
         const std::string checked_value = value.substr(10, value.size() - 11);
         *out << base_indent << "state." << variable << " = " << checked_value << ".value;" << std::endl;
-    } else if (value.starts_with("serialize_")) {
+    } else if (value.starts_with("serialize<")) {
+        const std::string serialize_value = value.substr(10, value.size() - 11);
+        std::list<std::string> serialize_values = utils::split(serialize_value, ", ");
+        if (serialize_values.size() == 2) {
+            serialize_values.push_back("state." + variable + ".value");
+        }
+
+        const std::string func_name = "serialize_" + serialize_values.front();
+        serialize_values.pop_front();
+        const std::string func_params = utils::join(serialize_values, ", ");
+        const std::string func = func_name + "(" + func_params + ")";
+
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
-        *out << base_indent << value << ";" << std::endl;
-    } else if (value.starts_with("deserialize_")) {
+        *out << base_indent << func << ";" << std::endl;
+    } else if (value.starts_with("deserialize<")) {
+        const std::string deserialize_value = value.substr(12, value.size() - 13);
+        std::list<std::string> deserialize_values = utils::split(deserialize_value, ", ");
+
+        const std::string func_name = "deserialize_" + deserialize_values.front();
+        deserialize_values.pop_front();
+        const std::string func_param = deserialize_values.front();
+        const std::string func = func_name + "(" + func_param + ")";
+
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
-        *out << base_indent << "state." << variable << ".value = " << value << ";" << std::endl;
+        *out << base_indent << "state." << variable << ".value = " << func << ";" << std::endl;
     } else if (value.starts_with("ok<")) {
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
         const std::string ok_value = value.substr(3, value.size() - 4);
@@ -743,9 +782,6 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         enum_values.pop_front();
 
         const std::optional<mir_statement> value_statement = mir_statement::get_statement(all_variables, variable + ".value_" + enum_value_name);
-        std::cout << value << std::endl;
-        std::cout << variable + ".value_" + enum_value_name << std::endl;
-        std::cout << value_statement.has_value() << std::endl;
         if (value_statement.has_value()) {
             int i = 0;
             while (!enum_values.empty()) {
