@@ -579,20 +579,34 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
 }
 
 std::tuple<std::string, std::string> mir_contract::parse_indexed(const std::string& identifier, const std::string& indexed_variable) {
-    std::string value = indexed_variable;
-    std::string indexer;
-    if (value.ends_with("]")) {
-        indexer = value.substr(value.find_last_of('['));
-        value = value.substr(0, value.find_last_of('['));
+    std::string buffer;
+    std::string value;
+    bool found_identifier = false;
+    int identifier_level = 0;
+    for (const auto c: indexed_variable) {
+        buffer += c;
+
+        if (c == '<') {
+            identifier_level += 1;
+        } else if (c == '>') {
+            identifier_level -= 1;
+        }
+
+        if (found_identifier && value.empty()) {
+            if (identifier_level == 0) {
+                value = buffer.substr(0, buffer.size()-1);
+                buffer = "";
+            }
+        }
+
+        if (!found_identifier && buffer == identifier + "<") {
+            found_identifier = true;
+            buffer = "";
+        }
     }
 
-    if (value.starts_with(identifier + "<")) {
-        value = value.substr(identifier.size() + 1, value.size() - identifier.size() - 2);
-    }
-
-    return std::make_tuple(value, indexer);
+    return std::make_tuple(value, buffer);
 }
-
 
 void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents) {
     auto base_indent = std::string(indents, '\t');
@@ -681,7 +695,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("copy_pubkey<")) {
         const std::string pubkey_value = value.substr(12, value.size() - 13);
         for (int i = 0; i < 32; i++) {
-            *out << base_indent << "state." << variable << ".p" << i << " = " << pubkey_value << ".p" << i << ";" << std::endl;
+            generate_block_assignment(out, variable + ".p" + std::to_string(i), pubkey_value + ".p" + std::to_string(i), true, all_variables, indents);
         }
     } else if (value.starts_with("copy_account_info<")) {
         const std::string info_value = value.substr(18, value.size() - 19);
@@ -770,13 +784,24 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                 enum_values.pop_front();
             }
         }
+    } else if (value.starts_with("init_account_meta<")) {
+        const std::string meta_value = value.substr(18, value.size() - 19);
+        const auto meta_values = utils::split(meta_value, ", ");
+        auto meta_values_itr = meta_values.begin();
+        for (int i = 0; i < meta_values.size(); i++) {
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), *meta_values_itr, true, all_variables, indents);
+            ++meta_values_itr;
+        }
     } else if (!variable.empty()) {
-        const std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, value.starts_with("state.") ? value.substr(6) : value);
+        std::cout << variable;
+        std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, variable);
+        std::cout << " DONE (" << statement.has_value() << ")";
         std::string formatted_value = value;
         if (statement.has_value()) {
-            std::string type = statement.value().get_ast_data().at("variable_type");
-            formatted_value = mir_statement::reformat_value_by_type(value, type);
+            formatted_value = mir_statement::reformat_value_by_type(value, statement.value().get_ast_data().at("variable_type"));
         }
+
+        std::cout << " PRINT (" << formatted_value << ", " << value << ")" << std::endl;
 
         if (formatted_value != value) {
             generate_block_assignment(out, variable, formatted_value, returns, all_variables, indents);

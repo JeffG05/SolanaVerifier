@@ -419,7 +419,10 @@ std::string mir_statement::reformat_value_by_type(const std::string &value, cons
         return "copy_account_info<" + value + ">";
     }
     if (type == "account_meta") {
-        return "copy_account_meta<" + value + ">";
+        if (!value.starts_with("init_account_meta<")) {
+            return "copy_account_meta<" + value + ">";
+        }
+        return value;
     }
     if (type == "solana_instruction") {
         if (!value.starts_with("init_solana_instruction<")) {
@@ -543,12 +546,8 @@ std::pair<std::string, std::string> mir_statement::get_argument_pair(const std::
 }
 
 std::optional<mir_statement> mir_statement::get_statement(const mir_statements &variables, const std::string &name) {
-    std::string search_name = name;
-
-    const std::regex indexed_regex (R"(^(.+)\[.+\]$)");
-    if (std::smatch match; std::regex_match(name, match, indexed_regex)) {
-        search_name = match[1].str() + ".t";
-    }
+    const std::regex indexed_regex (R"(\[.+?\])");
+    std::string search_name = std::regex_replace(name, indexed_regex, ".t");
 
     for (const auto& variable: variables) {
         std::string var_name = variable.get_ast_data().at("variable");
@@ -583,6 +582,12 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
                 const mir_statement subvariable = new_variable(new_var_name, child_type);
                 utils::extend(&subvariables, get_subvariables(subvariable, structs));
             }
+        }
+    }
+    if (type == "pubkey") {
+        for (int i = 0; i < 32; i++) {
+            const mir_statement p = new_variable(name + ".p" + std::to_string(i), "u8");
+            utils::extend(&subvariables, get_subvariables(p, structs));
         }
     }
     if (type == "account_info") {

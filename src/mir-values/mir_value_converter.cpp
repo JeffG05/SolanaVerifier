@@ -29,6 +29,8 @@
 #include "values/greater_than_equal_mir_value.h"
 #include "values/greater_than_mir_value.h"
 #include "values/index_mut_range_full_mir_value.h"
+#include "values/init_account_meta_mir_value.h"
+#include "values/init_account_meta_readonly_mir_value.h"
 #include "values/init_array_mir_value.h"
 #include "values/init_tuple_mir_value.h"
 #include "values/into_vec_mir_value.h"
@@ -116,6 +118,8 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     assert_failed_mir_value(),
     result_unwrap_mir_value(),
     into_vec_mir_value(),
+    init_account_meta_readonly_mir_value(),
+    init_account_meta_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
