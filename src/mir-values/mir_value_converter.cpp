@@ -34,6 +34,7 @@
 #include "values/init_array_mir_value.h"
 #include "values/init_tuple_mir_value.h"
 #include "values/into_vec_mir_value.h"
+#include "values/invoke_mir_value.h"
 #include "values/iter_mir_value.h"
 #include "values/less_than_equal_mir_value.h"
 #include "values/less_than_mir_value.h"
@@ -120,6 +121,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     into_vec_mir_value(),
     init_account_meta_readonly_mir_value(),
     init_account_meta_mir_value(),
+    invoke_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

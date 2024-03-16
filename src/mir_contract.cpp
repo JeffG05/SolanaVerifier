@@ -682,6 +682,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         for (int i = 0; i < _globals.ARRAY_SIZE-1; i++) {
             generate_block_assignment(out, get_c_value(iter_value).substr(6) + "[" + std::to_string(i) + "]", get_c_value(iter_value) + "[" + std::to_string(i+1) + "]", true, all_variables, indents);
         }
+    } else if (value.starts_with("invoke<")) {
+        *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
