@@ -401,7 +401,7 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
 
 std::string mir_statement::reformat_value_by_type(const std::string &value, const std::string &type) {
     if (type.starts_with("array<")) {
-        if (!value.starts_with("init_array<") && !value.starts_with("str_as_bytes<")) {
+        if (!value.starts_with("init_array<") && !value.starts_with("str_as_bytes<") && !value.starts_with("pubkey_as_bytes<")) {
             return "copy_array<" + value + ">";
         }
         return value;

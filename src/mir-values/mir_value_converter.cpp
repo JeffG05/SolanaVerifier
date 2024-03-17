@@ -54,6 +54,7 @@
 #include "values/print_mir_value.h"
 #include "values/program_error_mir_value.h"
 #include "values/promoted_mir_value.h"
+#include "values/pubkey_as_bytes_mir_value.h"
 #include "values/result_error_mir_value.h"
 #include "values/result_unwrap_mir_value.h"
 #include "values/serialize_mir_value.h"
@@ -140,6 +141,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     sysvar_rent_id_mir_value(),
     find_program_address_mir_value(),
     str_as_bytes_mir_value(),
+    pubkey_as_bytes_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

@@ -426,6 +426,44 @@ bool is_equal_pubkey(pubkey lhs, pubkey rhs) {
         lhs.p27 == rhs.p27 && lhs.p28 == rhs.p28 && lhs.p29 == rhs.p29 &&
         lhs.p30 == rhs.p30 && lhs.p31 == rhs.p31;
 }
+void pubkey_as_bytes(pubkey in, u8* out) {
+    u8 pubkey_data[32];
+    pubkey_data[0] = in.p0;
+    pubkey_data[1] = in.p1;
+    pubkey_data[2] = in.p2;
+    pubkey_data[3] = in.p3;
+    pubkey_data[4] = in.p4;
+    pubkey_data[5] = in.p5;
+    pubkey_data[6] = in.p6;
+    pubkey_data[7] = in.p7;
+    pubkey_data[8] = in.p8;
+    pubkey_data[9] = in.p9;
+    pubkey_data[10] = in.p10;
+    pubkey_data[11] = in.p11;
+    pubkey_data[12] = in.p12;
+    pubkey_data[13] = in.p13;
+    pubkey_data[14] = in.p14;
+    pubkey_data[15] = in.p15;
+    pubkey_data[16] = in.p16;
+    pubkey_data[17] = in.p17;
+    pubkey_data[18] = in.p18;
+    pubkey_data[19] = in.p19;
+    pubkey_data[20] = in.p20;
+    pubkey_data[21] = in.p21;
+    pubkey_data[22] = in.p22;
+    pubkey_data[23] = in.p23;
+    pubkey_data[24] = in.p24;
+    pubkey_data[25] = in.p25;
+    pubkey_data[26] = in.p26;
+    pubkey_data[27] = in.p27;
+    pubkey_data[28] = in.p28;
+    pubkey_data[29] = in.p29;
+    pubkey_data[30] = in.p30;
+    pubkey_data[31] = in.p31;
+    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
+        out[i] = pubkey_data[i];
+    }
+}
 
 // PROGRAM ADDRESS
 typedef struct solana_c_program_address_struct {
