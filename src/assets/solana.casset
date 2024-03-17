@@ -422,6 +422,18 @@ bool is_equal_pubkey(pubkey lhs, pubkey rhs) {
         lhs.p30 == rhs.p30 && lhs.p31 == rhs.p31;
 }
 
+// PROGRAM ADDRESS
+typedef struct solana_c_program_address_struct {
+    pubkey get0;
+    u8 get1;
+} solana_c_program_address;
+solana_c_program_address sol_find_program_address(u8 seeds[{{ARRAY_SIZE}}][{{ARRAY_SIZE}}], pubkey program_id) {
+    solana_c_program_address x;
+    x.get0 = program_id;
+    x.get1 = seeds[0][0];
+    return x;
+}
+
 // ACCOUNT INFO
 typedef struct account_info_struct {
     pubkey get0;

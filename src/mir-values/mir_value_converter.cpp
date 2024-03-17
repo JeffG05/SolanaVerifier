@@ -27,6 +27,7 @@
 #include "values/enum_mir_value.h"
 #include "values/equal_mir_value.h"
 #include "values/exchange_malloc_mir_value.h"
+#include "values/find_program_address_mir_value.h"
 #include "values/from_residual_mir_value.h"
 #include "values/function_mir_value.h"
 #include "values/greater_than_equal_mir_value.h"
@@ -136,6 +137,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     align_of_mir_value(),
     exchange_malloc_mir_value(),
     sysvar_rent_id_mir_value(),
+    find_program_address_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
