@@ -4,6 +4,7 @@
 #include "values/borrow_mir_value.h"
 #include "values/borrow_mutable_mir_value.h"
 #include "values/addition_mir_value.h"
+#include "values/align_of_mir_value.h"
 #include "values/assert_failed_mir_value.h"
 #include "values/as_box_mir_value.h"
 #include "values/bitand_mir_value.h"
@@ -25,6 +26,7 @@
 #include "values/discriminant_mir_value.h"
 #include "values/enum_mir_value.h"
 #include "values/equal_mir_value.h"
+#include "values/exchange_malloc_mir_value.h"
 #include "values/from_residual_mir_value.h"
 #include "values/function_mir_value.h"
 #include "values/greater_than_equal_mir_value.h"
@@ -55,6 +57,7 @@
 #include "values/result_unwrap_mir_value.h"
 #include "values/serialize_mir_value.h"
 #include "values/shallow_init_box_mir_value.h"
+#include "values/size_of_mir_value.h"
 #include "values/solana_instruction_mir_value.h"
 #include "values/system_program_id_mir_value.h"
 #include "values/try_branch_result_mir_value.h"
@@ -128,6 +131,9 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     system_program_id_mir_value(),
     const_bool_mir_value(),
     shallow_init_box_mir_value(),
+    size_of_mir_value(),
+    align_of_mir_value(),
+    exchange_malloc_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
