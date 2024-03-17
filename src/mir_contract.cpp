@@ -608,7 +608,7 @@ std::tuple<std::string, std::string> mir_contract::parse_indexed(const std::stri
     return std::make_tuple(value, buffer);
 }
 
-void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents) {
+void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents, bool prevent_modify) {
     auto base_indent = std::string(indents, '\t');
 
     if (value.starts_with("checked<")) {
@@ -724,7 +724,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(").front())) {
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
         } else {
-            generate_block_assignment(out, variable, result_value, true, all_variables, indents);
+            generate_block_assignment(out, variable, result_value, true, all_variables, indents, true);
         }
     } else if (value.starts_with("copy_result<")) {
         const std::string result_value = value.substr(12, value.size() - 13);
@@ -732,7 +732,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
             generate_block_assignment(out, variable + ".value", result_value + ".value", true, all_variables, indents);
         } else {
-            generate_block_assignment(out, variable, result_value, true, all_variables, indents);
+            generate_block_assignment(out, variable, result_value, true, all_variables, indents, true);
         }
     } else if (value.starts_with("copy_solana_instruction<")) {
         const std::string instruction_value = value.substr(24, value.size() - 25);
@@ -795,19 +795,17 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             ++meta_values_itr;
         }
     } else if (!variable.empty()) {
-        std::cout << variable;
-        std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, variable);
-        std::cout << " DONE (" << statement.has_value() << ")";
         std::string formatted_value = value;
-        if (statement.has_value()) {
-            formatted_value = mir_statement::reformat_value_by_type(value, statement.value().get_ast_data().at("variable_type"));
-        }
+        if (!prevent_modify) {
+            std::optional<mir_statement> statement = mir_statement::get_statement(all_variables, variable);
+            if (statement.has_value()) {
+                formatted_value = mir_statement::reformat_value_by_type(value, statement.value().get_ast_data().at("variable_type"));
+            }
 
-        std::cout << " PRINT (" << formatted_value << ", " << value << ")" << std::endl;
-
-        if (formatted_value != value) {
-            generate_block_assignment(out, variable, formatted_value, returns, all_variables, indents);
-            return;
+            if (formatted_value != value) {
+                generate_block_assignment(out, variable, formatted_value, returns, all_variables, indents);
+                return;
+            }
         }
 
         if (returns) {
