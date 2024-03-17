@@ -336,6 +336,11 @@ void print(string s) {
 bool is_equal_string(string lhs, string rhs) {
     return strcmp(lhs, rhs) == 0;
 }
+void str_as_bytes(string in, u8* out) {
+    for (int i = 0; i < fmin(strlen(in), {{ARRAY_SIZE}}); i++) {
+        out[i] = (u8) in[i];
+    }
+}
 
 // PUBKEY
 typedef struct pubkey_struct {

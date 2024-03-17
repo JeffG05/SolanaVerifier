@@ -60,6 +60,7 @@
 #include "values/shallow_init_box_mir_value.h"
 #include "values/size_of_mir_value.h"
 #include "values/solana_instruction_mir_value.h"
+#include "values/str_as_bytes_mir_value.h"
 #include "values/system_program_id_mir_value.h"
 #include "values/sysvar_rent_id_mir_value.h"
 #include "values/try_branch_result_mir_value.h"
@@ -138,6 +139,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     exchange_malloc_mir_value(),
     sysvar_rent_id_mir_value(),
     find_program_address_mir_value(),
+    str_as_bytes_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

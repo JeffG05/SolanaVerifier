@@ -713,6 +713,9 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const std::string subvalue = value.substr(21, value.size() - 22);
         generate_block_assignment(out, variable + ".get0", "copy_pubkey<sol_find_program_address(" + subvalue + ").get0>", true, all_variables, indents);
         generate_block_assignment(out, variable + ".get1", "sol_find_program_address(" + subvalue + ").get1", true, all_variables, indents);
+    } else if (value.starts_with("str_as_bytes<")) {
+        const std::string subvalue = value.substr(13, value.size() - 14);
+        generate_block_assignment(out, variable, "str_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, indents, true);
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
