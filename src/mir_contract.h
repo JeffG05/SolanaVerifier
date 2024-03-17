@@ -60,7 +60,7 @@ private:
 
     void generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const;
     void generate_nondet_from_statement(std::ostream* out, const mir_statement& statement, const std::string& function_name, const mir_statements &all_variables, bool in_main = false);
-    void generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type) const;
+    void generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type, const std::string& function_name) const;
 
     static void generate_serialization(std::ostream* out, const std::string &variable_name, const std::string& variable_type, unsigned int* counter);
     static void generate_deserialization(std::ostream* out, const std::string &variable_name, const std::string& variable_type, unsigned int* counter);

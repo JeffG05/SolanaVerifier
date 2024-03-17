@@ -916,7 +916,7 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
 
 void mir_contract::generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const {
     if (type.starts_with("array<")) {
-        generate_nondet_array(out, name, type);
+        generate_nondet_array(out, name, type, function_name);
     } else {
         *out << "\t" << name << " = nondet_" << get_return_c_type(type, function_name) << "();" << std::endl;
     }
@@ -941,9 +941,9 @@ void mir_contract::generate_nondet_from_statement(std::ostream *out, const mir_s
     }
 }
 
-void mir_contract::generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type) const {
+void mir_contract::generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const {
     for (int i = 0; i < _globals.ARRAY_SIZE-1; i++) {
-        *out << "\t" << name << "[" << i << "] = nondet_" << get_c_subtype(type) << "();" << std::endl;
+        generate_nondet_from_name(out, name + "[" + std::to_string(i) + "]", get_c_subtype(type), function_name);
     }
 }
 
