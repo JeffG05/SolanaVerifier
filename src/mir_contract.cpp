@@ -627,7 +627,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "state." << variable << " = " << checked_value << ".value;" << std::endl;
     } else if (value.starts_with("serialize<")) {
         const std::string serialize_value = value.substr(10, value.size() - 11);
-        std::list<std::string> serialize_values = utils::split(serialize_value, ", ");
+        std::list<std::string> serialize_values = utils::split(serialize_value, ", ", 3);
         if (serialize_values.size() == 2) {
             serialize_values.push_back("state." + variable + ".value");
         }
@@ -641,7 +641,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << func << ";" << std::endl;
     } else if (value.starts_with("deserialize<")) {
         const std::string deserialize_value = value.substr(12, value.size() - 13);
-        std::list<std::string> deserialize_values = utils::split(deserialize_value, ", ");
+        std::list<std::string> deserialize_values = utils::split(deserialize_value, ", ", 2);
 
         const std::string func_name = "deserialize_" + deserialize_values.front();
         deserialize_values.pop_front();
@@ -691,6 +691,24 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("invoke<")) {
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
+    } else if (value.starts_with("conversion<")) {
+        const auto [conversion_value, indexer] = parse_indexed("conversion", value);
+        auto conversion_values = utils::split(conversion_value, ", ", 2);
+
+        const std::string conversion_var = conversion_values.front();
+        const std::string conversion_type = conversion_values.back();
+
+        const std::optional<mir_statement> original_var_statement = mir_statement::get_statement(all_variables, conversion_var.starts_with("state.") ? conversion_var.substr(6) : conversion_var);
+        if (original_var_statement.has_value()) {
+            const std::string original_type = original_var_statement.value().get_ast_data().at("variable_type");
+            if (conversion_type == original_type) {
+                generate_block_assignment(out, variable, conversion_var + indexer, true, all_variables, indents);
+            } else {
+                generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, indents);
+            }
+        } else {
+            generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, indents);
+        }
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
@@ -728,14 +746,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("copy_void_result<")) {
         const std::string result_value = value.substr(17, value.size() - 18);
-        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(").front())) {
+        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(", 2).front())) {
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
         } else {
             generate_block_assignment(out, variable, result_value, true, all_variables, indents, true);
         }
     } else if (value.starts_with("copy_result<")) {
         const std::string result_value = value.substr(12, value.size() - 13);
-        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(").front())) {
+        if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(", 2).front())) {
             generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
             generate_block_assignment(out, variable + ".value", result_value + ".value", true, all_variables, indents);
         } else {
@@ -752,7 +770,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("init_solana_instruction<")) {
         const std::string instruction_value = value.substr(24, value.size() - 25);
-        const auto instruction_values = utils::split(instruction_value, ", ");
+        const auto instruction_values = utils::split(instruction_value, ", ", 3);
         auto instruction_values_itr = instruction_values.begin();
 
         generate_block_assignment(out, variable + ".get0", "copy_pubkey<" + *instruction_values_itr + ">", true, all_variables, indents);
@@ -795,7 +813,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("init_account_meta<")) {
         const std::string meta_value = value.substr(18, value.size() - 19);
-        const auto meta_values = utils::split(meta_value, ", ");
+        const auto meta_values = utils::split(meta_value, ", ", 3);
         auto meta_values_itr = meta_values.begin();
         for (int i = 0; i < meta_values.size(); i++) {
             generate_block_assignment(out, variable + ".get" + std::to_string(i), *meta_values_itr, true, all_variables, indents);

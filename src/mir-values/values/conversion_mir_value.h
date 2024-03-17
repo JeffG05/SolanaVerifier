@@ -10,8 +10,7 @@ public:
         std::regex (R"(^(.+) as (.+?)(?: \(.+\))?$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
-            std::string converted_value = "((" + match[2].str() + ") " + value + ")";
-            return std::make_tuple(converted_value, true);
+            return std::make_tuple("conversion<" + value + ", " + mir_type_converter::convert(match[2].str()) + ">", true);
         }
     ) {}
 };
