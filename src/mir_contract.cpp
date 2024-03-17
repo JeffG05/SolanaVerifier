@@ -115,6 +115,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
     // Add const definitions
     file << "pubkey SYSTEM_PROGRAM_ID;" << std::endl;
+    file << "pubkey SYSVAR_RENT_ID;" << std::endl;
     file << std::endl;
 
     mir_statements structs = ast_tree.get_children({statement_type::data_struct});
@@ -961,6 +962,7 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
     *out << "int main() {" << std::endl;
 
     *out << "\tSYSTEM_PROGRAM_ID = nondet_pubkey();" << std::endl;
+    *out << "\tSYSVAR_RENT_ID = nondet_pubkey();" << std::endl;
     *out << std::endl;
 
     for (const auto& parameter_statement: target_function_parameters) {

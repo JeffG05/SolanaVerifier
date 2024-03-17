@@ -151,6 +151,7 @@ add_executable(SolanaVerifier
         mir-values/values/size_of_mir_value.h
         mir-values/values/align_of_mir_value.h
         mir-values/values/exchange_malloc_mir_value.h
+        mir-values/values/sysvar_rent_id_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
