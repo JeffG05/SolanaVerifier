@@ -147,6 +147,7 @@ add_executable(SolanaVerifier
         mir-values/values/invoke_mir_value.h
         mir-values/values/system_program_id_mir_value.h
         mir-values/values/const_bool_mir_value.h
+        mir-values/values/shallow_init_box_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

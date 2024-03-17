@@ -615,7 +615,9 @@ std::tuple<std::string, std::string> mir_contract::parse_indexed(const std::stri
 void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents, bool prevent_modify) {
     auto base_indent = std::string(indents, '\t');
 
-    if (value.starts_with("checked<")) {
+    if (value.starts_with("ignore<")) {
+        return;
+    } if (value.starts_with("checked<")) {
         const std::string checked_value = value.substr(8, value.size() - 9);
         *out << base_indent << "state." << variable << ".get0 = " << checked_value << ".value;" << std::endl;
         *out << base_indent << "state." << variable << ".get1 = " << checked_value << ".errors;" << std::endl;

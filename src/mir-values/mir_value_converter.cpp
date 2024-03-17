@@ -54,6 +54,7 @@
 #include "values/result_error_mir_value.h"
 #include "values/result_unwrap_mir_value.h"
 #include "values/serialize_mir_value.h"
+#include "values/shallow_init_box_mir_value.h"
 #include "values/solana_instruction_mir_value.h"
 #include "values/system_program_id_mir_value.h"
 #include "values/try_branch_result_mir_value.h"
@@ -126,6 +127,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     invoke_mir_value(),
     system_program_id_mir_value(),
     const_bool_mir_value(),
+    shallow_init_box_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
