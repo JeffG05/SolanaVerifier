@@ -113,6 +113,10 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
     file << "#include \"solana.c\"" << std::endl;
     file << std::endl;
 
+    // Add const definitions
+    file << "pubkey SYSTEM_PROGRAM_ID;" << std::endl;
+    file << std::endl;
+
     mir_statements structs = ast_tree.get_children({statement_type::data_struct});
     for (auto struct_statement : std::ranges::reverse_view(structs)) {
         generate_struct_struct(&file, struct_statement.get_children(), struct_statement.get_ast_data().at("name"));
@@ -953,6 +957,10 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
     mir_statements target_function_all_variables = mir_statement::get_all_variables(target_function_statement, _structs);
 
     *out << "int main() {" << std::endl;
+
+    *out << "\tSYSTEM_PROGRAM_ID = nondet_pubkey();" << std::endl;
+    *out << std::endl;
+
     for (const auto& parameter_statement: target_function_parameters) {
         nlohmann::json parameter_data = parameter_statement.get_ast_data();
         const std::string parameter_name = parameter_data.at("variable").get<std::string>();

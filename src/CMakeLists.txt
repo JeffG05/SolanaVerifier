@@ -145,6 +145,7 @@ add_executable(SolanaVerifier
         mir-values/values/init_account_meta_readonly_mir_value.h
         mir-values/values/init_account_meta_mir_value.h
         mir-values/values/invoke_mir_value.h
+        mir-values/values/system_program_id_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
