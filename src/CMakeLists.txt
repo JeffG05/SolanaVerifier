@@ -96,7 +96,7 @@ add_executable(SolanaVerifier
         mir-values/values/discriminant_mir_value.h
         mir-values/values/borrow_mutable_mir_value.h
         mir-values/values/next_mir_value.h
-        mir-values/values/index_mut_range_full_mir_value.h
+        mir-values/values/index_range_full_mir_value.h
         hir_contract.cpp
         hir_contract.h
         mir-values/values/serialize_mir_value.h

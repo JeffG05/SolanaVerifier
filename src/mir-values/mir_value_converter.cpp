@@ -32,7 +32,7 @@
 #include "values/function_mir_value.h"
 #include "values/greater_than_equal_mir_value.h"
 #include "values/greater_than_mir_value.h"
-#include "values/index_mut_range_full_mir_value.h"
+#include "values/index_range_full_mir_value.h"
 #include "values/init_account_meta_mir_value.h"
 #include "values/init_account_meta_readonly_mir_value.h"
 #include "values/init_array_mir_value.h"
@@ -108,7 +108,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     discriminant_mir_value(),
     borrow_mutable_mir_value(),
     next_mir_value(),
-    index_mut_range_full_mir_value(),
+    index_range_full_mir_value(),
     serialize_mir_value(),
     deserialize_mir_value(),
     less_than_mir_value(),
