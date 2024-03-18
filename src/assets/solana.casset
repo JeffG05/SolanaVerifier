@@ -566,6 +566,52 @@ solana_instruction sol_transfer(pubkey from_pubkey, pubkey to_pubkey, u64 lampor
 
     return x;
 }
+solana_instruction sol_create_account(pubkey from_pubkey, pubkey to_pubkey, u64 lamports, u64 space, pubkey owner, pubkey system_program_id) {
+    account_meta from_meta;
+    from_meta.get0 = from_pubkey;
+    from_meta.get1 = true;
+    from_meta.get2 = true;
+
+    account_meta to_meta;
+    to_meta.get0 = to_pubkey;
+    to_meta.get1 = true;
+    to_meta.get2 = true;
+
+    solana_instruction x;
+    x.get0 = system_program_id;
+    x.get1[0] = from_meta;
+    x.get1[1] = to_meta;
+
+    int counter = 0;
+    int b = 0;
+    while (counter < {{ARRAY_SIZE}} && counter < 4) {
+        x.get2[counter] = 0 >> b & 0xFF;
+        b += 8;
+        counter += 1;
+    }
+    b = 0;
+    while (counter < {{ARRAY_SIZE}} && counter < 12) {
+        x.get2[counter] = lamports >> b & 0xFF;
+        b += 8;
+        counter += 1;
+    }
+    b = 0;
+    while (counter < {{ARRAY_SIZE}} && counter < 20) {
+        x.get2[counter] = space >> b & 0xFF;
+        b += 8;
+        counter += 1;
+    }
+    u8 pubkey_data[32];
+    pubkey_as_bytes(owner, pubkey_data);
+    b = 0;
+    while (counter < {{ARRAY_SIZE}} && counter < 52) {
+        x.get2[counter] = pubkey_data[b];
+        b += 1;
+        counter += 1;
+    }
+
+    return x;
+}
 
 // INFALLIBLE
 typedef enum { unreachable } infallible;

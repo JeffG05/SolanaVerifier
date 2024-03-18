@@ -22,6 +22,7 @@
 #include "values/const_string_mir_value.h"
 #include "values/const_void_mir_value.h"
 #include "values/conversion_mir_value.h"
+#include "values/create_account_mir_value.h"
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
 #include "values/discriminant_mir_value.h"
@@ -149,6 +150,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     panic_mir_value(),
     clone_mir_value(),
     transfer_mir_value(),
+    create_account_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
