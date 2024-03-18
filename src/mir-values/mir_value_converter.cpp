@@ -37,6 +37,7 @@
 #include "values/init_account_meta_mir_value.h"
 #include "values/init_account_meta_readonly_mir_value.h"
 #include "values/init_array_mir_value.h"
+#include "values/init_struct_mir_value.h"
 #include "values/init_tuple_mir_value.h"
 #include "values/into_vec_mir_value.h"
 #include "values/invoke_mir_value.h"
@@ -154,4 +155,5 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     promoted_mir_value(),
     function_mir_value(),
     enum_mir_value(),
+    init_struct_mir_value()
 };
