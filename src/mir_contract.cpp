@@ -663,6 +663,11 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         generate_block_assignment(out, variable, "return_error<>", true, all_variables, indents+1);
         *out << base_indent << "}" << std::endl;
         *out << base_indent << "state." << variable << " = " << result_value << ".value" + indexer + ";" << std::endl;
+    } else if (value.starts_with("result_void_unwrap<")) {
+        auto [result_value, indexer] = parse_indexed("result_void_unwrap", value);
+        *out << base_indent << "if (!" + result_value + ".is_success) {" << std::endl;
+        generate_block_assignment(out, variable, "return_error<>", true, all_variables, indents+1);
+        *out << base_indent << "}" << std::endl;
     } else if (value.starts_with("return_error<")) {
         std::optional<mir_statement> return_statement = mir_statement::get_statement(all_variables, "_0");
         if (return_statement.has_value() && return_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("result<")) {
