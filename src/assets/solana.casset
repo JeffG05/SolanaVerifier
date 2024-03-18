@@ -722,3 +722,8 @@ rent nondet_rent() {
     x.get2 = nondet_u8();
     return x;
 }
+u64 sol_minimum_balance(rent x, usize data_len) {
+    u64 bytes = data_len;
+    f64 lamports = (128 + bytes) * x.get0;
+    return lamports * x.get1;
+}

@@ -45,6 +45,7 @@
 #include "values/iter_mir_value.h"
 #include "values/less_than_equal_mir_value.h"
 #include "values/less_than_mir_value.h"
+#include "values/minimum_balance_mir_value.h"
 #include "values/move_mir_value.h"
 #include "values/mutable_mir_value.h"
 #include "values/negation_mir_value.h"
@@ -151,6 +152,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     clone_mir_value(),
     transfer_mir_value(),
     create_account_mir_value(),
+    minimum_balance_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
