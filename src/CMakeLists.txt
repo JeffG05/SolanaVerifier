@@ -156,6 +156,7 @@ add_executable(SolanaVerifier
         mir-values/values/str_as_bytes_mir_value.h
         mir-values/values/pubkey_as_bytes_mir_value.h
         mir-values/values/panic_mir_value.h
+        mir-values/values/clone_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

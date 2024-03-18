@@ -11,6 +11,7 @@
 #include "values/bitor_mir_value.h"
 #include "values/bitxor_mir_value.h"
 #include "values/box_indexer_mir_value.h"
+#include "values/clone_mir_value.h"
 #include "values/const_bool_mir_value.h"
 #include "values/const_number_max_mir_value.h"
 #include "values/const_number_min_mir_value.h"
@@ -144,6 +145,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     str_as_bytes_mir_value(),
     pubkey_as_bytes_mir_value(),
     panic_mir_value(),
+    clone_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
