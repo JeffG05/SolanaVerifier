@@ -51,6 +51,7 @@
 #include "values/not_equal_mir_value.h"
 #include "values/ok_result_mir_value.h"
 #include "values/panic_assert_kind_mir_value.h"
+#include "values/panic_mir_value.h"
 #include "values/print_mir_value.h"
 #include "values/program_error_mir_value.h"
 #include "values/promoted_mir_value.h"
@@ -142,6 +143,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     find_program_address_mir_value(),
     str_as_bytes_mir_value(),
     pubkey_as_bytes_mir_value(),
+    panic_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
