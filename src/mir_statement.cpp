@@ -412,9 +412,6 @@ std::string mir_statement::reformat_value_by_type(const std::string &value, cons
         }
         return value;
     }
-    if (type == "pubkey") {
-        return "copy_pubkey<" + value + ">";
-    }
     if (type == "account_info") {
         return "copy_account_info<" + value + ">";
     }

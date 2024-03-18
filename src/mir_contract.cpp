@@ -228,9 +228,6 @@ std::string mir_contract::get_c_value(const std::string &value) {
     if (value.starts_with("copy_tuple<")) {
         return get_c_value(value.substr(11, value.size() - 12));
     }
-    if (value.starts_with("copy_pubkey<")) {
-        return get_c_value(value.substr(12, value.size() - 13));
-    }
     if (value.starts_with("copy_account_info<")) {
         return get_c_value(value.substr(18, value.size() - 19));
     }
@@ -711,7 +708,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         }
     } else if (value.starts_with("find_program_address<")) {
         const std::string subvalue = value.substr(21, value.size() - 22);
-        generate_block_assignment(out, variable + ".get0", "copy_pubkey<sol_find_program_address(" + subvalue + ").get0>", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get0", "sol_find_program_address(" + subvalue + ").get0", true, all_variables, indents);
         generate_block_assignment(out, variable + ".get1", "sol_find_program_address(" + subvalue + ").get1", true, all_variables, indents);
     } else if (value.starts_with("str_as_bytes<")) {
         const std::string subvalue = value.substr(13, value.size() - 14);
@@ -729,17 +726,10 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
             generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, indents);
         }
-    } else if (value.starts_with("copy_pubkey<")) {
-        const std::string pubkey_value = value.substr(12, value.size() - 13);
-        for (int i = 0; i < 32; i++) {
-            generate_block_assignment(out, variable + ".p" + std::to_string(i), pubkey_value + ".p" + std::to_string(i), true, all_variables, indents);
-        }
     } else if (value.starts_with("copy_account_info<")) {
         const std::string info_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 8; i++) {
-            if (i == 0 || i == 3) {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + info_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
-            } else if (i == 2) {
+            if (i == 2) {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + info_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
             } else {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true, all_variables, indents);
@@ -748,11 +738,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("copy_account_meta<")) {
         const std::string meta_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 3; i++) {
-            if (i == 0) {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + meta_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
-            } else {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), meta_value + ".get" + std::to_string(i), true, all_variables, indents);
-            }
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), meta_value + ".get" + std::to_string(i), true, all_variables, indents);
         }
     } else if (value.starts_with("copy_void_result<")) {
         const std::string result_value = value.substr(17, value.size() - 18);
@@ -773,7 +759,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const std::string instruction_value = value.substr(24, value.size() - 25);
         for (int i = 0; i < 3; i++) {
             if (i == 0) {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_pubkey<" + instruction_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), instruction_value + ".get" + std::to_string(i), true, all_variables, indents);
             } else {
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + instruction_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
             }
@@ -783,7 +769,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const auto instruction_values = utils::split(instruction_value, ", ", 3);
         auto instruction_values_itr = instruction_values.begin();
 
-        generate_block_assignment(out, variable + ".get0", "copy_pubkey<" + *instruction_values_itr + ">", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get0", *instruction_values_itr, true, all_variables, indents);
         ++instruction_values_itr;
         generate_block_assignment(out, variable + ".get1", "copy_array<" + *instruction_values_itr + ">", true, all_variables, indents);
         ++instruction_values_itr;
