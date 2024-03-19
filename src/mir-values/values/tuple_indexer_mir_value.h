@@ -10,6 +10,9 @@ public:
         std::regex (R"(^\((.+)\.(\d+): .+\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [var, returns] = mir_value_converter::convert(match[1].str(), variables);
+            if (var.starts_with("init_")) {
+                var = var.substr(var.find_first_of('<')+1, var.size() - var.find_first_of('<') - 2);
+            }
             const std::optional<mir_statement> var_statement = mir_statement::get_statement(variables, match[1].str());
             std::string value;
             if (var.starts_with("continue<")) {

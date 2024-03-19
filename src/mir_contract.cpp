@@ -706,6 +706,13 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             if (conversion_type == original_type) {
                 generate_block_assignment(out, variable, conversion_var + indexer, true, all_variables, indents);
             } else {
+                for (const auto& s : _structs) {
+                    if (s.get_ast_data().at("name").get<std::string>() == original_type && s.get_type() == statement_type::data_enum) {
+                        std::cout << conversion_var << ".value_" << utils::to_lower(conversion_type) << indexer << std::endl;
+                        generate_block_assignment(out, variable, conversion_var + ".value_" + utils::to_lower(conversion_type) += indexer, true, all_variables, indents);
+                        return;
+                    }
+                }
                 generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, indents);
             }
         } else {
