@@ -61,6 +61,7 @@
 #include "values/program_error_mir_value.h"
 #include "values/promoted_mir_value.h"
 #include "values/pubkey_as_bytes_mir_value.h"
+#include "values/rent_from_account_info_mir_value.h"
 #include "values/result_error_mir_value.h"
 #include "values/result_unwrap_mir_value.h"
 #include "values/serialize_mir_value.h"
@@ -155,6 +156,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     create_account_mir_value(),
     minimum_balance_mir_value(),
     data_is_empty_mir_value(),
+    rent_from_account_info_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
