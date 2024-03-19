@@ -740,6 +740,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                 generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true, all_variables, indents);
             }
         }
+        generate_block_assignment(out, variable + ".data_is_empty", info_value + ".data_is_empty", true, all_variables, indents);
     } else if (value.starts_with("copy_account_meta<")) {
         const std::string meta_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 3; i++) {

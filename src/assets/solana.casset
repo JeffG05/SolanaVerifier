@@ -487,6 +487,7 @@ typedef struct account_info_struct {
     bool get5;
     bool get6;
     bool get7;
+    bool data_is_empty;
 } account_info;
 account_info nondet_account_info() {
     account_info info;
@@ -500,6 +501,7 @@ account_info nondet_account_info() {
     info.get5 = nondet_bool();
     info.get6 = nondet_bool();
     info.get7 = nondet_bool();
+    info.data_is_empty = nondet_bool();
     return info;
 }
 

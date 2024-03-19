@@ -596,6 +596,7 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
         const mir_statement get5 = new_variable(name + ".get5", "bool");
         const mir_statement get6 = new_variable(name + ".get6", "bool");
         const mir_statement get7 = new_variable(name + ".get7", "bool");
+        const mir_statement data_is_empty = new_variable(name + ".data_is_empty", "bool");
 
         utils::extend(&subvariables, get_subvariables(get0, structs));
         utils::extend(&subvariables, get_subvariables(get1, structs));
@@ -605,6 +606,7 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
         utils::extend(&subvariables, get_subvariables(get5, structs));
         utils::extend(&subvariables, get_subvariables(get6, structs));
         utils::extend(&subvariables, get_subvariables(get7, structs));
+        utils::extend(&subvariables, get_subvariables(data_is_empty, structs));
         return subvariables;
     }
     if (type == "account_meta") {

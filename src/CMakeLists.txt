@@ -161,6 +161,7 @@ add_executable(SolanaVerifier
         mir-values/values/init_struct_mir_value.h
         mir-values/values/create_account_mir_value.h
         mir-values/values/minimum_balance_mir_value.h
+        mir-values/values/data_is_empty_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
