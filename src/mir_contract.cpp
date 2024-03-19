@@ -940,25 +940,57 @@ void mir_contract::generate_nondet_array(std::ostream *out, const std::string &n
 }
 
 void mir_contract::generate_serialization(std::ostream *out, const std::string &variable_name, const std::string& variable_type, unsigned int *counter) {
-    const std::regex uint_regex (R"(^u(\d+)$)");
-    if (std::smatch match; std::regex_match(variable_type, match, uint_regex)) {
-        const int bits = std::stoi(match[1].str());
+    std::smatch match;
+    const std::regex uint_regex (R"(^u(\d+|size)$)");
+    const std::regex float_regex (R"(^f(\d+)$)");
+    if (std::regex_match(variable_type, match, uint_regex)) {
+        int bits;
+        if (match[1].str() == "size") {
+            bits = 64;
+        } else {
+            bits = std::stoi(match[1].str());
+        }
         for (int i = 0; i < bits; i+=8) {
             *out << "\tout[" << *counter << "] = x." << variable_name << " >> " << i << " & 0xFF;" << std::endl;
+            (*counter)++;
+        }
+    } else if (std::regex_match(variable_type, match, float_regex)) {
+        const std::string int_equiv = "u" + match[1].str();
+        const int bits = std::stoi(match[1].str());
+        *out << "\t" << int_equiv << "* " << utils::clean(variable_name) << "_ptr = (" << int_equiv << "*) &x." << variable_name << ";" << std::endl;
+        for (int i = 0; i < bits; i+=8) {
+            *out << "\tout[" << *counter << "] = (*" << utils::clean(variable_name) << "_ptr) >> " << i << " & 0xFF;" << std::endl;
             (*counter)++;
         }
     }
 }
 
 void mir_contract::generate_deserialization(std::ostream *out, const std::string &variable_name, const std::string &variable_type, unsigned int *counter) {
-    const std::regex uint_regex (R"(^u(\d+)$)");
-    if (std::smatch match; std::regex_match(variable_type, match, uint_regex)) {
-        const int bits = std::stoi(match[1].str());
+    std::smatch match;
+    const std::regex uint_regex (R"(^u(\d+|size)$)");
+    const std::regex float_regex (R"(^f(\d+)$)");
+    if (std::regex_match(variable_type, match, uint_regex)) {
+        int bits;
+        if (match[1].str() == "size") {
+            bits = 64;
+        } else {
+            bits = std::stoi(match[1].str());
+        }
         *out << "\tx." << variable_name << " = 0;" << std::endl;
         for (int i = 0; i < bits; i+=8) {
-            *out << "\tx." << variable_name << " = " << "x." << variable_name << " | in[" << *counter << "] << " << i << ";" << std::endl;
+            *out << "\tx." << variable_name << " = x." << variable_name << " | in[" << *counter << "] << " << i << ";" << std::endl;
             (*counter)++;
         }
+    } else if (std::regex_match(variable_type, match, float_regex)) {
+        const std::string int_equiv = "u" + match[1].str();
+        const int bits = std::stoi(match[1].str());
+        *out << "\t" << int_equiv << " " << utils::clean(variable_name) << "_int = 0;" << std::endl;
+        for (int i = 0; i < bits; i+=8) {
+            *out << "\t" << utils::clean(variable_name) << "_int = " << utils::clean(variable_name) << "_int | in[" << *counter << "] << " << i << ";" << std::endl;
+            (*counter)++;
+        }
+        *out << "\t" << match[0].str() << "* " << utils::clean(variable_name) << "_ptr = (" << match[0].str() << "*) &" << utils::clean(variable_name) << "_int;" << std::endl;
+        *out << "\tx." << variable_name << " = *" << utils::clean(variable_name) << "_ptr;" << std::endl;
     }
 }
 
