@@ -130,7 +130,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
 
     mir_statements enums = ast_tree.get_children({statement_type::data_enum});
     for (auto struct_statement : std::ranges::reverse_view(enums)) {
-        generate_enum_struct(&file, struct_statement.get_children(), struct_statement.get_ast_data().at("name"));
+        generate_enum_struct(&file, struct_statement.get_children({statement_type::variable}), struct_statement.get_ast_data().at("name"));
     }
 
     mir_statements functions = ast_tree.get_children({statement_type::function});
@@ -708,7 +708,6 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             } else {
                 for (const auto& s : _structs) {
                     if (s.get_ast_data().at("name").get<std::string>() == original_type && s.get_type() == statement_type::data_enum) {
-                        std::cout << conversion_var << ".value_" << utils::to_lower(conversion_type) << indexer << std::endl;
                         generate_block_assignment(out, variable, conversion_var + ".value_" + utils::to_lower(conversion_type) += indexer, true, all_variables, indents);
                         return;
                     }
@@ -728,6 +727,25 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("pubkey_as_bytes<")) {
         const std::string subvalue = value.substr(16, value.size() - 17);
         generate_block_assignment(out, variable, "pubkey_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, indents, true);
+    }  else if (value.starts_with("enum_discriminant<")) {
+        const std::string subvalue = value.substr(18, value.size() - 19);
+        std::optional<mir_statement> enum_statement = mir_statement::get_statement(all_variables, subvalue.starts_with("state.") ? subvalue.substr(6) : subvalue);
+        if (enum_statement.has_value()) {
+            for (auto s : _structs) {
+                if (s.get_type() != statement_type::data_enum || s.get_ast_data().at("name").get<std::string>() != enum_statement.value().get_ast_data().at("variable_type").get<std::string>()) {
+                    continue;
+                }
+                mir_statements options = s.get_children({statement_type::data_enum_option});
+                std::string option_if;
+                while (options.size() > 1) {
+                    option_if += "is_equal_string(" + subvalue + ".value, \"" + options.front().get_ast_data().at("name").get<std::string>() + "\") ? " + std::to_string(options.front().get_ast_data().at("value").get<int>()) + " : ";
+                    options.pop_front();
+                }
+                option_if += std::to_string(options.front().get_ast_data().at("value").get<int>());
+                generate_block_assignment(out, variable, option_if, true, all_variables, indents);
+                break;
+            }
+        }
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {

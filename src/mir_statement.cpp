@@ -55,6 +55,8 @@ std::string mir_statement::get_string_type() const {
             return "Enum";
         case statement_type::data_enum_struct:
             return "Enum Struct";
+        case statement_type::data_enum_option:
+            return "Enum Option";
         default:
             return "Unknown Statement";
     }
@@ -158,6 +160,8 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::data_enum;
     } else if (string_type == "Enum Struct") {
         type = statement_type::data_enum_struct;
+    } else if (string_type == "Enum Option") {
+        type = statement_type::data_enum_option;
     } else {
         type = statement_type::unknown;
     }
@@ -572,7 +576,7 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
 
     for (auto struct_statement: structs) {
         if (type == struct_statement.get_ast_data().at("name")) {
-            for (const auto& child_variable: struct_statement.get_children()) {
+            for (const auto& child_variable: struct_statement.get_children({statement_type::variable})) {
                 const std::string child_type = child_variable.get_ast_data().at("variable_type");
                 std::string new_var_name = name + ".";
                 new_var_name += child_variable.get_ast_data().at("variable");

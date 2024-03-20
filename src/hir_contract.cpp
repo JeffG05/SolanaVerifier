@@ -41,6 +41,7 @@ mir_statements hir_contract::extract_structs() const {
     bool struct_active = false;
     bool enum_active = false;
     unsigned int var_i = 0;
+    int enum_value = 0;
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
         if (!struct_active && !enum_active) {
@@ -106,10 +107,26 @@ mir_statements hir_contract::extract_structs() const {
                 var_i++;
             }
         } else {
+            std::regex simple_value_regex (R"(^(.+),$)");
             std::regex complex_value_regex (R"(^([^}\s]+) \{$)");
             std::smatch match;
-            if (std::regex_match(trimmed_line, match, complex_value_regex)) {
+            if (std::regex_match(trimmed_line, match, simple_value_regex)) {
+                nlohmann::json data1;
+                data1["name"] = utils::to_lower(match[1].str());
+                data1["value"] = enum_value;
+                auto field1 = mir_statement(statement_type::data_enum_option, data1);
+                structs.back().add_child(field1);
+                enum_value += 1;
+
+            } else if (std::regex_match(trimmed_line, match, complex_value_regex)) {
                 std::string subenum_name = structs.back().get_ast_data().at("name").get<std::string>() + "_" + match[1].str();
+
+                nlohmann::json data1;
+                data1["name"] = utils::to_lower(match[1].str());
+                data1["value"] = enum_value;
+                auto field1 = mir_statement(statement_type::data_enum_option, data1);
+                structs.back().add_child(field1);
+                enum_value += 1;
 
                 nlohmann::json data;
                 data["variable"] = "value_" + utils::to_lower(match[1].str());
