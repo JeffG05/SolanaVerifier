@@ -334,157 +334,22 @@ void print(string s) {
     printf("%s\n", s);
 }
 u8 get_str_len(string s) {
-    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
-        if (s[i] == '\0') {
-            return i+1;
-        }
-    }
-    return {{ARRAY_SIZE}};
+    return strlen(s);
 }
 bool is_equal_string(string lhs, string rhs) {
-    if (get_str_len(lhs) != get_str_len(rhs)) {
-        return false;
-    }
-    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
-        if (lhs[i] != rhs[i]) {
-            return false;
-        }
-        if (lhs[i] == '\0') {
-            return true;
-        }
-    }
-    return true;
+    return strcmp(lhs, rhs) == 0;
 }
 void str_as_bytes(string in, u8* out) {
-    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
-        if (in[i] == '\0') {
-            return;
-        }
-        out[i] = (u8) in[i];
-    }
+    out[0] = (u8) in % 256;
 }
 
 // PUBKEY
-typedef struct pubkey_struct {
-    u8 p0;
-    u8 p1;
-    u8 p2;
-    u8 p3;
-    u8 p4;
-    u8 p5;
-    u8 p6;
-    u8 p7;
-    u8 p8;
-    u8 p9;
-    u8 p10;
-    u8 p11;
-    u8 p12;
-    u8 p13;
-    u8 p14;
-    u8 p15;
-    u8 p16;
-    u8 p17;
-    u8 p18;
-    u8 p19;
-    u8 p20;
-    u8 p21;
-    u8 p22;
-    u8 p23;
-    u8 p24;
-    u8 p25;
-    u8 p26;
-    u8 p27;
-    u8 p28;
-    u8 p29;
-    u8 p30;
-    u8 p31;
-} pubkey;
+typedef u8 pubkey;
 pubkey nondet_pubkey() {
-    pubkey p;
-    p.p0 = nondet_u8();
-    p.p1 = nondet_u8();
-    p.p2 = nondet_u8();
-    p.p3 = nondet_u8();
-    p.p4 = nondet_u8();
-    p.p5 = nondet_u8();
-    p.p6 = nondet_u8();
-    p.p7 = nondet_u8();
-    p.p8 = nondet_u8();
-    p.p9 = nondet_u8();
-    p.p10 = nondet_u8();
-    p.p11 = nondet_u8();
-    p.p12 = nondet_u8();
-    p.p13 = nondet_u8();
-    p.p14 = nondet_u8();
-    p.p15 = nondet_u8();
-    p.p16 = nondet_u8();
-    p.p17 = nondet_u8();
-    p.p18 = nondet_u8();
-    p.p19 = nondet_u8();
-    p.p20 = nondet_u8();
-    p.p21 = nondet_u8();
-    p.p22 = nondet_u8();
-    p.p23 = nondet_u8();
-    p.p24 = nondet_u8();
-    p.p25 = nondet_u8();
-    p.p26 = nondet_u8();
-    p.p27 = nondet_u8();
-    p.p28 = nondet_u8();
-    p.p29 = nondet_u8();
-    p.p30 = nondet_u8();
-    p.p31 = nondet_u8();
-    return p;
-}
-bool is_equal_pubkey(pubkey lhs, pubkey rhs) {
-    return lhs.p0 == rhs.p0 && lhs.p1 == rhs.p1 && lhs.p2 == rhs.p2 &&
-        lhs.p3 == rhs.p3 && lhs.p4 == rhs.p4 && lhs.p5 == rhs.p5 &&
-        lhs.p6 == rhs.p6 && lhs.p7 == rhs.p7 && lhs.p8 == rhs.p8 &&
-        lhs.p9 == rhs.p9 && lhs.p10 == rhs.p10 && lhs.p11 == rhs.p11 &&
-        lhs.p12 == rhs.p12 && lhs.p13 == rhs.p13 && lhs.p14 == rhs.p14 &&
-        lhs.p15 == rhs.p15 && lhs.p16 == rhs.p16 && lhs.p17 == rhs.p17 &&
-        lhs.p18 == rhs.p18 && lhs.p19 == rhs.p19 && lhs.p20 == rhs.p20 &&
-        lhs.p21 == rhs.p21 && lhs.p22 == rhs.p22 && lhs.p23 == rhs.p23 &&
-        lhs.p24 == rhs.p24 && lhs.p25 == rhs.p25 && lhs.p26 == rhs.p26 &&
-        lhs.p27 == rhs.p27 && lhs.p28 == rhs.p28 && lhs.p29 == rhs.p29 &&
-        lhs.p30 == rhs.p30 && lhs.p31 == rhs.p31;
+    return nondet_u8();
 }
 void pubkey_as_bytes(pubkey in, u8* out) {
-    u8 pubkey_data[32];
-    pubkey_data[0] = in.p0;
-    pubkey_data[1] = in.p1;
-    pubkey_data[2] = in.p2;
-    pubkey_data[3] = in.p3;
-    pubkey_data[4] = in.p4;
-    pubkey_data[5] = in.p5;
-    pubkey_data[6] = in.p6;
-    pubkey_data[7] = in.p7;
-    pubkey_data[8] = in.p8;
-    pubkey_data[9] = in.p9;
-    pubkey_data[10] = in.p10;
-    pubkey_data[11] = in.p11;
-    pubkey_data[12] = in.p12;
-    pubkey_data[13] = in.p13;
-    pubkey_data[14] = in.p14;
-    pubkey_data[15] = in.p15;
-    pubkey_data[16] = in.p16;
-    pubkey_data[17] = in.p17;
-    pubkey_data[18] = in.p18;
-    pubkey_data[19] = in.p19;
-    pubkey_data[20] = in.p20;
-    pubkey_data[21] = in.p21;
-    pubkey_data[22] = in.p22;
-    pubkey_data[23] = in.p23;
-    pubkey_data[24] = in.p24;
-    pubkey_data[25] = in.p25;
-    pubkey_data[26] = in.p26;
-    pubkey_data[27] = in.p27;
-    pubkey_data[28] = in.p28;
-    pubkey_data[29] = in.p29;
-    pubkey_data[30] = in.p30;
-    pubkey_data[31] = in.p31;
-    for (int i = 0; i < {{ARRAY_SIZE}}; i++) {
-        out[i] = pubkey_data[i];
-    }
+    *out = in;
 }
 
 // PROGRAM ADDRESS
@@ -625,10 +490,10 @@ solana_instruction sol_create_account(pubkey from_pubkey, pubkey to_pubkey, u64 
         b += 8;
         counter += 1;
     }
-    u8 pubkey_data[32];
+    u8 pubkey_data[1];
     pubkey_as_bytes(owner, pubkey_data);
     b = 0;
-    while (counter < {{ARRAY_SIZE}} && counter < 52) {
+    while (counter < {{ARRAY_SIZE}} && counter < 21) {
         x.get2[counter] = pubkey_data[b];
         b += 1;
         counter += 1;

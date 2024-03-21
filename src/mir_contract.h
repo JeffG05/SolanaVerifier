@@ -53,7 +53,7 @@ private:
 
     void generate_block_function(std::ostream* out, mir_statement block_statement, const std::string& function_name, const mir_statements &all_variables);
     void generate_block_statement(std::ostream* out, mir_statement statement, const std::string& function_name, const mir_statements& all_variables);
-    void generate_block_assignment(std::ostream* out, const std::string &variable, const std::string &value, bool returns, const mir_statements& all_variables, int indents=1, bool prevent_modify=false);
+    void generate_block_assignment(std::ostream* out, const std::string &variable, const std::string &value, bool returns, const mir_statements& all_variables, const std::string& function_name, int indents=1, bool prevent_modify=false);
     static void generate_branch(std::ostream* out, const mir_statement &branch_statement, const std::string& function_name, const std::string& variable, const std::string& value);
     void generate_function(std::ostream* out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string& function_name, const std::string& function_return, const mir_statements &all_variables, bool forward_decl = false);
     void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name);

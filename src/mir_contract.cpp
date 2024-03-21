@@ -567,7 +567,7 @@ void mir_contract::generate_block_statement(std::ostream *out, mir_statement sta
     const bool assignment_returns = assignment_data.at("returns").get<bool>();
     mir_statements assignment_branches = statement.get_children({statement_type::branch});
 
-    generate_block_assignment(out, assignment_variable, assignment_value, assignment_returns, all_variables);
+    generate_block_assignment(out, assignment_variable, assignment_value, assignment_returns, all_variables, function_name);
 
     // Add branching logic
     if (!assignment_branches.empty()) {
@@ -610,7 +610,7 @@ std::tuple<std::string, std::string> mir_contract::parse_indexed(const std::stri
     return std::make_tuple(value, buffer);
 }
 
-void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, int indents, bool prevent_modify) {
+void mir_contract::generate_block_assignment(std::ostream *out, const std::string &variable, const std::string &value, bool returns, const mir_statements &all_variables, const std::string &function_name, int indents, bool prevent_modify) {
     auto base_indent = std::string(indents, '\t');
 
     if (value.starts_with("ignore<")) {
@@ -651,7 +651,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
         const std::string ok_value = value.substr(3, value.size() - 4);
         if (ok_value != "void") {
-            generate_block_assignment(out, variable + ".value", ok_value, true, all_variables, indents);
+            generate_block_assignment(out, variable + ".value", ok_value, true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("optional_none<")) {
         *out << base_indent << "state." << variable << ".is_none = true;" << std::endl;
@@ -660,18 +660,18 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("result_unwrap<")) {
         auto [result_value, indexer] = parse_indexed("result_unwrap", value);
         *out << base_indent << "if (!" + result_value + ".is_success) {" << std::endl;
-        generate_block_assignment(out, variable, "return_error<>", true, all_variables, indents+1);
+        generate_block_assignment(out, variable, "return_error<>", true, all_variables, function_name, indents+1);
         *out << base_indent << "}" << std::endl;
         *out << base_indent << "state." << variable << " = " << result_value << ".value" + indexer + ";" << std::endl;
     } else if (value.starts_with("result_void_unwrap<")) {
         auto [result_value, indexer] = parse_indexed("result_void_unwrap", value);
         *out << base_indent << "if (!" + result_value + ".is_success) {" << std::endl;
-        generate_block_assignment(out, variable, "return_error<>", true, all_variables, indents+1);
+        generate_block_assignment(out, variable, "return_error<>", true, all_variables, function_name, indents+1);
         *out << base_indent << "}" << std::endl;
     } else if (value.starts_with("return_error<")) {
         std::optional<mir_statement> return_statement = mir_statement::get_statement(all_variables, "_0");
         if (return_statement.has_value() && return_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("result<")) {
-            generate_block_assignment(out, "_0", "result_error<>", true, all_variables, indents);
+            generate_block_assignment(out, "_0", "result_error<>", true, all_variables, function_name, indents);
             *out << base_indent << "return state;" << std::endl;
         } else {
             *out << base_indent << "assert(false);" << std::endl;
@@ -681,15 +681,15 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("try_branch<")) {
         const std::string try_value = value.substr(11, value.size() - 12);
         *out << base_indent << "state." << variable << ".type = _continue;" << std::endl;
-        generate_block_assignment(out, variable + ".continue_value", try_value, true, all_variables, indents);
+        generate_block_assignment(out, variable + ".continue_value", try_value, true, all_variables, function_name, indents);
     } else if (value.starts_with("from_residual<")) {
         *out << base_indent << "state." << variable << ".is_success = false;" << std::endl;
     } else if (value.starts_with("next<")) {
         const std::string iter_value = value.substr(5, value.size() - 6);
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
-        generate_block_assignment(out, variable + ".value", get_c_value(iter_value) + "[0]", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".value", get_c_value(iter_value) + "[0]", true, all_variables, function_name, indents);
         for (int i = 0; i < _globals.ARRAY_SIZE-1; i++) {
-            generate_block_assignment(out, get_c_value(iter_value).substr(6) + "[" + std::to_string(i) + "]", get_c_value(iter_value) + "[" + std::to_string(i+1) + "]", true, all_variables, indents);
+            generate_block_assignment(out, get_c_value(iter_value).substr(6) + "[" + std::to_string(i) + "]", get_c_value(iter_value) + "[" + std::to_string(i+1) + "]", true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("invoke<")) {
         *out << base_indent << "state." << variable << ".is_success = true;" << std::endl;
@@ -704,29 +704,29 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         if (original_var_statement.has_value()) {
             const std::string original_type = original_var_statement.value().get_ast_data().at("variable_type");
             if (conversion_type == original_type) {
-                generate_block_assignment(out, variable, conversion_var + indexer, true, all_variables, indents);
+                generate_block_assignment(out, variable, conversion_var + indexer, true, all_variables, function_name, indents);
             } else {
                 for (const auto& s : _structs) {
                     if (s.get_ast_data().at("name").get<std::string>() == original_type && s.get_type() == statement_type::data_enum) {
-                        generate_block_assignment(out, variable, conversion_var + ".value_" + utils::to_lower(conversion_type) += indexer, true, all_variables, indents);
+                        generate_block_assignment(out, variable, conversion_var + ".value_" + utils::to_lower(conversion_type) += indexer, true, all_variables, function_name, indents);
                         return;
                     }
                 }
-                generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, indents);
+                generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, function_name, indents);
             }
         } else {
-            generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, indents);
+            generate_block_assignment(out, variable, "((" + conversion_type + ") " + conversion_var + ")" + indexer, true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("find_program_address<")) {
         const std::string subvalue = value.substr(21, value.size() - 22);
-        generate_block_assignment(out, variable + ".get0", "sol_find_program_address(" + subvalue + ").get0", true, all_variables, indents);
-        generate_block_assignment(out, variable + ".get1", "sol_find_program_address(" + subvalue + ").get1", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get0", "sol_find_program_address(" + subvalue + ").get0", true, all_variables, function_name, indents);
+        generate_block_assignment(out, variable + ".get1", "sol_find_program_address(" + subvalue + ").get1", true, all_variables, function_name, indents);
     } else if (value.starts_with("str_as_bytes<")) {
         const std::string subvalue = value.substr(13, value.size() - 14);
-        generate_block_assignment(out, variable, "str_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, indents, true);
+        generate_block_assignment(out, variable, "str_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, function_name, indents, true);
     } else if (value.starts_with("pubkey_as_bytes<")) {
         const std::string subvalue = value.substr(16, value.size() - 17);
-        generate_block_assignment(out, variable, "pubkey_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, indents, true);
+        generate_block_assignment(out, variable, "pubkey_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, function_name, indents, true);
     }  else if (value.starts_with("enum_discriminant<")) {
         const std::string subvalue = value.substr(18, value.size() - 19);
         std::optional<mir_statement> enum_statement = mir_statement::get_statement(all_variables, subvalue.starts_with("state.") ? subvalue.substr(6) : subvalue);
@@ -742,57 +742,57 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                     options.pop_front();
                 }
                 option_if += std::to_string(options.front().get_ast_data().at("value").get<int>());
-                generate_block_assignment(out, variable, option_if, true, all_variables, indents);
+                generate_block_assignment(out, variable, option_if, true, all_variables, function_name, indents);
                 break;
             }
         }
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
-            generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", array_value + "[" + std::to_string(i) + "]", true, all_variables, indents);
+            generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", array_value + "[" + std::to_string(i) + "]", true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("copy_tuple<")) {
         const std::string tuple_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
-            generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, indents);
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("copy_account_info<")) {
         const std::string info_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 8; i++) {
             if (i == 2) {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + info_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + info_value + ".get" + std::to_string(i) + ">", true, all_variables, function_name, indents);
             } else {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true, all_variables, indents);
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), info_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
             }
         }
-        generate_block_assignment(out, variable + ".data_is_empty", info_value + ".data_is_empty", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".data_is_empty", info_value + ".data_is_empty", true, all_variables, function_name, indents);
     } else if (value.starts_with("copy_account_meta<")) {
         const std::string meta_value = value.substr(18, value.size() - 19);
         for (int i = 0; i < 3; i++) {
-            generate_block_assignment(out, variable + ".get" + std::to_string(i), meta_value + ".get" + std::to_string(i), true, all_variables, indents);
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), meta_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("copy_void_result<")) {
         const std::string result_value = value.substr(17, value.size() - 18);
         if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(", 2).front())) {
-            generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
+            generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, function_name, indents);
         } else {
-            generate_block_assignment(out, variable, result_value, true, all_variables, indents, true);
+            generate_block_assignment(out, variable, result_value, true, all_variables, function_name, indents, true);
         }
     } else if (value.starts_with("copy_result<")) {
         const std::string result_value = value.substr(12, value.size() - 13);
         if (result_value.starts_with("state.") || _function_names.contains(utils::split(result_value, "(", 2).front())) {
-            generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, indents);
-            generate_block_assignment(out, variable + ".value", result_value + ".value", true, all_variables, indents);
+            generate_block_assignment(out, variable + ".is_success", result_value + ".is_success", true, all_variables, function_name, indents);
+            generate_block_assignment(out, variable + ".value", result_value + ".value", true, all_variables, function_name, indents);
         } else {
-            generate_block_assignment(out, variable, result_value, true, all_variables, indents, true);
+            generate_block_assignment(out, variable, result_value, true, all_variables, function_name, indents, true);
         }
     } else if (value.starts_with("copy_solana_instruction<")) {
         const std::string instruction_value = value.substr(24, value.size() - 25);
         for (int i = 0; i < 3; i++) {
             if (i == 0) {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), instruction_value + ".get" + std::to_string(i), true, all_variables, indents);
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), instruction_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
             } else {
-                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + instruction_value + ".get" + std::to_string(i) + ">", true, all_variables, indents);
+                generate_block_assignment(out, variable + ".get" + std::to_string(i), "copy_array<" + instruction_value + ".get" + std::to_string(i) + ">", true, all_variables, function_name, indents);
             }
         }
     } else if (value.starts_with("init_solana_instruction<")) {
@@ -800,17 +800,17 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const auto instruction_values = utils::split(instruction_value, ", ", 3);
         auto instruction_values_itr = instruction_values.begin();
 
-        generate_block_assignment(out, variable + ".get0", *instruction_values_itr, true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get0", *instruction_values_itr, true, all_variables, function_name, indents);
         ++instruction_values_itr;
-        generate_block_assignment(out, variable + ".get1", "copy_array<" + *instruction_values_itr + ">", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get1", "copy_array<" + *instruction_values_itr + ">", true, all_variables, function_name, indents);
         ++instruction_values_itr;
-        generate_block_assignment(out, variable + ".get2", "copy_array<" + *instruction_values_itr + ">", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".get2", "copy_array<" + *instruction_values_itr + ">", true, all_variables, function_name, indents);
     } else if (value.starts_with("init_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         const auto array_values = utils::split(array_value, ", ");
         auto array_values_itr = array_values.begin();
         for (int i = 0; i < array_values.size(); i++) {
-            generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", *array_values_itr, true, all_variables, indents);
+            generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", *array_values_itr, true, all_variables, function_name, indents);
             ++array_values_itr;
         }
     } else if (value.starts_with("init_tuple<")) {
@@ -818,14 +818,14 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const auto tuple_values = utils::split(tuple_value, ", ");
         auto tuple_values_itr = tuple_values.begin();
         for (int i = 0; i < tuple_values.size(); i++) {
-            generate_block_assignment(out, variable + ".get" + std::to_string(i), *tuple_values_itr, true, all_variables, indents);
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), *tuple_values_itr, true, all_variables, function_name, indents);
             ++tuple_values_itr;
         }
     } else if (value.starts_with("init_enum<")) {
         const std::string enum_value = value.substr(10, value.size() - 11);
         auto enum_values = utils::split(enum_value, ", ");
         const std::string enum_value_name = enum_values.front();
-        generate_block_assignment(out, variable + ".value", "\"" + enum_value_name + "\"", true, all_variables, indents);
+        generate_block_assignment(out, variable + ".value", "\"" + enum_value_name + "\"", true, all_variables, function_name, indents);
         enum_values.pop_front();
 
         const std::optional<mir_statement> value_statement = mir_statement::get_statement(all_variables, variable + ".value_" + enum_value_name);
@@ -833,7 +833,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             int i = 0;
             while (!enum_values.empty()) {
                 std::string enum_value_variable = variable + ".value_" += enum_value_name + ".get" + std::to_string(i);
-                generate_block_assignment(out, enum_value_variable, enum_values.front(), true, all_variables, indents);
+                generate_block_assignment(out, enum_value_variable, enum_values.front(), true, all_variables, function_name, indents);
                 ++i;
                 enum_values.pop_front();
             }
@@ -843,7 +843,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const auto meta_values = utils::split(meta_value, ", ", 3);
         auto meta_values_itr = meta_values.begin();
         for (int i = 0; i < meta_values.size(); i++) {
-            generate_block_assignment(out, variable + ".get" + std::to_string(i), *meta_values_itr, true, all_variables, indents);
+            generate_block_assignment(out, variable + ".get" + std::to_string(i), *meta_values_itr, true, all_variables, function_name, indents);
             ++meta_values_itr;
         }
     } else if (!variable.empty()) {
@@ -855,7 +855,7 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             }
 
             if (formatted_value != value) {
-                generate_block_assignment(out, variable, formatted_value, returns, all_variables, indents);
+                generate_block_assignment(out, variable, formatted_value, returns, all_variables, function_name, indents);
                 return;
             }
         }
@@ -952,14 +952,14 @@ void mir_contract::generate_nondet_from_statement(std::ostream *out, const mir_s
     }
 
     if (!in_main && statement.get_type() == statement_type::parameter) {
-        generate_block_assignment(out, parameter_name, mir_statement::reformat_value_by_type(parameter_name, parameter_type), true, all_variables);
+        generate_block_assignment(out, parameter_name, mir_statement::reformat_value_by_type(parameter_name, parameter_type), true, all_variables, function_name);
     } else {
         generate_nondet_from_name(out, nondet_name, parameter_type, function_name);
     }
 }
 
 void mir_contract::generate_nondet_array(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const {
-    for (int i = 0; i < _globals.ARRAY_SIZE-1; i++) {
+    for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
         generate_nondet_from_name(out, name + "[" + std::to_string(i) + "]", get_c_subtype(type), function_name);
     }
 }
@@ -1108,7 +1108,7 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         for (auto account_info: owner_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing ownership checks";
             std::string solution = "Add 'assert_eq!(" + std::get<1>(account_info) + ".owner, " + program_id_name + ")'";
-            *out << "\t__ESBMC_assert(!state._0.is_success || is_equal_pubkey(state._1, state." << std::get<0>(account_info) << ".get3), \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
+            *out << "\t__ESBMC_assert(!state._0.is_success || state._1 == state." << std::get<0>(account_info) << ".get3, \"Vulnerability Found: 9; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
 
         // Check signers have signed the instruction

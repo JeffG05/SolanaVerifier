@@ -25,7 +25,7 @@ verification_result c_program::verify(const std::filesystem::path& target, const
     const std::filesystem::path log_out = target / (_contract_name + "_" + smt_solver + "_log.txt");
 
     std::stringstream cmd;
-    cmd << esbmc_path << " " << get_path() << " --" << smt_solver << " --file-output " << log_out << " > /dev/null 2>&1";
+    cmd << esbmc_path << " " << get_path() << " --" << smt_solver << " --incremental-bmc --file-output " << log_out << " > /dev/null 2>&1";
     system(cmd.str().data());
 
     return verification_result(log_out);
