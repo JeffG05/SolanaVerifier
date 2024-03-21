@@ -26,57 +26,57 @@ pub fn process_instruction(
 
 fn initialize(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let wallet_info = next_account_info(account_info_iter)?;
+    let wallet_info__owner = next_account_info(account_info_iter)?;
     let vault_info = next_account_info(account_info_iter)?;
-    let authority_info = next_account_info(account_info_iter)?;
+    let authority_info__signer = next_account_info(account_info_iter)?;
     let rent_info = next_account_info(account_info_iter)?;
     let (wallet_address, wallet_seed) =
-        Pubkey::find_program_address(&[&authority_info.key.to_bytes()], program_id);
+        Pubkey::find_program_address(&[&authority_info__signer.key.to_bytes()], program_id);
     let (vault_address, vault_seed) = Pubkey::find_program_address(
-        &[&authority_info.key.to_bytes(), &"VAULT".as_bytes()],
+        &[&authority_info__signer.key.to_bytes(), &"VAULT".as_bytes()],
         program_id,
     );
 
     let rent = Rent::from_account_info(rent_info)?;
 
-    assert_eq!(*wallet_info.key, wallet_address);
-    assert!(wallet_info.data_is_empty());
+    assert_eq!(*wallet_info__owner.key, wallet_address);
+    assert!(wallet_info__owner.data_is_empty());
 
     invoke_signed(
         &system_instruction::create_account(
-            &authority_info.key,
+            &authority_info__signer.key,
             &wallet_address,
             rent.minimum_balance(WALLET_LEN as usize),
             WALLET_LEN,
             &program_id,
         ),
-        &[authority_info.clone(), wallet_info.clone()],
-        &[&[&authority_info.key.to_bytes(), &[wallet_seed]]],
+        &[authority_info__signer.clone(), wallet_info__owner.clone()],
+        &[&[&authority_info__signer.key.to_bytes(), &[wallet_seed]]],
     )?;
 
     invoke_signed(
         &system_instruction::create_account(
-            &authority_info.key,
+            &authority_info__signer.key,
             &vault_address,
             rent.minimum_balance(0),
             0,
             &program_id,
         ),
-        &[authority_info.clone(), vault_info.clone()],
+        &[authority_info__signer.clone(), vault_info.clone()],
         &[&[
-            &authority_info.key.to_bytes(),
+            &authority_info__signer.key.to_bytes(),
             &"VAULT".as_bytes(),
             &[vault_seed],
         ]],
     )?;
 
     let wallet = Wallet {
-        authority: *authority_info.key,
+        authority: *authority_info__signer.key,
         vault: vault_address,
     };
 
     wallet
-        .serialize(&mut &mut (*wallet_info.data).borrow_mut()[..])
+        .serialize(&mut &mut (*wallet_info__owner.data).borrow_mut()[..])
         .unwrap();
 
     Ok(())
@@ -84,16 +84,16 @@ fn initialize(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
 
 fn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let wallet_info = next_account_info(account_info_iter)?;
+    let wallet_info__owner = next_account_info(account_info_iter)?;
     let vault_info = next_account_info(account_info_iter)?;
-    let source_info = next_account_info(account_info_iter)?;
-    let wallet = Wallet::deserialize(&mut &(*wallet_info.data).borrow_mut()[..])?;
+    let source_info__signer = next_account_info(account_info_iter)?;
+    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;
 
     assert_eq!(wallet.vault, *vault_info.key);
 
     invoke(
-        &system_instruction::transfer(&source_info.key, &vault_info.key, amount),
-        &[vault_info.clone(), source_info.clone()],
+        &system_instruction::transfer(&source_info__signer.key, &vault_info.key, amount),
+        &[vault_info.clone(), source_info__signer.clone()],
     )?;
 
     Ok(())
@@ -101,14 +101,14 @@ fn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> Progr
 
 fn withdraw(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let wallet_info = next_account_info(account_info_iter)?;
+    let wallet_info__owner = next_account_info(account_info_iter)?;
     let vault_info = next_account_info(account_info_iter)?;
-    let authority_info = next_account_info(account_info_iter)?;
+    let authority_info__signer = next_account_info(account_info_iter)?;
     let destination_info = next_account_info(account_info_iter)?;
-    let wallet = Wallet::deserialize(&mut &(*wallet_info.data).borrow_mut()[..])?;
+    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;
 
-    assert!(authority_info.is_signer);
-    assert_eq!(wallet.authority, *authority_info.key);
+    assert!(authority_info__signer.is_signer);
+    assert_eq!(wallet.authority, *authority_info__signer.key);
     assert_eq!(wallet.vault, *vault_info.key);
 
     if amount > **vault_info.lamports.borrow_mut() {

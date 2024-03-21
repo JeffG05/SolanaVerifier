@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "config.h"
+#include "verification_result.h"
 
 class controller {
 
@@ -27,6 +28,12 @@ private:
     static std::filesystem::path get_temp_dir();
 
     static std::string get_millis(std::chrono::time_point<std::chrono::high_resolution_clock> start, std::chrono::time_point<std::chrono::high_resolution_clock> end);
+
+    void print_info(const std::string &line) const;
+    void print_warning(const std::string &line) const;
+    void print_error(const std::string &line) const;
+
+    static void print_report(const verification_result &result);
 };
 
 

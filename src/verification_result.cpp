@@ -5,9 +5,9 @@
 verification_result::verification_result(const std::filesystem::path &path) {
     _log_path = path;
 
-    auto [is_sat, vulnerability, error] = parse_log();
+    auto [is_sat, vulnerabilities, error] = parse_log();
     _is_sat = is_sat;
-    _vulnerability = vulnerability;
+    _vulnerabilities = vulnerabilities;
     _error = error;
 }
 
@@ -17,8 +17,8 @@ bool verification_result::get_is_sat() const {
     return _is_sat;
 }
 
-std::optional<vulnerability> verification_result::get_vulnerability() const {
-    return _vulnerability;
+std::list<vulnerability> verification_result::get_vulnerabilities() const {
+    return _vulnerabilities;
 }
 
 std::optional<std::string> verification_result::get_error() const {
@@ -27,7 +27,7 @@ std::optional<std::string> verification_result::get_error() const {
 
 result verification_result::parse_log() const {
     bool is_sat;
-    std::optional<vulnerability> vulnerability_found = std::nullopt;
+    std::list<vulnerability> vulnerabilities_found;
     std::optional<std::string> error_found = std::nullopt;
 
     std::fstream file;
@@ -64,26 +64,24 @@ result verification_result::parse_log() const {
                 int vulnerability_enum = std::stoi(vulnerability_id);
                 vulnerability_type_found = static_cast<vulnerability_type>(vulnerability_enum);
             }
-            if (!vulnerability_type_found.has_value()) {
-                vulnerability_found = std::nullopt;
-            }
 
             if (++result_itr == result_infos.end()) {
-                vulnerability_found = vulnerability(vulnerability_type_found.value(), std::nullopt, std::nullopt);
+                vulnerabilities_found.emplace_back(vulnerability_type_found.value(), std::nullopt, std::nullopt);
                 continue;
             }
 
             vulnerability_reason_found = result_itr->substr(8);
             if (++result_itr == result_infos.end()) {
-                vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found, std::nullopt);
+                vulnerabilities_found.emplace_back(vulnerability_type_found.value(), vulnerability_reason_found, std::nullopt);
+                continue;
             }
 
             vulnerability_solution_found = result_itr->substr(10);
-            vulnerability_found = vulnerability(vulnerability_type_found.value(), vulnerability_reason_found, vulnerability_solution_found);
+            vulnerabilities_found.emplace_back(vulnerability_type_found.value(), vulnerability_reason_found, vulnerability_solution_found);
         }
     }
 
-    return std::make_tuple(is_sat, vulnerability_found, error_found);
+    return std::make_tuple(is_sat, vulnerabilities_found, error_found);
 }
 
 

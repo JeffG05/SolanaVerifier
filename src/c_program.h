@@ -10,6 +10,7 @@ public:
     explicit c_program(const std::string &contract_name, const std::string& path);
 
     [[nodiscard]] std::string get_path() const;
+    [[nodiscard]] std::string get_dir() const;
 
     [[nodiscard]] verification_result verify_boolector(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
     [[nodiscard]] verification_result verify_z3(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;

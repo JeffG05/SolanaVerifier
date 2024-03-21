@@ -50,6 +50,56 @@ std::filesystem::path controller::get_temp_dir() {
     std::throw_with_nested(std::runtime_error("Unable to create temporary dir"));
 }
 
+void controller::print_info(const std::string &line) const {
+    if (_globals.NO_DEBUG) return;
+    std::cout << "INFO: " << line << std::endl;
+}
+
+void controller::print_warning(const std::string &line) const {
+    if (_globals.NO_DEBUG) return;
+    std::cout << "WARNING: " << line << std::endl;
+}
+
+void controller::print_error(const std::string &line) const {
+    if (_globals.NO_DEBUG) return;
+    std::cerr << "ERROR: " << line << std::endl;
+}
+
+void controller::print_report(const verification_result &result) {
+    std::cout << std::endl;
+    std::cout << "RESULT:" << std::endl;
+
+    if (result.get_is_sat()) {
+        std::cout << "No vulnerabilities found" << std::endl;
+        return;
+    }
+
+    if (result.get_vulnerabilities().empty()) {
+        std::cout << "Unable to run verification - " << result.get_error().value_or("unknown error occurred") << std::endl;
+        return;
+    }
+
+    if (result.get_vulnerabilities().size() == 1) {
+        std::cout << "1 vulnerability found" << std::endl;
+    } else {
+        std::cout << result.get_vulnerabilities().size() << " vulnerabilities found" << std::endl;
+    }
+
+    int i = 1;
+    for (const auto& v : result.get_vulnerabilities()) {
+        auto [v_name, v_description] = v.get_details();
+        std::cout << std::endl;
+        std::cout << "Vulnerability " << i << ": " << v_name << std::endl;
+        std::cout << "-- Description: " << v_description << std::endl;
+        if (v.get_reason().has_value()) {
+            std::cout << "-- Reason: " << v.get_reason().value() << std::endl;
+        }
+        if (v.get_solution().has_value()) {
+            std::cout << "-- Solution: " << v.get_solution().value() << std::endl;
+        }
+        ++i;
+    }
+}
 
 bool controller::run(const int argc, char *argv[]) {
     boost::program_options::options_description desc("Allowed options");
@@ -59,6 +109,7 @@ bool controller::run(const int argc, char *argv[]) {
         ("mir", boost::program_options::value<std::string>(&_mir_file), "MIR representation of Solana smart contract")
         ("hir", boost::program_options::value<std::string>(&_hir_file), "HIR representation of Solana smart contract")
         ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
+        ("no-debug", boost::program_options::bool_switch(&_globals.NO_DEBUG), "Turn off all debug statements")
         ("array-size", boost::program_options::value<int>(&_globals.ARRAY_SIZE)->default_value(10), "Max size of arrays in SMT model")
     ;
 
@@ -76,56 +127,55 @@ bool controller::run(const int argc, char *argv[]) {
     const std::filesystem::path temp_dir = get_temp_dir();
 
     if (vm.contains("contract")) {
-        std::cout << "Running SolanaVerifier on Rust contract" << std::endl;
-        std::cout << std::endl;
+        print_info("running SolanaVerifier on solana contract");
 
         if (!is_directory(_contract_dir)) {
-            std::cerr << "error: not a directory" << std::endl;
+            print_error("contract path provided is not a directory");
             return false;
         }
         if (vm.contains("mir")) {
-            std::cerr << "warning: ignoring MIR file" << std::endl;
+            print_warning("ignoring mir file provided");
         }
         if (vm.contains("hir")) {
-            std::cerr << "warning: ignoring HIR file" << std::endl;
+            print_warning("ignoring hir file provided");
         }
 
         auto t_contract_start = std::chrono::high_resolution_clock::now();
         const auto contract = solana_contract(_contract_dir, _globals);
         auto t_contract_end = std::chrono::high_resolution_clock::now();
-        std::cout << "Loaded solana contract: took " << get_millis(t_contract_start, t_contract_end) << std::endl;
-        std::cout << "-- Path: " << contract.get_path() << std::endl;
-        std::cout << std::endl;
+        print_info("solana contract loaded from '" + contract.get_path() + "' (took " + get_millis(t_contract_start, t_contract_end) + ")");
 
-        std::cout << "Converting to HIR" << std::endl;
+        print_info("starting conversion to hir");
         auto t_to_hir_start = std::chrono::high_resolution_clock::now();
         hir = contract.convert_to_hir(temp_dir);
         auto t_to_hir_end = std::chrono::high_resolution_clock::now();
         if (!hir.has_value()) {
-            std::cerr << "error: failed to generate hir file" << std::endl;
+            print_error("failed to convert contract to hir");
             return false;
         }
-        std::cout << "Converted to HIR: took " << get_millis(t_to_hir_start, t_to_hir_end) << std::endl;
-        std::cout << "-- Path: " << hir->get_path() << std::endl;
-        std::cout << std::endl;
+        print_info("conversion to hir completed (took " + get_millis(t_to_hir_start, t_to_hir_end) + ")");
+        print_info("hir saved to '" + hir->get_path() + "'");
 
-        std::cout << "Converting to MIR" << std::endl;
+        print_info("starting conversion to mir");
         auto t_to_mir_start = std::chrono::high_resolution_clock::now();
         mir = contract.convert_to_mir(temp_dir, hir->get_structs());
         auto t_to_mir_end = std::chrono::high_resolution_clock::now();
-        std::cout << "Converted to MIR: took " << get_millis(t_to_mir_start, t_to_mir_end) << std::endl;
-        std::cout << "-- Path: " << mir->get_path() << std::endl;
-        std::cout << std::endl;
+        if (!mir.has_value()) {
+            print_error("failed to convert contract to mir");
+            return false;
+        }
+        print_info("conversion to mir completed (took " + get_millis(t_to_mir_start, t_to_mir_end) + ")");
+        print_info("mir saved to '" + mir->get_path() + "'");
     } else if (vm.contains("mir") && vm.contains("hir")) {
-        std::cout << "Running SolanaVerifier on MIR file" << std::endl;
-        std::cout << std::endl;
+        print_info("running SolanaVerifier on mir and hir files");
 
         if (!is_mir(_mir_file)) {
-            if (is_directory(_mir_file)) {
-                std::cerr << "error: expected .mir file not directory" << std::endl;
-            } else {
-                std::cerr << "error: incorrect file type ('" << std::filesystem::path(_mir_file).extension().string() << "')" << std::endl;
-            }
+            print_error("mir path provided is not a .mir file");
+            return false;
+        }
+
+        if (!is_hir(_hir_file)) {
+            print_error("hir path provided is not a .hir file");
             return false;
         }
 
@@ -133,62 +183,40 @@ bool controller::run(const int argc, char *argv[]) {
         hir = hir_contract(_hir_file);
         auto t_hir_end = std::chrono::high_resolution_clock::now();
         if (!hir.has_value()) {
-            std::cerr << "error: failed to generate hir file" << std::endl;
+            print_error("failed to load hir");
             return false;
         }
-        std::cout << "Loaded HIR: took " << get_millis(t_hir_start, t_hir_end) << std::endl;
-        std::cout << "-- Path: " << hir->get_path() << std::endl;
-        std::cout << std::endl;
+        print_info("hir loaded from '" + hir->get_path() + "' (took " + get_millis(t_hir_start, t_hir_end) + ")");
 
         auto t_mir_start = std::chrono::high_resolution_clock::now();
         std::string contract_name = std::filesystem::path(_mir_file).stem().string();
         mir = mir_contract(contract_name, _mir_file, hir->get_structs(), _globals);
         auto t_mir_end = std::chrono::high_resolution_clock::now();
-        std::cout << "Loaded MIR: took " << get_millis(t_mir_start, t_mir_end) << std::endl;
-        std::cout << "-- Path: " << mir->get_path() << std::endl;
-        std::cout << std::endl;
+        if (!mir.has_value()) {
+            print_error("failed to load mir");
+            return false;
+        }
+        print_info("mir loaded from '" + mir->get_path() + "' (took " + get_millis(t_mir_start, t_mir_end) + ")");
     } else {
-        std::cerr << "error: expected contract or mir & hir file" << std::endl;
+        print_error("no contract or mir and hir files provided");
         return false;
     }
 
-    if (!mir.has_value()) {
-        std::cerr << "error: failed to generate mir file" << std::endl;
-        return false;
-    }
-
+    print_info("starting conversion to c program");
     auto t_to_c_start = std::chrono::high_resolution_clock::now();
-    c_program solana_c = mir.value().convert_to_c(temp_dir, hir->get_target());
+    c_program solana_c = mir.value().convert_to_c(temp_dir / "c", hir->get_target());
     auto t_to_c_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Converted to C: took " << get_millis(t_to_c_start, t_to_c_end) << std::endl;
-    std::cout << "-- Path: " << solana_c.get_path() << std::endl;
-    std::cout << std::endl;
+    print_info("conversion to c program completed (took " + get_millis(t_to_c_start, t_to_c_end) + ")");
+    print_info("c program saved in '" + solana_c.get_dir() + "'");
 
-    std::cout << "Running Verification using Boolector" << std::endl;
+    print_info("starting smt verification using boolector");
     const auto t_boolector_start = std::chrono::high_resolution_clock::now();
     const verification_result boolector_result = solana_c.verify_boolector(temp_dir, _esbmc_path);
     const auto t_boolector_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Completed Verification: took " << get_millis(t_boolector_start, t_boolector_end) << std::endl;
-    std::cout << std::endl;
+    print_info("completed smt verification (took " + get_millis(t_boolector_start, t_boolector_end) + ")");
 
-    if (boolector_result.get_is_sat()) {
-        std::cout << "Result: No Vulnerability Found" << std::endl;
-    } else if (boolector_result.get_vulnerability().has_value()) {
-        vulnerability v = boolector_result.get_vulnerability().value();
-        auto [v_name, v_description] = v.get_details();
-        std::cout << "Result: Vulnerability Found" << std::endl;
-        std::cout << "-- Vulnerability: " << v_name << " - " << v_description << std::endl;
-        if (v.get_reason().has_value()) {
-            std::cout << "-- Reason: " << v.get_reason().value() << std::endl;
-        }
-        if (v.get_solution().has_value()) {
-            std::cout << "-- Solution: " << v.get_solution().value() << std::endl;
-        }
-    } else {
-        std::string error = boolector_result.get_error().value_or("Unknown error");
-        std::cout << "Error: Unable to run verification" << std::endl;
-        std::cout << "-- Reason: " << error << std::endl;
-    }
+    print_info("printing vulnerability report");
+    print_report(boolector_result);
 
     return true;
 }
