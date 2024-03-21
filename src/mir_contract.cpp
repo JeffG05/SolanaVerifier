@@ -1115,7 +1115,7 @@ void mir_contract::generate_verification_statements(std::ostream *out, const mir
         // LOGIC: A successul return implies that the signer has signed the instruction
         for (auto account_info : signer_account_infos) {
             std::string reason = "The variable '" + std::get<1>(account_info) + "' is missing signer checks";
-            std::string solution = "Check '" + std::get<1>(account_info) + ".is_signer'";
+            std::string solution = "Add 'assert!(" + std::get<1>(account_info) + ".is_signer)'";
             *out << "\t__ESBMC_assert(!state._0.is_success || state." << std::get<0>(account_info) << ".get5, \"Vulnerability Found: 10; Reason: " << reason << "; Solution: " << solution << "\");" << std::endl;
         }
         *out << std::endl;
