@@ -42,10 +42,10 @@ std::string controller::get_datetime() {
 
 std::filesystem::path controller::get_temp_dir() {
     const std::string package_name = "com.jeffgugelmann.SmartContractVerification";
-    const std::filesystem::path tmp_dir = std::filesystem::temp_directory_path() / package_name / get_datetime();
+    const std::filesystem::path tmp_dir = std::filesystem::temp_directory_path() / package_name / get_datetime() / "c";
     remove_all(tmp_dir);
     if (create_directories(tmp_dir)) {
-        return tmp_dir;
+        return tmp_dir.parent_path();
     }
     std::throw_with_nested(std::runtime_error("Unable to create temporary dir"));
 }

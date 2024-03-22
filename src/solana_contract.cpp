@@ -33,7 +33,6 @@ mir_contract solana_contract::convert_to_mir(const std::filesystem::path &target
     // Copy contract code to target location
     if (is_empty(target)) {
         copy(_contract_dir, target, std::filesystem::copy_options::recursive);
-        create_directory(target / "c");
         edit_rust_files(target);
     }
 
@@ -51,7 +50,6 @@ hir_contract solana_contract::convert_to_hir(const std::filesystem::path& target
     // Copy contract code to target location
     if (is_empty(target)) {
         copy(_contract_dir, target, std::filesystem::copy_options::recursive);
-        create_directory(target / "c");
         edit_rust_files(target);
     }
 
