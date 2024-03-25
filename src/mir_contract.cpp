@@ -88,6 +88,16 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) {
     if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
         std::optional<mir_statement> statement = mir_statement::parse_function(current_statement_lines, _structs);
         if (statement.has_value() && !statement.value().get_ast_data().contains("source") && statement.value().get_ast_data().at("name") != "entrypoint") {
+            for (auto block : statement.value().get_children({statement_type::block})) {
+                for (const auto& assignment : block.get_children({statement_type::assignment})) {
+                    std::string value = assignment.get_ast_data().at("value");
+                    if (value.find("checked<") != std::string::npos) {
+                        std::string maths_function = value.substr(value.find("checked<") + 8, value.rfind(')') - value.find("checked<") - 7);
+                        mir_statement maths_statement = mir_statement::parse_maths(maths_function);
+                        statement->add_child(maths_statement);
+                    }
+                }
+            }
             root.add_child(statement.value());
         }
     }
@@ -139,6 +149,7 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
         const std::string function_name = function_data.at("name");
         const std::string function_return = function_data.at("return_type");
 
+        mir_statements function_maths = function_statement.get_children({statement_type::maths});
         mir_statements function_parameters = function_statement.get_children({statement_type::parameter});
         mir_statements function_variables = function_statement.get_children({statement_type::variable});
         mir_statements function_debugs = function_statement.get_children({statement_type::debug});
@@ -149,6 +160,10 @@ std::filesystem::path mir_contract::export_c_program(const std::filesystem::path
         std::ranges::copy(function_parameters, std::back_insert_iterator(function_states));
         std::ranges::copy(function_variables, std::back_insert_iterator(function_states));
 
+        for (const auto& s : function_maths) {
+            std::string operator_name = s.get_ast_data().at("value");
+            generate_maths_function(&file, operator_name, function_name);
+        }
         generate_structs(&file, function_states, function_name);
         generate_function(&file, function_states, function_debugs, function_name, function_return, function_all_variables, true);
     }
@@ -616,11 +631,11 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     if (value.starts_with("ignore<")) {
         return;
     } if (value.starts_with("checked<")) {
-        const std::string checked_value = value.substr(8, value.size() - 9);
+        const std::string checked_value = function_name + "_" + value.substr(8, value.size() - 9);
         *out << base_indent << "state." << variable << ".get0 = " << checked_value << ".value;" << std::endl;
         *out << base_indent << "state." << variable << ".get1 = " << checked_value << ".errors;" << std::endl;
     } else if (value.starts_with("unchecked<")) {
-        const std::string checked_value = value.substr(10, value.size() - 11);
+        const std::string checked_value = function_name + "_" + value.substr(10, value.size() - 11);
         *out << base_indent << "state." << variable << " = " << checked_value << ".value;" << std::endl;
     } else if (value.starts_with("serialize<")) {
         const std::string serialize_value = value.substr(10, value.size() - 11);
@@ -1074,6 +1089,201 @@ void mir_contract::generate_main_function(std::ostream *out, const mir_statement
 
     *out << "\treturn 0;" << std::endl;
     *out << "}" << std::endl;
+}
+
+void mir_contract::generate_maths_function(std::ostream *out, const std::string &operator_name, const std::string &function_name) {
+    if (operator_name == "u_addition") {
+        *out << "unsigned_math_result " << function_name << "_u_addition(unsigned long long int a, unsigned long long int b, unsigned long long int max) {" << std::endl;
+        *out << "\tunsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a + b;" << std::endl;
+        *out << "\tresult.errors = a > max - b;" << std::endl;
+        *out << "\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 0; Reason: Addition overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the addition overflow\");" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "i_addition") {
+        *out << "signed_math_result " << function_name << "_i_addition(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {" << std::endl;
+        *out << "\tsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a + b;" << std::endl;
+        *out << "\tif (b < 0) {" << std::endl;
+        *out << "\t\tresult.errors = a < min - b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 1; Reason: Addition underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the addition underflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = a > max - b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 0; Reason: Addition overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the addition overflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "f_addition") {
+        *out << "float_math_result " << function_name << "_f_addition(double a, double b, double max, double min) {" << std::endl;
+        *out << "\tfloat_math_result result;" << std::endl;
+        *out << "\tresult.value = a + b;" << std::endl;
+        *out << "\t if (b < 0) {" << std::endl;
+        *out << "\t\tresult.errors = a < min - b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 1; Reason: Addition underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the addition underflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = a > max - b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 0; Reason: Addition overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the addition overflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "u_subtraction") {
+        *out << "unsigned_math_result " << function_name << "_u_subtraction(unsigned long long int a, unsigned long long int b, unsigned long long int max) {" << std::endl;
+        *out << "\tunsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a - b;" << std::endl;
+        *out << "\tresult.errors = a < b;" << std::endl;
+        *out << "\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 3; Reason: Subtraction underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the subtraction underflow\");" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "i_subtraction") {
+        *out << "signed_math_result " << function_name << "_i_subtraction(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {" << std::endl;
+        *out << "\tsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a - b;" << std::endl;
+        *out << "\tif (b < 0) {" << std::endl;
+        *out << "\t\tresult.errors = a > max + b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 2; Reason: Subtraction overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the subtraction overflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = a < min + b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 3; Reason: Subtraction underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the subtraction underflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "f_subtraction") {
+        *out << "float_math_result " << function_name << "_f_subtraction(double a, double b, double max, double min) {" << std::endl;
+        *out << "\tfloat_math_result result;" << std::endl;
+        *out << "\tresult.value = a - b;" << std::endl;
+        *out << "\tif (b < 0) {" << std::endl;
+        *out << "\t\tresult.errors = a > max + b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 2; Reason: Subtraction overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the subtraction overflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = a < min + b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 3; Reason: Subtraction underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the subtraction underflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "u_multiplication") {
+        *out << "unsigned_math_result " << function_name << "_u_multiplication(unsigned long long int a, unsigned long long int b, unsigned long long int max) {" << std::endl;
+        *out << "\tunsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a * b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = a > max / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 4; Reason: Multiplication overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication overflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "i_multiplication") {
+        *out << "signed_math_result " << function_name << "_i_multiplication(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {" << std::endl;
+        *out << "\tsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a * b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t} else if ((b > 0) && (a > 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a > max / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 4; Reason: Multiplication overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication overflow\");" << std::endl;
+        *out << "\t} else if ((b < 0) && (a < 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a < max / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 4; Reason: Multiplication overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication overflow\");" << std::endl;
+        *out << "\t} else if ((b > 0) && (a < 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a < min / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 5; Reason: Multiplication underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication underflow\");" << std::endl;
+        *out << "\t} else if ((b < 0) && (a > 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a > min / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 5; Reason: Multiplication underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication underflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "f_multiplication") {
+        *out << "float_math_result " << function_name << "_f_multiplication(double a, double b, double max, double min) {" << std::endl;
+        *out << "\tfloat_math_result result;" << std::endl;
+        *out << "\tresult.value = a * b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t} else if ((b > 0) && (a > 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a > max / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 4; Reason: Multiplication overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication overflow\");" << std::endl;
+        *out << "\t} else if ((b < 0) && (a < 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a < max / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 4; Reason: Multiplication overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication overflow\");" << std::endl;
+        *out << "\t} else if ((b > 0) && (a < 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a < min / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 5; Reason: Multiplication underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication underflow\");" << std::endl;
+        *out << "\t} else if ((b < 0) && (a > 0)) {" << std::endl;
+        *out << "\t\tresult.errors = a > min / b;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 5; Reason: Multiplication underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the multiplication underflow\");" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "u_division") {
+        *out << "unsigned_math_result " << function_name << "_u_division(unsigned long long int a, unsigned long long int b, unsigned long long int max) {" << std::endl;
+        *out << "\tunsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a / b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = true;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 7; Reason: Division by zero in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the division by zero\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "i_division") {
+        *out << "signed_math_result " << function_name << "_i_division(signed long long int a, signed long long int b, signed long long int max, signed long long int min) {" << std::endl;
+        *out << "\tsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = a / b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = true;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 7; Reason: Division by zero in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the division by zero\");" << std::endl;
+        *out << "\t} else if (b == -1) {" << std::endl;
+        *out << "\t\tresult.errors = a == min;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 6; Reason: Division overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the division overflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "f_division") {
+        *out << "float_math_result " << function_name << "_f_division(double a, double b, double max, double min) {" << std::endl;
+        *out << "\tfloat_math_result result;" << std::endl;
+        *out << "\tresult.value = a / b;" << std::endl;
+        *out << "\tif (b == 0) {" << std::endl;
+        *out << "\t\tresult.errors = true;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 7; Reason: Division by zero in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the division by zero\");" << std::endl;
+        *out << "\t} else if (b == -1) {" << std::endl;
+        *out << "\t\tresult.errors = a == min;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 6; Reason: Division overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the division overflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "u_negation") {
+        *out << "unsigned_math_result " << function_name << "_u_negation(unsigned long long int a, unsigned long long int max) {" << std::endl;
+        *out << "\tunsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = -a;" << std::endl;
+        *out << "\tresult.errors = true;" << std::endl;
+        *out << "\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 12; Reason: Negation underflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the negation underflow\");" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "i_negation") {
+        *out << "signed_math_result " << function_name << "_i_negation(signed long long int a, signed long long int max, signed long long int min) {" << std::endl;
+        *out << "\tsigned_math_result result;" << std::endl;
+        *out << "\tresult.value = -a;" << std::endl;
+        *out << "\tif (a == min) {" << std::endl;
+        *out << "\t\tresult.errors = true;" << std::endl;
+        *out << "\t\t__ESBMC_assert(!result.errors, \"Vulnerability Found: 8; Reason: Negation overflow in the function '" << function_name << "'; Solution: Ensure contract inputs are validated to prevent the negation overflow\");" << std::endl;
+        *out << "\t} else {" << std::endl;
+        *out << "\t\tresult.errors = false;" << std::endl;
+        *out << "\t}" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    } else if (operator_name == "f_negation") {
+        *out << "float_math_result " << function_name << "_f_negation(double a, double max) {" << std::endl;
+        *out << "\tfloat_math_result result;" << std::endl;
+        *out << "\tresult.value = -a;" << std::endl;
+        *out << "\tresult.errors = false;" << std::endl;
+        *out << "\treturn result;" << std::endl;
+        *out << "}" << std::endl;
+    }
 }
 
 void mir_contract::generate_verification_statements(std::ostream *out, const mir_statements& state_statements, const mir_statements& debug_statements, const std::string& function_return) {

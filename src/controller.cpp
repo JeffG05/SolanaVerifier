@@ -209,6 +209,8 @@ bool controller::run(const int argc, char *argv[]) {
     print_info("conversion to c program completed (took " + get_millis(t_to_c_start, t_to_c_end) + ")");
     print_info("c program saved in '" + solana_c.get_dir() + "'");
 
+    // return true;
+
     print_info("starting smt verification using boolector");
     const auto t_boolector_start = std::chrono::high_resolution_clock::now();
     const verification_result boolector_result = solana_c.verify_boolector(temp_dir, _esbmc_path);

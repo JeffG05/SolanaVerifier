@@ -57,6 +57,7 @@ private:
     static void generate_branch(std::ostream* out, const mir_statement &branch_statement, const std::string& function_name, const std::string& variable, const std::string& value);
     void generate_function(std::ostream* out, const mir_statements &state_statements, const mir_statements &debug_statements, const std::string& function_name, const std::string& function_return, const mir_statements &all_variables, bool forward_decl = false);
     void generate_main_function(std::ostream* out, const mir_statements &function_statements, const std::string& target_function_name);
+    static void generate_maths_function(std::ostream* out, const std::string &operator_name, const std::string &function_name);
 
     void generate_nondet_from_name(std::ostream *out, const std::string &name, const std::string &type, const std::string &function_name) const;
     void generate_nondet_from_statement(std::ostream* out, const mir_statement& statement, const std::string& function_name, const mir_statements &all_variables, bool in_main = false);

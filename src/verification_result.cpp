@@ -1,5 +1,8 @@
 #include <fstream>
 #include "verification_result.h"
+
+#include <iostream>
+
 #include "utils.h"
 
 verification_result::verification_result(const std::filesystem::path &path) {
@@ -63,6 +66,8 @@ result verification_result::parse_log() const {
             if (std::ranges::all_of(vulnerability_id, ::isdigit)) {
                 int vulnerability_enum = std::stoi(vulnerability_id);
                 vulnerability_type_found = static_cast<vulnerability_type>(vulnerability_enum);
+            } else {
+                vulnerability_type_found = vulnerability_type::miscellaneous;
             }
 
             if (++result_itr == result_infos.end()) {

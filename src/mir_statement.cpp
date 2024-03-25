@@ -57,6 +57,8 @@ std::string mir_statement::get_string_type() const {
             return "Enum Struct";
         case statement_type::data_enum_option:
             return "Enum Option";
+        case statement_type::maths:
+            return "Maths";
         default:
             return "Unknown Statement";
     }
@@ -162,6 +164,8 @@ mir_statement mir_statement::parse_json(const nlohmann::json &json) {
         type = statement_type::data_enum_struct;
     } else if (string_type == "Enum Option") {
         type = statement_type::data_enum_option;
+    } else if (string_type == "Maths") {
+        type = statement_type::maths;
     } else {
         type = statement_type::unknown;
     }
@@ -411,7 +415,7 @@ std::string mir_statement::reformat_value_by_type(const std::string &value, cons
         return value;
     }
     if (type.starts_with("tuple<")) {
-        if (!value.starts_with("init_tuple<") && !value.starts_with("find_program_address<")) {
+        if (!value.starts_with("init_tuple<") && !value.starts_with("find_program_address<") && !value.starts_with("checked<") && !value.starts_with("unchecked<")) {
             return "copy_tuple<" + value + ">";
         }
         return value;
@@ -513,6 +517,12 @@ std::optional<mir_statement> mir_statement::parse_branch(const std::string &line
     }
 
     return mir_statement(statement_type::branch, data);
+}
+
+mir_statement mir_statement::parse_maths(const std::string &line) {
+    nlohmann::json data;
+    data["value"] = line.substr(0, line.find('('));
+    return { statement_type::maths, data };
 }
 
 std::string mir_statement::convert_type(const std::string &type) {

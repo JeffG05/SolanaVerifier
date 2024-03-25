@@ -7,7 +7,7 @@
 
 class mir_statement;
 typedef std::list<mir_statement> mir_statements;
-enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, data_struct, debug, data_enum, data_enum_struct, data_enum_option };
+enum class statement_type { unknown, root, function, block, assignment, variable, parameter, return_type, branch, data_struct, debug, data_enum, data_enum_struct, data_enum_option, maths };
 
 class mir_statement {
 public:
@@ -31,13 +31,14 @@ public:
     static std::optional<mir_statement> get_statement(const mir_statements& variables, const std::string& name);
 
     static std::optional<mir_statement> parse_function(std::list<std::string> lines, const mir_statements& structs);
+    static std::optional<mir_statement> parse_function_header(const std::string& line);
+    static mir_statement parse_maths(const std::string& line);
+
     static mir_statement create_root(const std::string &contract_name);
     static bool line_is_statement_start(const std::string &line);
     static bool line_is_function(const std::string &line);
     static bool line_is_block(const std::string& line);
     static std::string convert_type(const std::string& type);
-
-    static std::optional<mir_statement> parse_function_header(const std::string& line);
 
     static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
     static std::string reformat_value_by_type(const std::string& value, const std::string& type);

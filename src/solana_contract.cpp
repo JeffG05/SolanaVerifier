@@ -4,6 +4,8 @@
 #include <iostream>
 #include <regex>
 
+#include "utils.h"
+
 solana_contract::solana_contract(const std::filesystem::path &path, const config globals) {
     _contract_dir = path;
     _globals = globals;
@@ -31,7 +33,7 @@ std::string solana_contract::get_name() const {
 
 mir_contract solana_contract::convert_to_mir(const std::filesystem::path &target, const mir_statements& structs) const {
     // Copy contract code to target location
-    if (is_empty(target)) {
+    if (!utils::contains_file(target)) {
         copy(_contract_dir, target, std::filesystem::copy_options::recursive);
         edit_rust_files(target);
     }
@@ -48,7 +50,7 @@ mir_contract solana_contract::convert_to_mir(const std::filesystem::path &target
 
 hir_contract solana_contract::convert_to_hir(const std::filesystem::path& target) const {
     // Copy contract code to target location
-    if (is_empty(target)) {
+    if (!utils::contains_file(target)) {
         copy(_contract_dir, target, std::filesystem::copy_options::recursive);
         edit_rust_files(target);
     }
