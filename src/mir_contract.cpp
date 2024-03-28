@@ -77,6 +77,16 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) {
             if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
                 std::optional<mir_statement> statement = mir_statement::parse_function(current_statement_lines, _structs);
                 if (statement.has_value() && !statement.value().get_ast_data().contains("source") && statement.value().get_ast_data().at("name") != "entrypoint") {
+                    for (auto block : statement.value().get_children({statement_type::block})) {
+                        for (const auto& assignment : block.get_children({statement_type::assignment})) {
+                            std::string value = assignment.get_ast_data().at("value");
+                            if (value.find("checked<") != std::string::npos) {
+                                std::string maths_function = value.substr(value.find("checked<") + 8, value.rfind(')') - value.find("checked<") - 7);
+                                mir_statement maths_statement = mir_statement::parse_maths(maths_function);
+                                statement->add_child(maths_statement);
+                            }
+                        }
+                    }
                     root.add_child(statement.value());
                 }
             }
