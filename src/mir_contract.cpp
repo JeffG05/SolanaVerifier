@@ -34,7 +34,7 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
     }
 
     // Create AST tree
-    mir_statement ast_tree = create_ast_tree(file);
+    mir_statement ast_tree = create_ast_tree(file, target_funtion);
     file.close();
     // ast_tree.print();
 
@@ -48,7 +48,7 @@ c_program mir_contract::convert_to_c(const std::filesystem::path& target, const 
 
 }
 
-mir_statement mir_contract::create_ast_tree(std::istream& file) {
+mir_statement mir_contract::create_ast_tree(std::istream &file, const std::string& target) {
     // Init statement tree
     auto root = mir_statement::create_root(_contract_name);
 
@@ -113,7 +113,41 @@ mir_statement mir_contract::create_ast_tree(std::istream& file) {
     }
     current_statement_lines.clear();
 
-    return root;
+    return trim_ast_tree(root, target);
+}
+
+mir_statement mir_contract::trim_ast_tree(mir_statement tree, const std::string& target) const {
+    std::set<std::string> _remove_functions = _function_names;
+    _remove_functions.erase(target);
+
+    for (auto function_statement : tree.get_children({statement_type::function})) {
+        for (auto block_statement : function_statement.get_children({statement_type::block})) {
+            for (const auto& assignment_statement : block_statement.get_children({statement_type::assignment})) {
+                std::string value = assignment_statement.get_ast_data().at("value");
+                for (const auto& function_name : _remove_functions) {
+                    std::regex function_call_regex (R"(^(?:.+<)?)" + function_name + R"(\(.+$)");
+                    if (std::smatch match; std::regex_match(value, match, function_call_regex)) {
+                        _remove_functions.erase(function_name);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    mir_statement new_root = mir_statement::extract_node(tree);
+    for (const auto& statement : tree.get_children()) {
+        if (statement.get_type() == statement_type::function) {
+            if (_remove_functions.contains(statement.get_ast_data().at("name"))) {
+                continue;
+            }
+            new_root.add_child(statement);
+        } else {
+            new_root.add_child(statement);
+        }
+    }
+
+    return new_root;
 }
 
 std::filesystem::path mir_contract::export_c_program(const std::filesystem::path &target, mir_statement ast_tree, const std::string& target_function) {

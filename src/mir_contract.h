@@ -28,7 +28,8 @@ private:
     std::set<std::string> _function_names;
     config _globals{};
 
-    mir_statement create_ast_tree(std::istream& file);
+    mir_statement create_ast_tree(std::istream& file, const std::string& target);
+    [[nodiscard]] mir_statement trim_ast_tree(mir_statement tree, const std::string& target) const;
 
     [[nodiscard]] static std::string get_c_subtype(const std::string& type);
     [[nodiscard]] std::string get_c_type(const std::string& type, const std::string& name, const std::string& function_name) const;
