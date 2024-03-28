@@ -6,7 +6,7 @@
 class string_mir_type : public mir_type {
 public:
     string_mir_type() : mir_type(
-        std::regex (R"(^str$)"),
+        std::regex (R"(^(?:str|std::string::String)$)"),
         [](const std::smatch &match) {
             return "string";
         }

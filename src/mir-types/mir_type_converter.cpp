@@ -2,6 +2,7 @@
 #include "mir-types/mir_type.h"
 #include "types/account_info_mir_type.h"
 #include "types/account_meta_mir_type.h"
+#include "types/argument_mir_type.h"
 #include "types/arguments_mir_type.h"
 #include "types/array_mir_type.h"
 #include "types/backtick_mir_type.h"
@@ -73,4 +74,5 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     arguments_mir_type(),
     float_mir_type(),
     rent_mir_type(),
+    argument_mir_type()
 };

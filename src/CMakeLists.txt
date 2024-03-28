@@ -163,6 +163,7 @@ add_executable(SolanaVerifier
         mir-values/values/minimum_balance_mir_value.h
         mir-values/values/data_is_empty_mir_value.h
         mir-values/values/rent_from_account_info_mir_value.h
+        mir-types/types/argument_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier
