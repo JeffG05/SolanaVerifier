@@ -691,6 +691,56 @@ mir_statements mir_statement::get_subvariables(const mir_statement &variable, co
         utils::extend(&subvariables, get_subvariables(value, structs));
         return subvariables;
     }
+    if (type == "solana_c_program_address") {
+        const mir_statement get0 = new_variable(name + ".get0", "pubkey");
+        const mir_statement get1 = new_variable(name + ".get1", "u8");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        return subvariables;
+    }
+    if (type == "placeholder") {
+        const mir_statement get0 = new_variable(name + ".get0", "usize");
+        const mir_statement get1 = new_variable(name + ".get1", "char");
+        const mir_statement get2 = new_variable(name + ".get2", "alignment");
+        const mir_statement get3 = new_variable(name + ".get3", "u32");
+        const mir_statement get4 = new_variable(name + ".get4", "count");
+        const mir_statement get5 = new_variable(name + ".get5", "count");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        utils::extend(&subvariables, get_subvariables(get2, structs));
+        utils::extend(&subvariables, get_subvariables(get3, structs));
+        utils::extend(&subvariables, get_subvariables(get4, structs));
+        utils::extend(&subvariables, get_subvariables(get5, structs));
+        return subvariables;
+    }
+    if (type == "argument") {
+        const mir_statement get0 = new_variable(name + ".get0", "string");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        return subvariables;
+    }
+    if (type == "arguments") {
+        const mir_statement get0 = new_variable(name + ".get0", "array<string>");
+        const mir_statement get1 = new_variable(name + ".get1", "optional<placeholder>");
+        const mir_statement get2 = new_variable(name + ".get2", "array<argument>");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        utils::extend(&subvariables, get_subvariables(get2, structs));
+        return subvariables;
+    }
+    if (type == "rent") {
+        const mir_statement get0 = new_variable(name + ".get0", "u64");
+        const mir_statement get1 = new_variable(name + ".get1", "f64");
+        const mir_statement get2 = new_variable(name + ".get2", "u8");
+
+        utils::extend(&subvariables, get_subvariables(get0, structs));
+        utils::extend(&subvariables, get_subvariables(get1, structs));
+        utils::extend(&subvariables, get_subvariables(get2, structs));
+        return subvariables;
+    }
 
     return subvariables;
 }
