@@ -25,38 +25,38 @@ fn <impl at src/lib.rs:9:10: 9:15>::fmt(_1: &WalletInstruction, _2: &mut Formatt
 
     bb0: {
         _3 = discriminant((*_1));
-        switchInt(move _3) -> [0: bb2, 1: bb3, 2: bb1, otherwise: bb5];
+        switchInt(move _3) -> [0: bb3, 1: bb4, 2: bb2, otherwise: bb1];
     }
 
     bb1: {
+        unreachable;
+    }
+
+    bb2: {
         _10 = &(((*_1) as Withdraw).0: u64);
         _11 = const "Withdraw";
         _12 = const "amount";
         _14 = &_10;
         _13 = _14 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
-        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _11, _12, move _13) -> [return: bb4, unwind continue];
-    }
-
-    bb2: {
-        _4 = const "Initialize";
-        _0 = Formatter::<'_>::write_str(_2, _4) -> [return: bb4, unwind continue];
+        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _11, _12, move _13) -> [return: bb5, unwind continue];
     }
 
     bb3: {
+        _4 = const "Initialize";
+        _0 = Formatter::<'_>::write_str(_2, _4) -> [return: bb5, unwind continue];
+    }
+
+    bb4: {
         _5 = &(((*_1) as Deposit).0: u64);
         _6 = const "Deposit";
         _7 = const "amount";
         _9 = &_5;
         _8 = _9 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
-        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _6, _7, move _8) -> [return: bb4, unwind continue];
-    }
-
-    bb4: {
-        return;
+        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _6, _7, move _8) -> [return: bb5, unwind continue];
     }
 
     bb5: {
-        unreachable;
+        return;
     }
 }
 
@@ -145,117 +145,117 @@ fn <impl at src/lib.rs:9:17: 9:33>::deserialize(_1: &mut &[u8]) -> Result<Wallet
 
     bb2: {
         _5 = discriminant(_3);
-        switchInt(move _5) -> [0: bb3, 1: bb4, otherwise: bb23];
+        switchInt(move _5) -> [0: bb4, 1: bb5, otherwise: bb3];
     }
 
     bb3: {
-        _7 = ((_3 as Continue).0: u8);
-        _2 = _7;
-        switchInt(_2) -> [0: bb6, 1: bb7, 2: bb12, otherwise: bb5];
+        unreachable;
     }
 
     bb4: {
-        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb22, unwind continue];
+        _7 = ((_3 as Continue).0: u8);
+        _2 = _7;
+        switchInt(_2) -> [0: bb7, 1: bb8, 2: bb13, otherwise: bb6];
     }
 
     bb5: {
-        _30 = const _;
-        _21 = _30 as &[&str] (PointerCoercion(Unsize));
-        _26 = &_2;
-        _25 = core::fmt::rt::Argument::<'_>::new_debug::<u8>(_26) -> [return: bb17, unwind continue];
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb23, unwind continue];
     }
 
     bb6: {
-        _8 = WalletInstruction::Initialize;
-        goto -> bb21;
+        _30 = const <WalletInstruction as borsh::BorshDeserialize>::deserialize::promoted[0];
+        _21 = _30 as &[&str] (PointerCoercion(Unsize));
+        _26 = &_2;
+        _25 = core::fmt::rt::Argument::<'_>::new_debug::<u8>(_26) -> [return: bb18, unwind continue];
     }
 
     bb7: {
-        _10 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb8, unwind continue];
+        _8 = WalletInstruction::Initialize;
+        goto -> bb22;
     }
 
     bb8: {
-        _9 = <Result<u64, std::io::Error> as Try>::branch(move _10) -> [return: bb9, unwind continue];
+        _10 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb9, unwind continue];
     }
 
     bb9: {
-        _11 = discriminant(_9);
-        switchInt(move _11) -> [0: bb10, 1: bb11, otherwise: bb23];
+        _9 = <Result<u64, std::io::Error> as Try>::branch(move _10) -> [return: bb10, unwind continue];
     }
 
     bb10: {
-        _13 = ((_9 as Continue).0: u64);
-        _8 = WalletInstruction::Deposit { amount: _13 };
-        goto -> bb21;
+        _11 = discriminant(_9);
+        switchInt(move _11) -> [0: bb11, 1: bb12, otherwise: bb3];
     }
 
     bb11: {
-        _12 = move ((_9 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb22, unwind continue];
+        _13 = ((_9 as Continue).0: u64);
+        _8 = WalletInstruction::Deposit { amount: _13 };
+        goto -> bb22;
     }
 
     bb12: {
-        _15 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb13, unwind continue];
+        _12 = move ((_9 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb23, unwind continue];
     }
 
     bb13: {
-        _14 = <Result<u64, std::io::Error> as Try>::branch(move _15) -> [return: bb14, unwind continue];
+        _15 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb14, unwind continue];
     }
 
     bb14: {
-        _16 = discriminant(_14);
-        switchInt(move _16) -> [0: bb15, 1: bb16, otherwise: bb23];
+        _14 = <Result<u64, std::io::Error> as Try>::branch(move _15) -> [return: bb15, unwind continue];
     }
 
     bb15: {
-        _18 = ((_14 as Continue).0: u64);
-        _8 = WalletInstruction::Withdraw { amount: _18 };
-        goto -> bb21;
+        _16 = discriminant(_14);
+        switchInt(move _16) -> [0: bb16, 1: bb17, otherwise: bb3];
     }
 
     bb16: {
-        _17 = move ((_14 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _17) -> [return: bb22, unwind continue];
+        _18 = ((_14 as Continue).0: u64);
+        _8 = WalletInstruction::Withdraw { amount: _18 };
+        goto -> bb22;
     }
 
     bb17: {
-        _24 = [move _25];
-        _23 = &_24;
-        _22 = _23 as &[core::fmt::rt::Argument<'_>] (PointerCoercion(Unsize));
-        _20 = Arguments::<'_>::new_v1(move _21, move _22) -> [return: bb18, unwind continue];
+        _17 = move ((_14 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _17) -> [return: bb23, unwind continue];
     }
 
     bb18: {
-        _19 = format(move _20) -> [return: bb19, unwind continue];
+        _24 = [move _25];
+        _23 = &_24;
+        _22 = _23 as &[core::fmt::rt::Argument<'_>] (PointerCoercion(Unsize));
+        _20 = Arguments::<'_>::new_v1(move _21, move _22) -> [return: bb19, unwind continue];
     }
 
     bb19: {
-        _28 = InvalidInput;
-        _27 = std::io::Error::new::<String>(move _28, move _19) -> [return: bb20, unwind continue];
+        _19 = format(move _20) -> [return: bb20, unwind continue];
     }
 
     bb20: {
-        _0 = Result::<WalletInstruction, std::io::Error>::Err(move _27);
-        goto -> bb22;
+        _28 = InvalidInput;
+        _27 = std::io::Error::new::<String>(move _28, move _19) -> [return: bb21, unwind continue];
     }
 
     bb21: {
-        _29 = move _8;
-        _0 = Result::<WalletInstruction, std::io::Error>::Ok(move _29);
-        goto -> bb22;
+        _0 = Result::<WalletInstruction, std::io::Error>::Err(move _27);
+        goto -> bb23;
     }
 
     bb22: {
-        return;
+        _29 = move _8;
+        _0 = Result::<WalletInstruction, std::io::Error>::Ok(move _29);
+        goto -> bb23;
     }
 
     bb23: {
-        unreachable;
+        return;
     }
 }
 
-promoted[0] in <impl at src/lib.rs:9:17: 9:33>::deserialize: &[&str; 1] = {
+const <impl at src/lib.rs:9:17: 9:33>::deserialize::promoted[0]: &[&str; 1] = {
     let mut _0: &[&str; 1];
     let mut _1: [&str; 1];
 
@@ -333,103 +333,103 @@ fn <impl at src/lib.rs:9:35: 9:49>::serialize(_1: &WalletInstruction, _2: &mut W
 
     bb0: {
         _4 = discriminant((*_1));
-        switchInt(move _4) -> [0: bb2, 1: bb3, 2: bb1, otherwise: bb20];
+        switchInt(move _4) -> [0: bb3, 1: bb4, 2: bb2, otherwise: bb1];
     }
 
     bb1: {
-        _3 = const 2_u8;
-        goto -> bb4;
+        unreachable;
     }
 
     bb2: {
-        _3 = const 0_u8;
-        goto -> bb4;
+        _3 = const 2_u8;
+        goto -> bb5;
     }
 
     bb3: {
-        _3 = const 1_u8;
-        goto -> bb4;
+        _3 = const 0_u8;
+        goto -> bb5;
     }
 
     bb4: {
-        _10 = _3;
-        _9 = core::num::<impl u8>::to_le_bytes(move _10) -> [return: bb5, unwind continue];
+        _3 = const 1_u8;
+        goto -> bb5;
     }
 
     bb5: {
-        _8 = &_9;
-        _7 = _8 as &[u8] (PointerCoercion(Unsize));
-        _6 = <W as std::io::Write>::write_all(_2, move _7) -> [return: bb6, unwind continue];
+        _10 = _3;
+        _9 = core::num::<impl u8>::to_le_bytes(move _10) -> [return: bb6, unwind continue];
     }
 
     bb6: {
-        _5 = <Result<(), std::io::Error> as Try>::branch(move _6) -> [return: bb7, unwind continue];
+        _8 = &_9;
+        _7 = _8 as &[u8] (PointerCoercion(Unsize));
+        _6 = <W as std::io::Write>::write_all(_2, move _7) -> [return: bb7, unwind continue];
     }
 
     bb7: {
-        _11 = discriminant(_5);
-        switchInt(move _11) -> [0: bb8, 1: bb9, otherwise: bb20];
+        _5 = <Result<(), std::io::Error> as Try>::branch(move _6) -> [return: bb8, unwind continue];
     }
 
     bb8: {
-        _13 = discriminant((*_1));
-        switchInt(move _13) -> [0: bb18, 1: bb11, 2: bb10, otherwise: bb20];
+        _11 = discriminant(_5);
+        switchInt(move _11) -> [0: bb9, 1: bb10, otherwise: bb1];
     }
 
     bb9: {
-        _12 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb19, unwind continue];
+        _13 = discriminant((*_1));
+        switchInt(move _13) -> [0: bb19, 1: bb12, 2: bb11, otherwise: bb1];
     }
 
     bb10: {
-        _19 = &(((*_1) as Withdraw).0: u64);
-        _21 = <u64 as BorshSerialize>::serialize::<W>(_19, _2) -> [return: bb15, unwind continue];
+        _12 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb20, unwind continue];
     }
 
     bb11: {
-        _14 = &(((*_1) as Deposit).0: u64);
-        _16 = <u64 as BorshSerialize>::serialize::<W>(_14, _2) -> [return: bb12, unwind continue];
+        _19 = &(((*_1) as Withdraw).0: u64);
+        _21 = <u64 as BorshSerialize>::serialize::<W>(_19, _2) -> [return: bb16, unwind continue];
     }
 
     bb12: {
-        _15 = <Result<(), std::io::Error> as Try>::branch(move _16) -> [return: bb13, unwind continue];
+        _14 = &(((*_1) as Deposit).0: u64);
+        _16 = <u64 as BorshSerialize>::serialize::<W>(_14, _2) -> [return: bb13, unwind continue];
     }
 
     bb13: {
-        _17 = discriminant(_15);
-        switchInt(move _17) -> [0: bb18, 1: bb14, otherwise: bb20];
+        _15 = <Result<(), std::io::Error> as Try>::branch(move _16) -> [return: bb14, unwind continue];
     }
 
     bb14: {
-        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _18) -> [return: bb19, unwind continue];
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb19, 1: bb15, otherwise: bb1];
     }
 
     bb15: {
-        _20 = <Result<(), std::io::Error> as Try>::branch(move _21) -> [return: bb16, unwind continue];
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _18) -> [return: bb20, unwind continue];
     }
 
     bb16: {
-        _22 = discriminant(_20);
-        switchInt(move _22) -> [0: bb18, 1: bb17, otherwise: bb20];
+        _20 = <Result<(), std::io::Error> as Try>::branch(move _21) -> [return: bb17, unwind continue];
     }
 
     bb17: {
-        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _23) -> [return: bb19, unwind continue];
+        _22 = discriminant(_20);
+        switchInt(move _22) -> [0: bb19, 1: bb18, otherwise: bb1];
     }
 
     bb18: {
-        _0 = Result::<(), std::io::Error>::Ok(const ());
-        goto -> bb19;
+        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _23) -> [return: bb20, unwind continue];
     }
 
     bb19: {
-        return;
+        _0 = Result::<(), std::io::Error>::Ok(const ());
+        goto -> bb20;
     }
 
     bb20: {
-        unreachable;
+        return;
     }
 }
 
@@ -576,44 +576,44 @@ fn <impl at src/lib.rs:42:50: 42:64>::serialize(_1: &Wallet, _2: &mut W) -> Resu
 
     bb2: {
         _6 = discriminant(_3);
-        switchInt(move _6) -> [0: bb3, 1: bb4, otherwise: bb10];
+        switchInt(move _6) -> [0: bb4, 1: bb5, otherwise: bb3];
     }
 
     bb3: {
-        _10 = &((*_1).1: solana_program::pubkey::Pubkey);
-        _9 = <Pubkey as BorshSerialize>::serialize::<W>(_10, _2) -> [return: bb5, unwind continue];
+        unreachable;
     }
 
     bb4: {
-        _7 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _7) -> [return: bb9, unwind continue];
+        _10 = &((*_1).1: solana_program::pubkey::Pubkey);
+        _9 = <Pubkey as BorshSerialize>::serialize::<W>(_10, _2) -> [return: bb6, unwind continue];
     }
 
     bb5: {
-        _8 = <Result<(), std::io::Error> as Try>::branch(move _9) -> [return: bb6, unwind continue];
+        _7 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _7) -> [return: bb10, unwind continue];
     }
 
     bb6: {
-        _11 = discriminant(_8);
-        switchInt(move _11) -> [0: bb7, 1: bb8, otherwise: bb10];
+        _8 = <Result<(), std::io::Error> as Try>::branch(move _9) -> [return: bb7, unwind continue];
     }
 
     bb7: {
-        _0 = Result::<(), std::io::Error>::Ok(const ());
-        goto -> bb9;
+        _11 = discriminant(_8);
+        switchInt(move _11) -> [0: bb8, 1: bb9, otherwise: bb3];
     }
 
     bb8: {
-        _12 = move ((_8 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb9, unwind continue];
+        _0 = Result::<(), std::io::Error>::Ok(const ());
+        goto -> bb10;
     }
 
     bb9: {
-        return;
+        _12 = move ((_8 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb10, unwind continue];
     }
 
     bb10: {
-        unreachable;
+        return;
     }
 }
 
@@ -662,46 +662,46 @@ fn <impl at src/lib.rs:42:66: 42:82>::deserialize(_1: &mut &[u8]) -> Result<Wall
 
     bb2: {
         _5 = discriminant(_3);
-        switchInt(move _5) -> [0: bb3, 1: bb4, otherwise: bb10];
+        switchInt(move _5) -> [0: bb4, 1: bb5, otherwise: bb3];
     }
 
     bb3: {
-        _7 = ((_3 as Continue).0: solana_program::pubkey::Pubkey);
-        _9 = <Pubkey as BorshDeserialize>::deserialize(_1) -> [return: bb5, unwind continue];
+        unreachable;
     }
 
     bb4: {
-        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<Wallet, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb9, unwind continue];
+        _7 = ((_3 as Continue).0: solana_program::pubkey::Pubkey);
+        _9 = <Pubkey as BorshDeserialize>::deserialize(_1) -> [return: bb6, unwind continue];
     }
 
     bb5: {
-        _8 = <Result<Pubkey, std::io::Error> as Try>::branch(move _9) -> [return: bb6, unwind continue];
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<Wallet, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb10, unwind continue];
     }
 
     bb6: {
-        _10 = discriminant(_8);
-        switchInt(move _10) -> [0: bb7, 1: bb8, otherwise: bb10];
+        _8 = <Result<Pubkey, std::io::Error> as Try>::branch(move _9) -> [return: bb7, unwind continue];
     }
 
     bb7: {
-        _12 = ((_8 as Continue).0: solana_program::pubkey::Pubkey);
-        _2 = Wallet { authority: _7, vault: _12 };
-        _0 = Result::<Wallet, std::io::Error>::Ok(move _2);
-        goto -> bb9;
+        _10 = discriminant(_8);
+        switchInt(move _10) -> [0: bb8, 1: bb9, otherwise: bb3];
     }
 
     bb8: {
-        _11 = move ((_8 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<Wallet, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _11) -> [return: bb9, unwind continue];
+        _12 = ((_8 as Continue).0: solana_program::pubkey::Pubkey);
+        _2 = Wallet { authority: _7, vault: _12 };
+        _0 = Result::<Wallet, std::io::Error>::Ok(move _2);
+        goto -> bb10;
     }
 
     bb9: {
-        return;
+        _11 = move ((_8 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<Wallet, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _11) -> [return: bb10, unwind continue];
     }
 
     bb10: {
-        unreachable;
+        return;
     }
 }
 
@@ -762,40 +762,40 @@ fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result
 
     bb2: {
         _7 = discriminant(_4);
-        switchInt(move _7) -> [0: bb3, 1: bb4, otherwise: bb9];
+        switchInt(move _7) -> [0: bb4, 1: bb5, otherwise: bb3];
     }
 
     bb3: {
-        _9 = move ((_4 as Continue).0: WalletInstruction);
-        _10 = discriminant(_9);
-        switchInt(move _10) -> [0: bb6, 1: bb7, 2: bb5, otherwise: bb9];
+        unreachable;
     }
 
     bb4: {
-        _8 = move ((_4 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _8) -> [return: bb8, unwind continue];
+        _9 = move ((_4 as Continue).0: WalletInstruction);
+        _10 = discriminant(_9);
+        switchInt(move _10) -> [0: bb7, 1: bb8, 2: bb6, otherwise: bb3];
     }
 
     bb5: {
-        _12 = ((_9 as Withdraw).0: u64);
-        _0 = processor::withdraw(_1, _2, _12) -> [return: bb8, unwind continue];
+        _8 = move ((_4 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _8) -> [return: bb9, unwind continue];
     }
 
     bb6: {
-        _0 = processor::initialize(_1, _2) -> [return: bb8, unwind continue];
+        _12 = ((_9 as Withdraw).0: u64);
+        _0 = processor::withdraw(_1, _2, _12) -> [return: bb9, unwind continue];
     }
 
     bb7: {
-        _11 = ((_9 as Deposit).0: u64);
-        _0 = processor::deposit(_1, _2, _11) -> [return: bb8, unwind continue];
+        _0 = processor::initialize(_1, _2) -> [return: bb9, unwind continue];
     }
 
     bb8: {
-        return;
+        _11 = ((_9 as Deposit).0: u64);
+        _0 = processor::deposit(_1, _2, _11) -> [return: bb9, unwind continue];
     }
 
     bb9: {
-        unreachable;
+        return;
     }
 }
 
@@ -1077,129 +1077,133 @@ fn processor::initialize(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), Prog
 
     bb3: {
         _7 = discriminant(_5);
-        switchInt(move _7) -> [0: bb4, 1: bb5, otherwise: bb76];
+        switchInt(move _7) -> [0: bb5, 1: bb6, otherwise: bb4];
     }
 
     bb4: {
-        _9 = ((_5 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _11 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb6, unwind continue];
+        unreachable;
     }
 
     bb5: {
-        _8 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _8) -> [return: bb67, unwind continue];
+        _9 = ((_5 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _11 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb7, unwind continue];
     }
 
     bb6: {
-        _10 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _11) -> [return: bb7, unwind continue];
+        _8 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _8) -> [return: bb68, unwind continue];
     }
 
     bb7: {
-        _12 = discriminant(_10);
-        switchInt(move _12) -> [0: bb8, 1: bb9, otherwise: bb76];
+        _10 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _11) -> [return: bb8, unwind continue];
     }
 
     bb8: {
-        _14 = ((_10 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _16 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb10, unwind continue];
+        _12 = discriminant(_10);
+        switchInt(move _12) -> [0: bb9, 1: bb10, otherwise: bb4];
     }
 
     bb9: {
-        _13 = move ((_10 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _13) -> [return: bb67, unwind continue];
+        _14 = ((_10 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _16 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb11, unwind continue];
     }
 
     bb10: {
-        _15 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _16) -> [return: bb11, unwind continue];
+        _13 = move ((_10 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _13) -> [return: bb68, unwind continue];
     }
 
     bb11: {
-        _17 = discriminant(_15);
-        switchInt(move _17) -> [0: bb12, 1: bb13, otherwise: bb76];
+        _15 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _16) -> [return: bb12, unwind continue];
     }
 
     bb12: {
-        _19 = ((_15 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _21 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb14, unwind continue];
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb13, 1: bb14, otherwise: bb4];
     }
 
     bb13: {
-        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _18) -> [return: bb67, unwind continue];
+        _19 = ((_15 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _21 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb15, unwind continue];
     }
 
     bb14: {
-        _20 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _21) -> [return: bb15, unwind continue];
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _18) -> [return: bb68, unwind continue];
     }
 
     bb15: {
-        _22 = discriminant(_20);
-        switchInt(move _22) -> [0: bb16, 1: bb17, otherwise: bb76];
+        _20 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _21) -> [return: bb16, unwind continue];
     }
 
     bb16: {
-        _24 = ((_20 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _142 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
-        _34 = (*_142);
-        _33 = Pubkey::to_bytes(move _34) -> [return: bb18, unwind continue];
+        _22 = discriminant(_20);
+        switchInt(move _22) -> [0: bb17, 1: bb18, otherwise: bb4];
     }
 
     bb17: {
-        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _23) -> [return: bb67, unwind continue];
+        _24 = ((_20 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _142 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
+        _34 = (*_142);
+        _33 = Pubkey::to_bytes(move _34) -> [return: bb19, unwind continue];
     }
 
     bb18: {
+        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _23) -> [return: bb68, unwind continue];
+    }
+
+    bb19: {
         _32 = &_33;
         _31 = _32 as &[u8] (PointerCoercion(Unsize));
         _30 = [move _31];
         _29 = &_30;
         _28 = _29 as &[&[u8]] (PointerCoercion(Unsize));
         _35 = _1;
-        _27 = Pubkey::find_program_address(move _28, move _35) -> [return: bb19, unwind continue];
+        _27 = Pubkey::find_program_address(move _28, move _35) -> [return: bb20, unwind continue];
     }
 
-    bb19: {
+    bb20: {
         _25 = (_27.0: solana_program::pubkey::Pubkey);
         _26 = (_27.1: u8);
         _143 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
         _45 = (*_143);
-        _44 = Pubkey::to_bytes(move _45) -> [return: bb20, unwind continue];
-    }
-
-    bb20: {
-        _43 = &_44;
-        _42 = _43 as &[u8] (PointerCoercion(Unsize));
-        _48 = const "VAULT";
-        _47 = core::str::<impl str>::as_bytes(_48) -> [return: bb21, unwind continue];
+        _44 = Pubkey::to_bytes(move _45) -> [return: bb21, unwind continue];
     }
 
     bb21: {
+        _43 = &_44;
+        _42 = _43 as &[u8] (PointerCoercion(Unsize));
+        _48 = const "VAULT";
+        _47 = core::str::<impl str>::as_bytes(_48) -> [return: bb22, unwind continue];
+    }
+
+    bb22: {
         _46 = &_47;
         _144 = deref_copy (*_46);
         _41 = [move _42, _144];
         _40 = &_41;
         _39 = _40 as &[&[u8]] (PointerCoercion(Unsize));
         _49 = _1;
-        _38 = Pubkey::find_program_address(move _39, move _49) -> [return: bb22, unwind continue];
-    }
-
-    bb22: {
-        _36 = (_38.0: solana_program::pubkey::Pubkey);
-        _37 = (_38.1: u8);
-        _52 = <Rent as Sysvar>::from_account_info(_24) -> [return: bb23, unwind continue];
+        _38 = Pubkey::find_program_address(move _39, move _49) -> [return: bb23, unwind continue];
     }
 
     bb23: {
-        _51 = <Result<Rent, ProgramError> as Try>::branch(move _52) -> [return: bb24, unwind continue];
+        _36 = (_38.0: solana_program::pubkey::Pubkey);
+        _37 = (_38.1: u8);
+        _52 = <Rent as Sysvar>::from_account_info(_24) -> [return: bb24, unwind continue];
     }
 
     bb24: {
-        _53 = discriminant(_51);
-        switchInt(move _53) -> [0: bb25, 1: bb26, otherwise: bb76];
+        _51 = <Result<Rent, ProgramError> as Try>::branch(move _52) -> [return: bb25, unwind continue];
     }
 
     bb25: {
+        _53 = discriminant(_51);
+        switchInt(move _53) -> [0: bb26, 1: bb27, otherwise: bb4];
+    }
+
+    bb26: {
         _55 = move ((_51 as Continue).0: solana_program::rent::Rent);
         _50 = move _55;
         _145 = deref_copy ((*_9).0: &solana_program::pubkey::Pubkey);
@@ -1207,70 +1211,70 @@ fn processor::initialize(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), Prog
         _56 = (_145, move _57);
         _58 = (_56.0: &solana_program::pubkey::Pubkey);
         _59 = (_56.1: &solana_program::pubkey::Pubkey);
-        _60 = <Pubkey as PartialEq>::eq(_58, _59) -> [return: bb27, unwind continue];
-    }
-
-    bb26: {
-        _54 = move ((_51 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _54) -> [return: bb67, unwind continue];
+        _60 = <Pubkey as PartialEq>::eq(_58, _59) -> [return: bb28, unwind continue];
     }
 
     bb27: {
-        switchInt(move _60) -> [0: bb29, otherwise: bb28];
+        _54 = move ((_51 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _54) -> [return: bb68, unwind continue];
     }
 
     bb28: {
-        _64 = AccountInfo::<'_>::data_is_empty(_9) -> [return: bb30, unwind continue];
+        switchInt(move _60) -> [0: bb30, otherwise: bb29];
     }
 
     bb29: {
+        _64 = AccountInfo::<'_>::data_is_empty(_9) -> [return: bb31, unwind continue];
+    }
+
+    bb30: {
         _61 = core::panicking::AssertKind::Eq;
         _63 = Option::<Arguments<'_>>::None;
         _62 = assert_failed::<Pubkey, Pubkey>(move _61, _58, _59, move _63) -> unwind continue;
     }
 
-    bb30: {
-        switchInt(move _64) -> [0: bb32, otherwise: bb31];
+    bb31: {
+        switchInt(move _64) -> [0: bb33, otherwise: bb32];
     }
 
-    bb31: {
+    bb32: {
         _70 = &((*_19).0: &solana_program::pubkey::Pubkey);
         _146 = deref_copy (*_70);
         _71 = &_25;
         _73 = &_50;
-        _74 = const _ as usize (IntToInt);
-        _72 = Rent::minimum_balance(move _73, move _74) -> [return: bb33, unwind continue];
-    }
-
-    bb32: {
-        _65 = panic(const "assertion failed: wallet_info.data_is_empty()") -> unwind continue;
+        _74 = const WALLET_LEN as usize (IntToInt);
+        _72 = Rent::minimum_balance(move _73, move _74) -> [return: bb34, unwind continue];
     }
 
     bb33: {
-        _75 = &_1;
-        _147 = deref_copy (*_75);
-        _69 = solana_program::system_instruction::create_account(_146, _71, move _72, const _, _147) -> [return: bb34, unwind continue];
+        _65 = panic(const "assertion failed: wallet_info.data_is_empty()") -> unwind continue;
     }
 
     bb34: {
-        _68 = &_69;
-        _79 = <AccountInfo<'_> as Clone>::clone(_19) -> [return: bb35, unwind: bb74];
+        _75 = &_1;
+        _147 = deref_copy (*_75);
+        _69 = solana_program::system_instruction::create_account(_146, _71, move _72, const WALLET_LEN, _147) -> [return: bb35, unwind continue];
     }
 
     bb35: {
-        _80 = <AccountInfo<'_> as Clone>::clone(_9) -> [return: bb36, unwind: bb73];
+        _68 = &_69;
+        _79 = <AccountInfo<'_> as Clone>::clone(_19) -> [return: bb36, unwind: bb75];
     }
 
     bb36: {
+        _80 = <AccountInfo<'_> as Clone>::clone(_9) -> [return: bb37, unwind: bb74];
+    }
+
+    bb37: {
         _78 = [move _79, move _80];
         _77 = &_78;
         _76 = _77 as &[solana_program::account_info::AccountInfo<'_>] (PointerCoercion(Unsize));
         _148 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
         _90 = (*_148);
-        _89 = Pubkey::to_bytes(move _90) -> [return: bb37, unwind: bb72];
+        _89 = Pubkey::to_bytes(move _90) -> [return: bb38, unwind: bb73];
     }
 
-    bb37: {
+    bb38: {
         _88 = &_89;
         _87 = _88 as &[u8] (PointerCoercion(Unsize));
         _93 = [_26];
@@ -1282,75 +1286,75 @@ fn processor::initialize(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), Prog
         _83 = [move _84];
         _82 = &_83;
         _81 = _82 as &[&[&[u8]]] (PointerCoercion(Unsize));
-        _67 = invoke_signed(_68, move _76, move _81) -> [return: bb38, unwind: bb72];
-    }
-
-    bb38: {
-        _66 = <Result<(), ProgramError> as Try>::branch(move _67) -> [return: bb39, unwind: bb72];
+        _67 = invoke_signed(_68, move _76, move _81) -> [return: bb39, unwind: bb73];
     }
 
     bb39: {
-        _94 = discriminant(_66);
-        switchInt(move _94) -> [0: bb40, 1: bb41, otherwise: bb76];
+        _66 = <Result<(), ProgramError> as Try>::branch(move _67) -> [return: bb40, unwind: bb73];
     }
 
     bb40: {
-        drop(_78) -> [return: bb43, unwind: bb74];
+        _94 = discriminant(_66);
+        switchInt(move _94) -> [0: bb41, 1: bb42, otherwise: bb4];
     }
 
     bb41: {
-        _95 = move ((_66 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _95) -> [return: bb42, unwind: bb72];
+        drop(_78) -> [return: bb44, unwind: bb75];
     }
 
     bb42: {
-        drop(_78) -> [return: bb66, unwind: bb74];
+        _95 = move ((_66 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _95) -> [return: bb43, unwind: bb73];
     }
 
     bb43: {
-        drop(_69) -> [return: bb44, unwind continue];
+        drop(_78) -> [return: bb67, unwind: bb75];
     }
 
     bb44: {
+        drop(_69) -> [return: bb45, unwind continue];
+    }
+
+    bb45: {
         _100 = &((*_19).0: &solana_program::pubkey::Pubkey);
         _149 = deref_copy (*_100);
         _101 = &_36;
         _103 = &_50;
-        _102 = Rent::minimum_balance(move _103, const 0_usize) -> [return: bb45, unwind continue];
-    }
-
-    bb45: {
-        _104 = &_1;
-        _150 = deref_copy (*_104);
-        _99 = solana_program::system_instruction::create_account(_149, _101, move _102, const 0_u64, _150) -> [return: bb46, unwind continue];
+        _102 = Rent::minimum_balance(move _103, const 0_usize) -> [return: bb46, unwind continue];
     }
 
     bb46: {
-        _98 = &_99;
-        _108 = <AccountInfo<'_> as Clone>::clone(_19) -> [return: bb47, unwind: bb71];
+        _104 = &_1;
+        _150 = deref_copy (*_104);
+        _99 = solana_program::system_instruction::create_account(_149, _101, move _102, const 0_u64, _150) -> [return: bb47, unwind continue];
     }
 
     bb47: {
-        _109 = <AccountInfo<'_> as Clone>::clone(_14) -> [return: bb48, unwind: bb70];
+        _98 = &_99;
+        _108 = <AccountInfo<'_> as Clone>::clone(_19) -> [return: bb48, unwind: bb72];
     }
 
     bb48: {
+        _109 = <AccountInfo<'_> as Clone>::clone(_14) -> [return: bb49, unwind: bb71];
+    }
+
+    bb49: {
         _107 = [move _108, move _109];
         _106 = &_107;
         _105 = _106 as &[solana_program::account_info::AccountInfo<'_>] (PointerCoercion(Unsize));
         _151 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
         _119 = (*_151);
-        _118 = Pubkey::to_bytes(move _119) -> [return: bb49, unwind: bb69];
-    }
-
-    bb49: {
-        _117 = &_118;
-        _116 = _117 as &[u8] (PointerCoercion(Unsize));
-        _122 = const "VAULT";
-        _121 = core::str::<impl str>::as_bytes(_122) -> [return: bb50, unwind: bb69];
+        _118 = Pubkey::to_bytes(move _119) -> [return: bb50, unwind: bb70];
     }
 
     bb50: {
+        _117 = &_118;
+        _116 = _117 as &[u8] (PointerCoercion(Unsize));
+        _122 = const "VAULT";
+        _121 = core::str::<impl str>::as_bytes(_122) -> [return: bb51, unwind: bb70];
+    }
+
+    bb51: {
         _120 = &_121;
         _152 = deref_copy (*_120);
         _125 = [_37];
@@ -1362,124 +1366,120 @@ fn processor::initialize(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), Prog
         _112 = [move _113];
         _111 = &_112;
         _110 = _111 as &[&[&[u8]]] (PointerCoercion(Unsize));
-        _97 = invoke_signed(_98, move _105, move _110) -> [return: bb51, unwind: bb69];
-    }
-
-    bb51: {
-        _96 = <Result<(), ProgramError> as Try>::branch(move _97) -> [return: bb52, unwind: bb69];
+        _97 = invoke_signed(_98, move _105, move _110) -> [return: bb52, unwind: bb70];
     }
 
     bb52: {
-        _126 = discriminant(_96);
-        switchInt(move _126) -> [0: bb53, 1: bb54, otherwise: bb76];
+        _96 = <Result<(), ProgramError> as Try>::branch(move _97) -> [return: bb53, unwind: bb70];
     }
 
     bb53: {
-        drop(_107) -> [return: bb56, unwind: bb71];
+        _126 = discriminant(_96);
+        switchInt(move _126) -> [0: bb54, 1: bb55, otherwise: bb4];
     }
 
     bb54: {
-        _127 = move ((_96 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _127) -> [return: bb55, unwind: bb69];
+        drop(_107) -> [return: bb57, unwind: bb72];
     }
 
     bb55: {
-        drop(_107) -> [return: bb65, unwind: bb71];
+        _127 = move ((_96 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _127) -> [return: bb56, unwind: bb70];
     }
 
     bb56: {
-        drop(_99) -> [return: bb57, unwind continue];
+        drop(_107) -> [return: bb66, unwind: bb72];
     }
 
     bb57: {
+        drop(_99) -> [return: bb58, unwind continue];
+    }
+
+    bb58: {
         _153 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
         _129 = (*_153);
         _130 = _36;
         _128 = Wallet { authority: move _129, vault: move _130 };
         _133 = &_128;
         _141 = &((*_9).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
-        _140 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _141) -> [return: bb58, unwind continue];
-    }
-
-    bb58: {
-        _139 = RefCell::<&mut [u8]>::borrow_mut(_140) -> [return: bb59, unwind continue];
+        _140 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _141) -> [return: bb59, unwind continue];
     }
 
     bb59: {
-        _138 = &mut _139;
-        _137 = <RefMut<'_, &mut [u8]> as DerefMut>::deref_mut(move _138) -> [return: bb60, unwind: bb68];
+        _139 = RefCell::<&mut [u8]>::borrow_mut(_140) -> [return: bb60, unwind continue];
     }
 
     bb60: {
-        _154 = deref_copy (*_137);
-        _136 = <[u8] as IndexMut<RangeFull>>::index_mut(_154, const RangeFull) -> [return: bb61, unwind: bb68];
+        _138 = &mut _139;
+        _137 = <RefMut<'_, &mut [u8]> as DerefMut>::deref_mut(move _138) -> [return: bb61, unwind: bb69];
     }
 
     bb61: {
-        _135 = _136;
-        _134 = &mut _135;
-        _132 = <Wallet as BorshSerialize>::serialize::<&mut [u8]>(move _133, _134) -> [return: bb62, unwind: bb68];
+        _154 = deref_copy (*_137);
+        _136 = <[u8] as IndexMut<RangeFull>>::index_mut(_154, const RangeFull) -> [return: bb62, unwind: bb69];
     }
 
     bb62: {
-        _131 = Result::<(), std::io::Error>::unwrap(move _132) -> [return: bb63, unwind: bb68];
+        _135 = _136;
+        _134 = &mut _135;
+        _132 = <Wallet as BorshSerialize>::serialize::<&mut [u8]>(move _133, _134) -> [return: bb63, unwind: bb69];
     }
 
     bb63: {
-        drop(_139) -> [return: bb64, unwind continue];
+        _131 = Result::<(), std::io::Error>::unwrap(move _132) -> [return: bb64, unwind: bb69];
     }
 
     bb64: {
-        _0 = Result::<(), ProgramError>::Ok(const ());
-        goto -> bb67;
+        drop(_139) -> [return: bb65, unwind continue];
     }
 
     bb65: {
-        drop(_99) -> [return: bb67, unwind continue];
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb68;
     }
 
     bb66: {
-        drop(_69) -> [return: bb67, unwind continue];
+        drop(_99) -> [return: bb68, unwind continue];
     }
 
     bb67: {
+        drop(_69) -> [return: bb68, unwind continue];
+    }
+
+    bb68: {
         return;
     }
 
-    bb68 (cleanup): {
-        drop(_139) -> [return: bb75, unwind terminate(cleanup)];
-    }
-
     bb69 (cleanup): {
-        drop(_107) -> [return: bb71, unwind terminate(cleanup)];
+        drop(_139) -> [return: bb76, unwind terminate(cleanup)];
     }
 
     bb70 (cleanup): {
-        drop(_108) -> [return: bb71, unwind terminate(cleanup)];
+        drop(_107) -> [return: bb72, unwind terminate(cleanup)];
     }
 
     bb71 (cleanup): {
-        drop(_99) -> [return: bb75, unwind terminate(cleanup)];
+        drop(_108) -> [return: bb72, unwind terminate(cleanup)];
     }
 
     bb72 (cleanup): {
-        drop(_78) -> [return: bb74, unwind terminate(cleanup)];
+        drop(_99) -> [return: bb76, unwind terminate(cleanup)];
     }
 
     bb73 (cleanup): {
-        drop(_79) -> [return: bb74, unwind terminate(cleanup)];
+        drop(_78) -> [return: bb75, unwind terminate(cleanup)];
     }
 
     bb74 (cleanup): {
-        drop(_69) -> [return: bb75, unwind terminate(cleanup)];
+        drop(_79) -> [return: bb75, unwind terminate(cleanup)];
     }
 
     bb75 (cleanup): {
-        resume;
+        drop(_69) -> [return: bb76, unwind terminate(cleanup)];
     }
 
-    bb76: {
-        unreachable;
+    bb76 (cleanup): {
+        resume;
     }
 }
 
@@ -1633,207 +1633,207 @@ fn processor::deposit(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<()
 
     bb3: {
         _8 = discriminant(_6);
-        switchInt(move _8) -> [0: bb4, 1: bb5, otherwise: bb44];
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
     }
 
     bb4: {
-        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb6, unwind continue];
+        unreachable;
     }
 
     bb5: {
-        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb38, unwind continue];
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
     }
 
     bb6: {
-        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb7, unwind continue];
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb39, unwind continue];
     }
 
     bb7: {
-        _13 = discriminant(_11);
-        switchInt(move _13) -> [0: bb8, 1: bb9, otherwise: bb44];
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
     }
 
     bb8: {
-        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb10, unwind continue];
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
     }
 
     bb9: {
-        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb38, unwind continue];
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb11, unwind continue];
     }
 
     bb10: {
-        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb11, unwind continue];
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb39, unwind continue];
     }
 
     bb11: {
-        _18 = discriminant(_16);
-        switchInt(move _18) -> [0: bb12, 1: bb13, otherwise: bb44];
+        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb12, unwind continue];
     }
 
     bb12: {
-        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _32 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
-        _31 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _32) -> [return: bb14, unwind continue];
+        _18 = discriminant(_16);
+        switchInt(move _18) -> [0: bb13, 1: bb14, otherwise: bb4];
     }
 
     bb13: {
-        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb38, unwind continue];
+        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _32 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        _31 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _32) -> [return: bb15, unwind continue];
     }
 
     bb14: {
-        _30 = RefCell::<&mut [u8]>::borrow_mut(_31) -> [return: bb15, unwind continue];
+        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb39, unwind continue];
     }
 
     bb15: {
-        _29 = &_30;
-        _28 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _29) -> [return: bb16, unwind: bb42];
+        _30 = RefCell::<&mut [u8]>::borrow_mut(_31) -> [return: bb16, unwind continue];
     }
 
     bb16: {
-        _57 = deref_copy (*_28);
-        _27 = &(*_57);
-        _26 = <[u8] as Index<RangeFull>>::index(move _27, const RangeFull) -> [return: bb17, unwind: bb42];
+        _29 = &_30;
+        _28 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _29) -> [return: bb17, unwind: bb43];
     }
 
     bb17: {
-        _25 = _26;
-        _24 = &mut _25;
-        _23 = <Wallet as BorshDeserialize>::deserialize(_24) -> [return: bb18, unwind: bb42];
+        _57 = deref_copy (*_28);
+        _27 = &(*_57);
+        _26 = <[u8] as Index<RangeFull>>::index(move _27, const RangeFull) -> [return: bb18, unwind: bb43];
     }
 
     bb18: {
-        _22 = <Result<Wallet, std::io::Error> as Try>::branch(move _23) -> [return: bb19, unwind: bb42];
+        _25 = _26;
+        _24 = &mut _25;
+        _23 = <Wallet as BorshDeserialize>::deserialize(_24) -> [return: bb19, unwind: bb43];
     }
 
     bb19: {
-        _33 = discriminant(_22);
-        switchInt(move _33) -> [0: bb20, 1: bb21, otherwise: bb44];
+        _22 = <Result<Wallet, std::io::Error> as Try>::branch(move _23) -> [return: bb20, unwind: bb43];
     }
 
     bb20: {
-        _35 = ((_22 as Continue).0: Wallet);
-        _21 = _35;
-        drop(_30) -> [return: bb23, unwind continue];
+        _33 = discriminant(_22);
+        switchInt(move _33) -> [0: bb21, 1: bb22, otherwise: bb4];
     }
 
     bb21: {
-        _34 = move ((_22 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _34) -> [return: bb22, unwind: bb42];
+        _35 = ((_22 as Continue).0: Wallet);
+        _21 = _35;
+        drop(_30) -> [return: bb24, unwind continue];
     }
 
     bb22: {
-        drop(_30) -> [return: bb38, unwind continue];
+        _34 = move ((_22 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _34) -> [return: bb23, unwind: bb43];
     }
 
     bb23: {
+        drop(_30) -> [return: bb39, unwind continue];
+    }
+
+    bb24: {
         _37 = &(_21.1: solana_program::pubkey::Pubkey);
         _58 = deref_copy ((*_15).0: &solana_program::pubkey::Pubkey);
         _36 = (move _37, _58);
         _38 = (_36.0: &solana_program::pubkey::Pubkey);
         _39 = (_36.1: &solana_program::pubkey::Pubkey);
-        _40 = <Pubkey as PartialEq>::eq(_38, _39) -> [return: bb24, unwind continue];
-    }
-
-    bb24: {
-        switchInt(move _40) -> [0: bb26, otherwise: bb25];
+        _40 = <Pubkey as PartialEq>::eq(_38, _39) -> [return: bb25, unwind continue];
     }
 
     bb25: {
+        switchInt(move _40) -> [0: bb27, otherwise: bb26];
+    }
+
+    bb26: {
         _48 = &((*_20).0: &solana_program::pubkey::Pubkey);
         _59 = deref_copy (*_48);
         _49 = &((*_15).0: &solana_program::pubkey::Pubkey);
         _60 = deref_copy (*_49);
-        _47 = transfer(_59, _60, _3) -> [return: bb27, unwind continue];
+        _47 = transfer(_59, _60, _3) -> [return: bb28, unwind continue];
     }
 
-    bb26: {
+    bb27: {
         _41 = core::panicking::AssertKind::Eq;
         _43 = Option::<Arguments<'_>>::None;
         _42 = assert_failed::<Pubkey, Pubkey>(move _41, _38, _39, move _43) -> unwind continue;
     }
 
-    bb27: {
-        _46 = &_47;
-        _53 = <AccountInfo<'_> as Clone>::clone(_15) -> [return: bb28, unwind: bb41];
-    }
-
     bb28: {
-        _54 = <AccountInfo<'_> as Clone>::clone(_20) -> [return: bb29, unwind: bb40];
+        _46 = &_47;
+        _53 = <AccountInfo<'_> as Clone>::clone(_15) -> [return: bb29, unwind: bb42];
     }
 
     bb29: {
-        _52 = [move _53, move _54];
-        _51 = &_52;
-        _50 = _51 as &[solana_program::account_info::AccountInfo<'_>] (PointerCoercion(Unsize));
-        _45 = invoke(_46, move _50) -> [return: bb30, unwind: bb39];
+        _54 = <AccountInfo<'_> as Clone>::clone(_20) -> [return: bb30, unwind: bb41];
     }
 
     bb30: {
-        _44 = <Result<(), ProgramError> as Try>::branch(move _45) -> [return: bb31, unwind: bb39];
+        _52 = [move _53, move _54];
+        _51 = &_52;
+        _50 = _51 as &[solana_program::account_info::AccountInfo<'_>] (PointerCoercion(Unsize));
+        _45 = invoke(_46, move _50) -> [return: bb31, unwind: bb40];
     }
 
     bb31: {
-        _55 = discriminant(_44);
-        switchInt(move _55) -> [0: bb32, 1: bb33, otherwise: bb44];
+        _44 = <Result<(), ProgramError> as Try>::branch(move _45) -> [return: bb32, unwind: bb40];
     }
 
     bb32: {
-        drop(_52) -> [return: bb35, unwind: bb41];
+        _55 = discriminant(_44);
+        switchInt(move _55) -> [0: bb33, 1: bb34, otherwise: bb4];
     }
 
     bb33: {
-        _56 = move ((_44 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _56) -> [return: bb34, unwind: bb39];
+        drop(_52) -> [return: bb36, unwind: bb42];
     }
 
     bb34: {
-        drop(_52) -> [return: bb37, unwind: bb41];
+        _56 = move ((_44 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _56) -> [return: bb35, unwind: bb40];
     }
 
     bb35: {
-        drop(_47) -> [return: bb36, unwind continue];
+        drop(_52) -> [return: bb38, unwind: bb42];
     }
 
     bb36: {
-        _0 = Result::<(), ProgramError>::Ok(const ());
-        goto -> bb38;
+        drop(_47) -> [return: bb37, unwind continue];
     }
 
     bb37: {
-        drop(_47) -> [return: bb38, unwind continue];
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb39;
     }
 
     bb38: {
+        drop(_47) -> [return: bb39, unwind continue];
+    }
+
+    bb39: {
         return;
     }
 
-    bb39 (cleanup): {
-        drop(_52) -> [return: bb41, unwind terminate(cleanup)];
-    }
-
     bb40 (cleanup): {
-        drop(_53) -> [return: bb41, unwind terminate(cleanup)];
+        drop(_52) -> [return: bb42, unwind terminate(cleanup)];
     }
 
     bb41 (cleanup): {
-        drop(_47) -> [return: bb43, unwind terminate(cleanup)];
+        drop(_53) -> [return: bb42, unwind terminate(cleanup)];
     }
 
     bb42 (cleanup): {
-        drop(_30) -> [return: bb43, unwind terminate(cleanup)];
+        drop(_47) -> [return: bb44, unwind terminate(cleanup)];
     }
 
     bb43 (cleanup): {
-        resume;
+        drop(_30) -> [return: bb44, unwind terminate(cleanup)];
     }
 
-    bb44: {
-        unreachable;
+    bb44 (cleanup): {
+        resume;
     }
 }
 
@@ -2021,277 +2021,277 @@ fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(
 
     bb3: {
         _8 = discriminant(_6);
-        switchInt(move _8) -> [0: bb4, 1: bb5, otherwise: bb57];
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
     }
 
     bb4: {
-        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb6, unwind continue];
+        unreachable;
     }
 
     bb5: {
-        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb51, unwind continue];
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
     }
 
     bb6: {
-        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb7, unwind continue];
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb52, unwind continue];
     }
 
     bb7: {
-        _13 = discriminant(_11);
-        switchInt(move _13) -> [0: bb8, 1: bb9, otherwise: bb57];
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
     }
 
     bb8: {
-        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb10, unwind continue];
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
     }
 
     bb9: {
-        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb51, unwind continue];
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb11, unwind continue];
     }
 
     bb10: {
-        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb11, unwind continue];
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb52, unwind continue];
     }
 
     bb11: {
-        _18 = discriminant(_16);
-        switchInt(move _18) -> [0: bb12, 1: bb13, otherwise: bb57];
+        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb12, unwind continue];
     }
 
     bb12: {
-        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _22 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb14, unwind continue];
+        _18 = discriminant(_16);
+        switchInt(move _18) -> [0: bb13, 1: bb14, otherwise: bb4];
     }
 
     bb13: {
-        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb51, unwind continue];
+        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _22 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb15, unwind continue];
     }
 
     bb14: {
-        _21 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _22) -> [return: bb15, unwind continue];
+        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb52, unwind continue];
     }
 
     bb15: {
-        _23 = discriminant(_21);
-        switchInt(move _23) -> [0: bb16, 1: bb17, otherwise: bb57];
+        _21 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _22) -> [return: bb16, unwind continue];
     }
 
     bb16: {
-        _25 = ((_21 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
-        _37 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
-        _36 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _37) -> [return: bb18, unwind continue];
+        _23 = discriminant(_21);
+        switchInt(move _23) -> [0: bb17, 1: bb18, otherwise: bb4];
     }
 
     bb17: {
-        _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb51, unwind continue];
+        _25 = ((_21 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _37 = &((*_10).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        _36 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _37) -> [return: bb19, unwind continue];
     }
 
     bb18: {
-        _35 = RefCell::<&mut [u8]>::borrow_mut(_36) -> [return: bb19, unwind continue];
+        _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb52, unwind continue];
     }
 
     bb19: {
-        _34 = &_35;
-        _33 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _34) -> [return: bb20, unwind: bb55];
+        _35 = RefCell::<&mut [u8]>::borrow_mut(_36) -> [return: bb20, unwind continue];
     }
 
     bb20: {
-        _77 = deref_copy (*_33);
-        _32 = &(*_77);
-        _31 = <[u8] as Index<RangeFull>>::index(move _32, const RangeFull) -> [return: bb21, unwind: bb55];
+        _34 = &_35;
+        _33 = <RefMut<'_, &mut [u8]> as Deref>::deref(move _34) -> [return: bb21, unwind: bb56];
     }
 
     bb21: {
-        _30 = _31;
-        _29 = &mut _30;
-        _28 = <Wallet as BorshDeserialize>::deserialize(_29) -> [return: bb22, unwind: bb55];
+        _77 = deref_copy (*_33);
+        _32 = &(*_77);
+        _31 = <[u8] as Index<RangeFull>>::index(move _32, const RangeFull) -> [return: bb22, unwind: bb56];
     }
 
     bb22: {
-        _27 = <Result<Wallet, std::io::Error> as Try>::branch(move _28) -> [return: bb23, unwind: bb55];
+        _30 = _31;
+        _29 = &mut _30;
+        _28 = <Wallet as BorshDeserialize>::deserialize(_29) -> [return: bb23, unwind: bb56];
     }
 
     bb23: {
-        _38 = discriminant(_27);
-        switchInt(move _38) -> [0: bb24, 1: bb25, otherwise: bb57];
+        _27 = <Result<Wallet, std::io::Error> as Try>::branch(move _28) -> [return: bb24, unwind: bb56];
     }
 
     bb24: {
-        _40 = ((_27 as Continue).0: Wallet);
-        _26 = _40;
-        drop(_35) -> [return: bb27, unwind continue];
+        _38 = discriminant(_27);
+        switchInt(move _38) -> [0: bb25, 1: bb26, otherwise: bb4];
     }
 
     bb25: {
-        _39 = move ((_27 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
-        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _39) -> [return: bb26, unwind: bb55];
+        _40 = ((_27 as Continue).0: Wallet);
+        _26 = _40;
+        drop(_35) -> [return: bb28, unwind continue];
     }
 
     bb26: {
-        drop(_35) -> [return: bb51, unwind continue];
+        _39 = move ((_27 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _39) -> [return: bb27, unwind: bb56];
     }
 
     bb27: {
-        _41 = ((*_20).5: bool);
-        switchInt(move _41) -> [0: bb28, otherwise: bb29];
+        drop(_35) -> [return: bb52, unwind continue];
     }
 
     bb28: {
-        _42 = panic(const "assertion failed: authority_info.is_signer") -> unwind continue;
+        _41 = ((*_20).5: bool);
+        switchInt(move _41) -> [0: bb29, otherwise: bb30];
     }
 
     bb29: {
+        _42 = panic(const "assertion failed: authority_info.is_signer") -> unwind continue;
+    }
+
+    bb30: {
         _44 = &(_26.0: solana_program::pubkey::Pubkey);
         _78 = deref_copy ((*_20).0: &solana_program::pubkey::Pubkey);
         _43 = (move _44, _78);
         _45 = (_43.0: &solana_program::pubkey::Pubkey);
         _46 = (_43.1: &solana_program::pubkey::Pubkey);
-        _47 = <Pubkey as PartialEq>::eq(_45, _46) -> [return: bb30, unwind continue];
-    }
-
-    bb30: {
-        switchInt(move _47) -> [0: bb32, otherwise: bb31];
+        _47 = <Pubkey as PartialEq>::eq(_45, _46) -> [return: bb31, unwind continue];
     }
 
     bb31: {
+        switchInt(move _47) -> [0: bb33, otherwise: bb32];
+    }
+
+    bb32: {
         _52 = &(_26.1: solana_program::pubkey::Pubkey);
         _79 = deref_copy ((*_15).0: &solana_program::pubkey::Pubkey);
         _51 = (move _52, _79);
         _53 = (_51.0: &solana_program::pubkey::Pubkey);
         _54 = (_51.1: &solana_program::pubkey::Pubkey);
-        _55 = <Pubkey as PartialEq>::eq(_53, _54) -> [return: bb33, unwind continue];
+        _55 = <Pubkey as PartialEq>::eq(_53, _54) -> [return: bb34, unwind continue];
     }
 
-    bb32: {
+    bb33: {
         _48 = core::panicking::AssertKind::Eq;
         _50 = Option::<Arguments<'_>>::None;
         _49 = assert_failed::<Pubkey, Pubkey>(move _48, _45, _46, move _50) -> unwind continue;
     }
 
-    bb33: {
-        switchInt(move _55) -> [0: bb35, otherwise: bb34];
-    }
-
     bb34: {
-        _65 = &((*_15).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
-        _64 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _65) -> [return: bb36, unwind continue];
+        switchInt(move _55) -> [0: bb36, otherwise: bb35];
     }
 
     bb35: {
+        _65 = &((*_15).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
+        _64 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _65) -> [return: bb37, unwind continue];
+    }
+
+    bb36: {
         _56 = core::panicking::AssertKind::Eq;
         _58 = Option::<Arguments<'_>>::None;
         _57 = assert_failed::<Pubkey, Pubkey>(move _56, _53, _54, move _58) -> unwind continue;
     }
 
-    bb36: {
-        _63 = RefCell::<&mut u64>::borrow_mut(_64) -> [return: bb37, unwind continue];
-    }
-
     bb37: {
-        _62 = &_63;
-        _61 = <RefMut<'_, &mut u64> as Deref>::deref(move _62) -> [return: bb38, unwind: bb54];
+        _63 = RefCell::<&mut u64>::borrow_mut(_64) -> [return: bb38, unwind continue];
     }
 
     bb38: {
-        _80 = deref_copy (*_61);
-        _60 = (*_80);
-        _59 = Gt(_3, move _60);
-        switchInt(move _59) -> [0: bb41, otherwise: bb39];
+        _62 = &_63;
+        _61 = <RefMut<'_, &mut u64> as Deref>::deref(move _62) -> [return: bb39, unwind: bb55];
     }
 
     bb39: {
-        drop(_63) -> [return: bb40, unwind continue];
+        _80 = deref_copy (*_61);
+        _60 = (*_80);
+        _59 = Gt(_3, move _60);
+        switchInt(move _59) -> [0: bb42, otherwise: bb40];
     }
 
     bb40: {
-        _66 = solana_program::program_error::ProgramError::InsufficientFunds;
-        _0 = Result::<(), ProgramError>::Err(move _66);
-        goto -> bb51;
+        drop(_63) -> [return: bb41, unwind continue];
     }
 
     bb41: {
-        drop(_63) -> [return: bb42, unwind continue];
+        _66 = solana_program::program_error::ProgramError::InsufficientFunds;
+        _0 = Result::<(), ProgramError>::Err(move _66);
+        goto -> bb52;
     }
 
     bb42: {
-        _71 = &((*_15).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
-        _70 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _71) -> [return: bb43, unwind continue];
+        drop(_63) -> [return: bb43, unwind continue];
     }
 
     bb43: {
-        _69 = RefCell::<&mut u64>::borrow_mut(_70) -> [return: bb44, unwind continue];
+        _71 = &((*_15).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
+        _70 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _71) -> [return: bb44, unwind continue];
     }
 
     bb44: {
-        _68 = &mut _69;
-        _67 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _68) -> [return: bb45, unwind: bb53];
+        _69 = RefCell::<&mut u64>::borrow_mut(_70) -> [return: bb45, unwind continue];
     }
 
     bb45: {
-        _81 = deref_copy (*_67);
-        _82 = deref_copy (*_67);
-        (*_81) = Sub((*_82), _3);
-        drop(_69) -> [return: bb46, unwind continue];
+        _68 = &mut _69;
+        _67 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _68) -> [return: bb46, unwind: bb54];
     }
 
     bb46: {
-        _76 = &((*_25).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
-        _75 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _76) -> [return: bb47, unwind continue];
+        _81 = deref_copy (*_67);
+        _82 = deref_copy (*_67);
+        (*_81) = Sub((*_82), _3);
+        drop(_69) -> [return: bb47, unwind continue];
     }
 
     bb47: {
-        _74 = RefCell::<&mut u64>::borrow_mut(_75) -> [return: bb48, unwind continue];
+        _76 = &((*_25).1: std::rc::Rc<std::cell::RefCell<&mut u64>>);
+        _75 = <Rc<RefCell<&mut u64>> as Deref>::deref(move _76) -> [return: bb48, unwind continue];
     }
 
     bb48: {
-        _73 = &mut _74;
-        _72 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _73) -> [return: bb49, unwind: bb52];
+        _74 = RefCell::<&mut u64>::borrow_mut(_75) -> [return: bb49, unwind continue];
     }
 
     bb49: {
-        _83 = deref_copy (*_72);
-        _84 = deref_copy (*_72);
-        (*_83) = Add((*_84), _3);
-        drop(_74) -> [return: bb50, unwind continue];
+        _73 = &mut _74;
+        _72 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _73) -> [return: bb50, unwind: bb53];
     }
 
     bb50: {
-        _0 = Result::<(), ProgramError>::Ok(const ());
-        goto -> bb51;
+        _83 = deref_copy (*_72);
+        _84 = deref_copy (*_72);
+        (*_83) = Add((*_84), _3);
+        drop(_74) -> [return: bb51, unwind continue];
     }
 
     bb51: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb52;
+    }
+
+    bb52: {
         return;
     }
 
-    bb52 (cleanup): {
-        drop(_74) -> [return: bb56, unwind terminate(cleanup)];
-    }
-
     bb53 (cleanup): {
-        drop(_69) -> [return: bb56, unwind terminate(cleanup)];
+        drop(_74) -> [return: bb57, unwind terminate(cleanup)];
     }
 
     bb54 (cleanup): {
-        drop(_63) -> [return: bb56, unwind terminate(cleanup)];
+        drop(_69) -> [return: bb57, unwind terminate(cleanup)];
     }
 
     bb55 (cleanup): {
-        drop(_35) -> [return: bb56, unwind terminate(cleanup)];
+        drop(_63) -> [return: bb57, unwind terminate(cleanup)];
     }
 
     bb56 (cleanup): {
-        resume;
+        drop(_35) -> [return: bb57, unwind terminate(cleanup)];
     }
 
-    bb57: {
-        unreachable;
+    bb57 (cleanup): {
+        resume;
     }
 }
 
@@ -2333,56 +2333,56 @@ fn entrypoint(_1: *mut u8) -> u64 {
         _7 = &_2;
         _13 = deref_copy (*_7);
         _9 = &_3;
-        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb9];
+        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb10];
     }
 
     bb2: {
         _10 = &_4;
         _14 = deref_copy (*_10);
-        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb9];
+        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb10];
     }
 
     bb3: {
         _11 = discriminant(_6);
-        switchInt(move _11) -> [0: bb5, 1: bb4, otherwise: bb11];
+        switchInt(move _11) -> [0: bb6, 1: bb5, otherwise: bb4];
     }
 
     bb4: {
-        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
-        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb8];
-    }
-
-    bb5: {
-        _0 = const _;
-        goto -> bb6;
-    }
-
-    bb6: {
-        drop(_3) -> [return: bb7, unwind continue];
-    }
-
-    bb7: {
-        return;
-    }
-
-    bb8 (cleanup): {
-        drop(_3) -> [return: bb10, unwind terminate(cleanup)];
-    }
-
-    bb9 (cleanup): {
-        drop(_3) -> [return: bb10, unwind terminate(cleanup)];
-    }
-
-    bb10 (cleanup): {
-        resume;
-    }
-
-    bb11: {
         unreachable;
     }
 
+    bb5: {
+        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb9];
+    }
+
+    bb6: {
+        _0 = const solana_program::entrypoint::SUCCESS;
+        goto -> bb7;
+    }
+
+    bb7: {
+        drop(_3) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+
+    bb9 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb10 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb11 (cleanup): {
+        resume;
+    }
+
     bb12: {
-        goto -> bb6;
+        goto -> bb7;
     }
 }
 
@@ -2554,7 +2554,7 @@ fn initialize(_1: Pubkey, _2: Pubkey) -> Instruction {
     }
 
     bb11: {
-        _21 = const _;
+        _21 = const initialize::promoted[0];
         _20 = <WalletInstruction as BorshSerialize>::try_to_vec(_21) -> [return: bb12, unwind: bb14];
     }
 
@@ -2580,7 +2580,7 @@ fn initialize(_1: Pubkey, _2: Pubkey) -> Instruction {
     }
 }
 
-promoted[0] in initialize: &WalletInstruction = {
+const initialize::promoted[0]: &WalletInstruction = {
     let mut _0: &WalletInstruction;
     let mut _1: WalletInstruction;
 

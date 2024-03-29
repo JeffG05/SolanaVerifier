@@ -222,13 +222,12 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
 
     // Create blocks
     std::string function_name = function_header.get_ast_data().at("name");
-    int promoted_i = 0;
     auto current_block_lines = std::list<std::string>();
     while (!lines.empty()) {
         const std::string line = lines.front();
         if (line_is_block(line)) {
             if (!current_block_lines.empty() && line_is_block(current_block_lines.front())) {
-                mir_statement statement = parse_block(current_block_lines, all_variables, function_name, &promoted_i);
+                mir_statement statement = parse_block(current_block_lines, all_variables);
                 function_header.add_child(statement);
             }
             current_block_lines.clear();
@@ -238,7 +237,7 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
     }
 
     if (!current_block_lines.empty() && line_is_block(current_block_lines.front())) {
-        mir_statement statement = parse_block(current_block_lines, all_variables, function_name, &promoted_i);
+        mir_statement statement = parse_block(current_block_lines, all_variables);
         function_header.add_child(statement);
     }
     current_block_lines.clear();
@@ -250,7 +249,7 @@ std::optional<mir_statement> mir_statement::parse_function_header(const std::str
     const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)\((.*?)\) -> (.+?) \{$)");
     const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)\((.*?)\) -> (.+?) \{$)");
     const std::regex local_function_regex (R"(^fn (.+?)\((.*?)\) -> (.*?) \{$)");
-    const std::regex promoted_function_regex (R"(^promoted\[(\d+)\] in (.+): (.+?) = \{$)");
+    const std::regex const_regex (R"(^const (?:(<.+?>)::)?(.+): (.+?) = \{$)");
 
     nlohmann::json function_data;
     std::string parameters;
@@ -268,11 +267,8 @@ std::optional<mir_statement> mir_statement::parse_function_header(const std::str
         function_data["name"] = match[1].str();
         function_data["return_type"] = convert_type(match[3].str());
         parameters = match[2].str();
-    } else if (regex_match(line, match, promoted_function_regex)) {
-        if (match[2].str().starts_with("<")) {
-            return std::nullopt;
-        }
-        function_data["name"] = "promoted_" + match[2].str() + "_" + match[1].str();
+    } else if (regex_match(line, match, const_regex)) {
+        function_data["name"] = std::regex_replace(match[2].str(), std::regex(R"(\W)"), "_");
         function_data["return_type"] = convert_type(match[3].str());
         parameters = "";
     }
@@ -285,7 +281,7 @@ std::optional<mir_statement> mir_statement::parse_function_header(const std::str
     return function_statement;
 }
 
-mir_statement mir_statement::parse_block(std::list<std::string> lines, const mir_statements &variables, const std::string& function_name, int *promoted_i) {
+mir_statement mir_statement::parse_block(std::list<std::string> lines, const mir_statements &variables) {
     // Create block header
     const std::string header_line = lines.front();
     mir_statement block = parse_block_header(header_line);
@@ -296,11 +292,6 @@ mir_statement mir_statement::parse_block(std::list<std::string> lines, const mir
         std::string line = lines.front();
         if (std::optional<mir_statements> assignments = parse_assignment(line, variables); assignments.has_value()) {
             for (auto& assignment: assignments.value()) {
-                if (assignment.get_type() == statement_type::assignment && assignment.get_ast_data().at("value") == "promoted<>") {
-                    std::string promoted_func = "promoted_" + function_name + "_" + std::to_string(*promoted_i) + "()";
-                    assignment.update_ast_data("value", promoted_func);
-                    *promoted_i += 1;
-                }
                 block.add_child(assignment);
             }
         }
@@ -534,7 +525,7 @@ std::tuple<std::string, bool> mir_statement::convert_value(const std::string &va
 }
 
 bool mir_statement::line_is_function(const std::string &line) {
-    return line.starts_with("fn ") || line.starts_with("promoted[");
+    return line.starts_with("fn ") || line.starts_with("const ");
 }
 
 bool mir_statement::line_is_block(const std::string &line) {

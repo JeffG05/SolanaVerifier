@@ -2,12 +2,12 @@
 use std::prelude::rust_2018::*;
 #[macro_use]
 extern crate std;
-use borsh::{};
+use ::{};
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
-use solana_program::{};
+use ::{};
 use solana_program::entrypoint;
-use solana_program::instruction::{};
+use ::{};
 use solana_program::instruction::AccountMeta;
 use solana_program::instruction::Instruction;
 use solana_program::pubkey::Pubkey;
@@ -286,15 +286,15 @@ impl borsh::de::BorshDeserialize for Wallet where
 }
 const WALLET_LEN: u64 = 32 + 32;
 mod processor {
-    use borsh::{};
+    use ::{};
     use borsh::BorshDeserialize;
     use borsh::BorshSerialize;
-    use solana_program::{};
-    use solana_program::account_info::{};
+    use ::{};
+    use ::{};
     use solana_program::account_info::next_account_info;
     use solana_program::account_info::AccountInfo;
     use solana_program::entrypoint::ProgramResult;
-    use solana_program::program::{};
+    use ::{};
     use solana_program::program::invoke;
     use solana_program::program::invoke_signed;
     use solana_program::program_error::ProgramError;
@@ -302,7 +302,7 @@ mod processor {
     use solana_program::rent::Rent;
     use solana_program::system_instruction;
     use solana_program::sysvar::Sysvar;
-    use crate::{};
+    use ::{};
     use crate::Wallet;
     use crate::WalletInstruction;
     use crate::WALLET_LEN;

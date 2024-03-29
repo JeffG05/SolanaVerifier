@@ -13,6 +13,7 @@
 #include "values/box_indexer_mir_value.h"
 #include "values/clone_mir_value.h"
 #include "values/const_bool_mir_value.h"
+#include "values/const_function_mir_value.h"
 #include "values/const_number_max_mir_value.h"
 #include "values/const_number_min_mir_value.h"
 #include "values/division_mir_value.h"
@@ -59,7 +60,6 @@
 #include "values/panic_mir_value.h"
 #include "values/print_mir_value.h"
 #include "values/program_error_mir_value.h"
-#include "values/promoted_mir_value.h"
 #include "values/pubkey_as_bytes_mir_value.h"
 #include "values/rent_from_account_info_mir_value.h"
 #include "values/result_error_mir_value.h"
@@ -160,7 +160,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
 
     // KEEP LAST
     conversion_mir_value(),
-    promoted_mir_value(),
+    const_function_mir_value(),
     function_mir_value(),
     enum_mir_value(),
     init_struct_mir_value()

@@ -129,7 +129,6 @@ add_executable(SolanaVerifier
         mir-types/types/panic_assert_kind_mir_type.h
         mir-values/values/panic_assert_kind_mir_value.h
         mir-values/values/init_tuple_mir_value.h
-        mir-values/values/promoted_mir_value.h
         mir-types/types/optional_mir_type.h
         mir-values/values/none_optional_mir_value.h
         mir-types/types/arguments_mir_type.h
@@ -164,6 +163,7 @@ add_executable(SolanaVerifier
         mir-values/values/data_is_empty_mir_value.h
         mir-values/values/rent_from_account_info_mir_value.h
         mir-types/types/argument_mir_type.h
+        mir-values/values/const_function_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
