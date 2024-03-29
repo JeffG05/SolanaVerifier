@@ -1,0 +1,37 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use ::{};
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::pubkey::Pubkey;
+use solana_program::msg;
+
+// declare and export the program's entrypoint
+
+// program entrypoint's implementation
+// log a message to the blockchain
+
+// gracefully exit the program
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+fn process_instruction<'_, '_, '_,
+    '_>(_program_id: &'_ Pubkey, _accounts: &'_ [AccountInfo<>],
+    _instruction_data: &'_ [u8])
+    ->
+        ProgramResult {
+        ::solana_program::log::sol_log("Hello, world!");
+        Ok(())
+    }
