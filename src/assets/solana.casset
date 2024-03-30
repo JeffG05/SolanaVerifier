@@ -181,6 +181,10 @@ solana_c_program_address sol_find_program_address(u8 seeds[{{ARRAY_SIZE}}][{{ARR
     return x;
 }
 
+pubkey sol_create_program_address(u8 seeds[{{ARRAY_SIZE}}][{{ARRAY_SIZE}}], pubkey program_id) {
+    return program_id;
+}
+
 // ACCOUNT INFO
 typedef struct account_info_struct {
     pubkey get0;

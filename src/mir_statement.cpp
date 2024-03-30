@@ -221,7 +221,6 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
     mir_statements all_variables = get_all_variables(function_header, structs);
 
     // Create blocks
-    std::string function_name = function_header.get_ast_data().at("name");
     auto current_block_lines = std::list<std::string>();
     while (!lines.empty()) {
         const std::string line = lines.front();
@@ -246,9 +245,9 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
 }
 
 std::optional<mir_statement> mir_statement::parse_function_header(const std::string& line) {
-    const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)\((.*?)\) -> (.+?) \{$)");
-    const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)\((.*?)\) -> (.+?) \{$)");
-    const std::regex local_function_regex (R"(^fn (.+?)\((.*?)\) -> (.*?) \{$)");
+    const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)(::\{closure#\d+\})?\((.*?)\) -> (.+?) \{$)");
+    const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)(::\{closure#\d+\})?\((.*?)\) -> (.+?) \{$)");
+    const std::regex local_function_regex (R"(^fn (.+?)(::\{closure#\d+\})?\((.*?)\) -> (.*?) \{$)");
     const std::regex const_regex (R"(^const (?:(<.+?>)::)?(.+): (.+?) = \{$)");
 
     nlohmann::json function_data;
@@ -256,17 +255,35 @@ std::optional<mir_statement> mir_statement::parse_function_header(const std::str
     std::smatch match;
     if (regex_match(line, match, imported_lib_function_regex)) {
         function_data["source"] = match[1].str();
-        function_data["name"] = match[2].str();
-        function_data["return_type"] = convert_type(match[4].str());
-        parameters = match[3].str();
+        function_data["return_type"] = convert_type(match[5].str());
+        if (match[3].matched) {
+            std::string name = match[4].str().substr(match[4].str().find('{'), match[4].str().find('}')-match[4].str().find('{')+1);
+            function_data["name"] = std::regex_replace(name, std::regex(R"(\W)"), "_");
+            parameters = match[4].str().substr(match[4].str().find("_2"));
+        } else {
+            function_data["name"] = match[2].str();
+            parameters = match[4].str();
+        }
     } else if (regex_match(line, match, imported_local_function_regex)) {
-        function_data["name"] = match[1].str() + "__" + match[2].str();
-        function_data["return_type"] = convert_type(match[4].str());
-        parameters = match[3].str();
+        function_data["return_type"] = convert_type(match[5].str());
+        if (match[3].matched) {
+            std::string name = match[4].str().substr(match[4].str().find('{'), match[4].str().find('}')-match[4].str().find('{')+1);
+            function_data["name"] = std::regex_replace(name, std::regex(R"(\W)"), "_");
+            parameters = match[4].str().substr(match[4].str().find("_2"));
+        } else {
+            function_data["name"] = match[1].str() + "__" + match[2].str();
+            parameters = match[4].str();
+        }
     } else if (regex_match(line, match, local_function_regex)) {
-        function_data["name"] = match[1].str();
-        function_data["return_type"] = convert_type(match[3].str());
-        parameters = match[2].str();
+        function_data["return_type"] = convert_type(match[4].str());
+        if (match[2].matched) {
+            std::string name = match[3].str().substr(match[3].str().find('{'), match[3].str().find('}')-match[3].str().find('{')+1);
+            function_data["name"] = std::regex_replace(name, std::regex(R"(\W)"), "_");
+            parameters = match[3].str().substr(match[3].str().find("_2"));
+        } else {
+            function_data["name"] = match[1].str();
+            parameters = match[3].str();
+        }
     } else if (regex_match(line, match, const_regex)) {
         function_data["name"] = std::regex_replace(match[2].str(), std::regex(R"(\W)"), "_");
         function_data["return_type"] = convert_type(match[3].str());

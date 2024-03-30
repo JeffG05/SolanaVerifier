@@ -7,7 +7,7 @@
 class not_equal_mir_value : public mir_value {
 public:
     not_equal_mir_value() : mir_value(
-        std::regex (R"(^<.+ as PartialEq>::ne\((.+), (.+)\)$)"),
+        std::regex (R"(^(?:Ne|<.+ as PartialEq>::ne)\((.+), (.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value1, returns1] = mir_value_converter::convert(match[1].str(), variables);
             auto [value2, returns2] = mir_value_converter::convert(match[2].str(), variables);

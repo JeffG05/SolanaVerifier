@@ -5,8 +5,10 @@
 #include "values/borrow_mutable_mir_value.h"
 #include "values/addition_mir_value.h"
 #include "values/align_of_mir_value.h"
+#include "values/any_mir_value.h"
 #include "values/assert_failed_mir_value.h"
 #include "values/as_box_mir_value.h"
+#include "values/as_some_mir_value.h"
 #include "values/bitand_mir_value.h"
 #include "values/bitor_mir_value.h"
 #include "values/bitxor_mir_value.h"
@@ -24,6 +26,7 @@
 #include "values/const_void_mir_value.h"
 #include "values/conversion_mir_value.h"
 #include "values/create_account_mir_value.h"
+#include "values/create_program_address_mir_value.h"
 #include "values/data_is_empty_mir_value.h"
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
@@ -42,6 +45,7 @@
 #include "values/init_array_mir_value.h"
 #include "values/init_struct_mir_value.h"
 #include "values/init_tuple_mir_value.h"
+#include "values/into_iter_mir_value.h"
 #include "values/into_vec_mir_value.h"
 #include "values/invoke_mir_value.h"
 #include "values/iter_mir_value.h"
@@ -148,6 +152,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     exchange_malloc_mir_value(),
     sysvar_rent_id_mir_value(),
     find_program_address_mir_value(),
+    create_program_address_mir_value(),
     str_as_bytes_mir_value(),
     pubkey_as_bytes_mir_value(),
     panic_mir_value(),
@@ -157,6 +162,9 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     minimum_balance_mir_value(),
     data_is_empty_mir_value(),
     rent_from_account_info_mir_value(),
+    any_mir_value(),
+    into_iter_mir_value(),
+    as_some_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

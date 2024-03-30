@@ -11,16 +11,16 @@
 class number_operator_mir_value : public mir_value {
 public:
     explicit number_operator_mir_value(const std::string &regex_name, const std::string &full_name, bool is_reducing) : mir_value(
-        std::regex (R"(^(?:Checked)?)" + regex_name + R"(\((.+), (.+)\)$)"),
+        std::regex (R"(^(core::num::<.+>::checked_)" + utils::to_lower(regex_name) + R"(|(?:Checked)?)" + regex_name + R"()\((.+), (.+)\)$)"),
         [full_name, is_reducing](const std::smatch &match, const mir_statements& variables) {
 
-            auto [a_value, a_returns] = mir_value_converter::convert(match[1].str(), variables);
-            auto [b_value, b_returns] = mir_value_converter::convert(match[2].str(), variables);
+            auto [a_value, a_returns] = mir_value_converter::convert(match[2].str(), variables);
+            auto [b_value, b_returns] = mir_value_converter::convert(match[3].str(), variables);
 
             const std::optional<mir_statement> var1 = mir_statement::get_statement(variables, a_value.starts_with("state.") ? a_value.substr(6) : a_value);
             const std::optional<mir_statement> var2 = mir_statement::get_statement(variables, b_value.starts_with("state.") ? b_value.substr(6) : b_value);
-            const std::string var1_name = match[1].str();
-            const std::string var2_name = match[2].str();
+            const std::string var1_name = match[2].str();
+            const std::string var2_name = match[3].str();
 
             const std::regex num_const (R"(^const -?(?:\d+\.)?\d+(?:E[+-]\d+)?_?((?:[ui](?:8|16|32|64|size)|f(?:32|64)))$)");
             std::string var_type;
@@ -38,10 +38,10 @@ public:
                 c = static_cast<char>(toupper(c));
             }
 
-            if (match[1].str() == "const _") {
+            if (match[2].str() == "const _") {
                 a_value = "MAX_" + var_type;
             }
-            if (match[2].str() == "const _") {
+            if (match[3].str() == "const _") {
                 if (is_reducing) {
                     b_value = "MIN_" + var_type;
                 } else {
@@ -52,8 +52,10 @@ public:
             std::string func = full_name + "(" + a_value + ", " + b_value + ", MAX_" + var_type;
 
             std::string wrapper;
-            if (match[0].str().starts_with("Checked")) {
+            if (match[1].str().starts_with("Checked")) {
                 wrapper = "checked";
+            } else if (match[1].str().starts_with("core::num")) {
+                wrapper = "option_checked";
             } else {
                 wrapper = "unchecked";
             }

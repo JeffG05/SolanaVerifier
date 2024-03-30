@@ -164,6 +164,10 @@ add_executable(SolanaVerifier
         mir-values/values/rent_from_account_info_mir_value.h
         mir-types/types/argument_mir_type.h
         mir-values/values/const_function_mir_value.h
+        mir-values/values/any_mir_value.h
+        mir-values/values/into_iter_mir_value.h
+        mir-values/values/as_some_mir_value.h
+        mir-values/values/create_program_address_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier

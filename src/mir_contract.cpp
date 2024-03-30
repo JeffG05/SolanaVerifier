@@ -143,7 +143,7 @@ mir_statement mir_contract::trim_ast_tree(mir_statement tree, const std::string&
             for (const auto& assignment_statement : block_statement.get_children({statement_type::assignment})) {
                 std::string value = assignment_statement.get_ast_data().at("value");
                 for (const auto& function_name : _remove_functions) {
-                    std::regex function_call_regex (R"(^(?:.+<)?)" + function_name + R"(\(.+$)");
+                    std::regex function_call_regex (R"(^(?:.*<|.*\s)?)" + function_name + R"(\(.+$)");
                     if (std::smatch match; std::regex_match(value, match, function_call_regex)) {
                         _remove_functions.erase(function_name);
                         break;
@@ -699,6 +699,10 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
     } else if (value.starts_with("unchecked<")) {
         const std::string checked_value = function_name + "_" + value.substr(10, value.size() - 11);
         *out << base_indent << "state." << variable << " = " << checked_value << ".value;" << std::endl;
+    } else if (value.starts_with("option_checked<")) {
+        const std::string checked_value = function_name + "_" + value.substr(15, value.size() - 16);
+        *out << base_indent << "state." << variable << ".value = " << checked_value << ".value;" << std::endl;
+        *out << base_indent << "state." << variable << ".is_none = " << checked_value << ".errors;" << std::endl;
     } else if (value.starts_with("serialize<")) {
         const std::string serialize_value = value.substr(10, value.size() - 11);
         std::list<std::string> serialize_values = utils::split(serialize_value, ", ", 3);
@@ -798,6 +802,10 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const std::string subvalue = value.substr(21, value.size() - 22);
         generate_block_assignment(out, variable + ".get0", "sol_find_program_address(" + subvalue + ").get0", true, all_variables, function_name, indents);
         generate_block_assignment(out, variable + ".get1", "sol_find_program_address(" + subvalue + ").get1", true, all_variables, function_name, indents);
+    } else if (value.starts_with("create_program_address<")) {
+        const std::string subvalue = value.substr(23, value.size() - 24);
+        generate_block_assignment(out, variable + ".is_success", "true", true, all_variables, function_name, indents);
+        generate_block_assignment(out, variable + ".value", "sol_create_program_address(" + subvalue + ")", true, all_variables, function_name, indents);
     } else if (value.starts_with("str_as_bytes<")) {
         const std::string subvalue = value.substr(13, value.size() - 14);
         generate_block_assignment(out, variable, "str_as_bytes(" + subvalue + ", state." + variable + ")", false, all_variables, function_name, indents, true);
@@ -823,6 +831,20 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
                 break;
             }
         }
+    } else if (value.starts_with("any<")) {
+        const std::string subvalue = value.substr(4, value.size() - 5);
+        std::list<std::string> any_values = utils::split(subvalue, ", ", 2);
+
+        std::string arr = any_values.front();
+        std::string test_function_name = any_values.back().substr(0, any_values.back().size()-2);
+        std::string indexer = "i_" + utils::clean(variable);
+        generate_block_assignment(out, variable, "false", true, all_variables, function_name, indents);
+        *out << base_indent << "for (int " + indexer + " = 0; " + indexer + " < " + std::to_string(_globals.ARRAY_SIZE) + "; " + indexer + "++) {" << std::endl;
+        *out << base_indent << "\tif (" << test_function_name << "(" + arr + "[" + indexer + "])) {" << std::endl;
+        generate_block_assignment(out, variable, "true", true, all_variables, function_name, indents+2);
+        *out << base_indent << "\t\tbreak;" << std::endl;
+        *out << base_indent << "\t}" << std::endl;
+        *out << base_indent << "}" << std::endl;
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
