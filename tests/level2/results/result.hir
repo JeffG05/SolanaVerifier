@@ -1,0 +1,552 @@
+#[prelude_import]
+use std::prelude::rust_2018::*;
+#[macro_use]
+extern crate std;
+use ::{};
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use ::{};
+use solana_program::entrypoint;
+use ::{};
+use solana_program::instruction::AccountMeta;
+use solana_program::instruction::Instruction;
+use solana_program::pubkey::Pubkey;
+use solana_program::system_program;
+use solana_program::sysvar;
+
+
+enum WalletInstruction {
+
+    /// Initialize a Personal Savings Wallet
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Wallet account
+    /// (2) authority
+    /// (3) Rent sysvar
+    /// (4) System program
+    Initialize,
+
+    /// Deposit
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Wallet account
+    /// (2) Money Source
+    /// (3) System program
+    Deposit {
+            amount: u64,
+        },
+
+    /// Withdraw from Wallet
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Wallet account
+    /// (2) authority
+    /// (3) Target Wallet account
+    /// (4) Rent sysvar
+    /// (5) System program
+    Withdraw {
+            amount: u64,
+        },
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for WalletInstruction {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            match self {
+                    WalletInstruction::Initialize =>
+                        ::core::fmt::Formatter::write_str(f, "Initialize"),
+                    WalletInstruction::Deposit {  amount: __self_0 } =>
+                        ::core::fmt::Formatter::debug_struct_field1_finish(f,
+                            "Deposit", "amount", &__self_0),
+                    WalletInstruction::Withdraw {  amount: __self_0 } =>
+                        ::core::fmt::Formatter::debug_struct_field1_finish(f,
+                            "Withdraw", "amount", &__self_0),
+                }
+        }
+}
+impl borsh::de::BorshDeserialize for WalletInstruction where
+    u64: borsh::BorshDeserialize, u64: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            let variant_idx: u8 =
+                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let return_value =
+                match variant_idx {
+                        0u8 => WalletInstruction::Initialize,
+                        1u8 =>
+                            WalletInstruction::Deposit{
+                                amount:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },},
+                        2u8 =>
+                            WalletInstruction::Withdraw{
+                                amount:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },},
+                        _ => {
+                            let msg =
+
+
+
+
+
+
+                                {
+                                        let res =
+                                            ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                    &[format_argument::new_debug(&variant_idx)]));
+                                        res
+                                    };
+                            return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                        msg));
+                        }
+                    };
+            Ok(return_value)
+        }
+}
+impl borsh::ser::BorshSerialize for WalletInstruction where
+    u64: borsh::ser::BorshSerialize, u64: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            let variant_idx: u8 =
+                match self {
+                        WalletInstruction::Initialize => 0u8,
+                        WalletInstruction::Deposit { .. } => 1u8,
+                        WalletInstruction::Withdraw { .. } => 2u8,
+                    };
+            match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                        {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match self {
+                    WalletInstruction::Initialize => { }
+                    WalletInstruction::Deposit {  amount } => {
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(amount,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                    }
+                    WalletInstruction::Withdraw {  amount } => {
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(amount,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                    }
+                }
+            Ok(())
+        }
+}
+#[repr(C)]
+struct Wallet {
+    authority: Pubkey,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for Wallet {
+    #[inline]
+    fn clone<'_>(self: &'_ Self)
+        -> Wallet { let _: ::core::clone::AssertParamIsClone<Pubkey>; *self }
+}
+#[automatically_derived]
+impl ::core::marker::Copy for Wallet { }
+#[automatically_derived]
+impl ::core::fmt::Debug for Wallet {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(f, "Wallet",
+                "authority", &&self.authority)
+        }
+}
+#[automatically_derived]
+impl ::core::default::Default for Wallet {
+    #[inline]
+    fn default()
+        -> Wallet { Wallet{ authority: ::core::default::Default::default(),} }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for Wallet { }
+#[automatically_derived]
+impl ::core::cmp::PartialEq for Wallet {
+    #[inline]
+    fn eq<'_, '_>(self: &'_ Self, other: &'_ Wallet)
+        -> bool { self.authority == other.authority }
+}
+impl borsh::ser::BorshSerialize for Wallet where
+    Pubkey: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.authority,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for Wallet where
+    Pubkey: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            ::core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            Ok(Self{
+                    authority:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+const WALLET_LEN: u64 = 32;
+mod processor {
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    use ::{};
+    use ::{};
+    use solana_program::account_info::next_account_info;
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::msg;
+    use ::{};
+    use solana_program::program::invoke;
+    use solana_program::program::invoke_signed;
+    use solana_program::program_error::ProgramError;
+    use solana_program::pubkey::Pubkey;
+    use solana_program::rent::Rent;
+    use solana_program::system_instruction;
+    use solana_program::sysvar::Sysvar;
+    use ::{};
+    use crate::Wallet;
+    use crate::WalletInstruction;
+    use crate::WALLET_LEN;
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        mut instruction_data: &'_ [u8])
+        ->
+            ProgramResult {
+            match match #[lang = "branch"](WalletInstruction::deserialize(&mut instruction_data))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            } {
+                    WalletInstruction::Initialize =>
+                        initialize(program_id, accounts),
+                    WalletInstruction::Deposit {  amount } =>
+                        deposit(program_id, accounts, amount),
+                    WalletInstruction::Withdraw {  amount } =>
+                        withdraw(program_id, accounts, amount),
+                }
+        }
+    fn initialize<'_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>])
+        ->
+            ProgramResult {
+            let account_info_iter = &mut accounts.iter();
+            let wallet_info =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let authority =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let rent_info =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let (wallet_address, wallet_seed) =
+                Pubkey::find_program_address(&[&authority.key.to_bytes()],
+                    program_id);
+            let rent =
+                match #[lang = "branch"](Rent::from_account_info(rent_info)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            if *wallet_info.key != wallet_address
+                    { { ::std::rt::begin_panic("explicit panic") }; }
+                    if !wallet_info.data_is_empty()
+                            { { ::std::rt::begin_panic("explicit panic") }; }
+                            if !authority.is_signer
+                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                    let wallet = Wallet{ authority: *authority.key,};
+                                    wallet.serialize(&mut &mut (*wallet_info.data).borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                    Ok(())
+                                }
+                            fn deposit<'_, '_,
+                                '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                                amount: u64)
+                                ->
+                                    ProgramResult {
+                                    let account_info_iter = &mut accounts.iter();
+                                    let wallet_info =
+                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            };
+                                    let source_info =
+                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            };
+                                    if wallet_info.owner != program_id
+                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                            Ok(())
+                                        }
+                                    fn withdraw<'_, '_,
+                                        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                                        amount: u64)
+                                        ->
+                                            ProgramResult {
+                                            let account_info_iter = &mut accounts.iter();
+                                            let wallet_info =
+                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            let authority_info =
+                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            let destination_info =
+                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            let rent_info =
+                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            let wallet =
+                                                match #[lang = "branch"](Wallet::deserialize(&mut &(*wallet_info.data).borrow_mut()[#[lang = "RangeFull"]{}]))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            let rent =
+                                                match #[lang = "branch"](Rent::from_account_info(rent_info))
+                                                            {
+                                                        #[lang = "Break"] {  0: residual } =>
+                                                            #[allow(unreachable_code)]
+                                                            return #[lang = "from_residual"](residual),
+                                                        #[lang = "Continue"] {  0: val } =>
+                                                            #[allow(unreachable_code)]
+                                                            val,
+                                                    };
+                                            if wallet_info.owner != program_id
+                                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                                    if wallet.authority != *authority_info.key
+                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                            if !authority_info.is_signer
+                                                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                    let min_balance = rent.minimum_balance(WALLET_LEN as usize);
+                                                                    if min_balance + amount >
+                                                                                **wallet_info.lamports.borrow_mut()
+                                                                            { return Err(ProgramError::InsufficientFunds); }
+                                                                            **wallet_info.lamports.borrow_mut() -= amount;
+                                                                            **destination_info.lamports.borrow_mut() += amount;
+                                                                            wallet.serialize(&mut &mut (*wallet_info.data).borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                                                            Ok(())
+                                                                        }
+                                                                }
+                                                                use processor::process_instruction;
+                                                                /// # Safety
+                                                                #[no_mangle]
+                                                                unsafe extern "C" fn entrypoint(input: *mut u8)
+                                                                    ->
+                                                                        u64 {
+                                                                        let (program_id, accounts, instruction_data) =
+                                                                            unsafe { ::solana_program::entrypoint::deserialize(input) };
+                                                                        match process_instruction(&program_id, &accounts,
+                                                                                        &instruction_data) {
+                                                                                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                                                                                Err(error) => error.into(),
+                                                                            }
+                                                                    }
+                                                                fn get_wallet_address(authority: Pubkey,
+                                                                    wallet_program: Pubkey)
+                                                                    ->
+                                                                        Pubkey {
+                                                                        let (wallet_address, _) =
+                                                                            Pubkey::find_program_address(&[&authority.to_bytes()],
+                                                                                &wallet_program);
+                                                                        wallet_address
+                                                                    }
+                                                                fn initialize(wallet_program: Pubkey,
+                                                                    authority_address: Pubkey)
+                                                                    ->
+                                                                        Instruction {
+                                                                        let wallet_address =
+                                                                            get_wallet_address(authority_address, wallet_program);
+                                                                        Instruction{
+                                                                            program_id: wallet_program,
+
+                                                                            accounts:
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([AccountMeta::new(wallet_address,
+                                                                                                    false), AccountMeta::new(authority_address, true),
+                                                                                                AccountMeta::new_readonly(sysvar::rent::id(), false),
+                                                                                                AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                            data: WalletInstruction::Initialize.try_to_vec().unwrap(),}
+                                                                    }
+                                                                fn deposit(wallet_program: Pubkey,
+                                                                    authority_address: Pubkey, source: Pubkey, amount: u64)
+                                                                    ->
+                                                                        Instruction {
+                                                                        let wallet_address =
+                                                                            get_wallet_address(authority_address, wallet_program);
+                                                                        Instruction{
+                                                                            program_id: wallet_program,
+
+                                                                            accounts:
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([AccountMeta::new(wallet_address,
+                                                                                                    false), AccountMeta::new(source, true),
+                                                                                                AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                            data:
+                                                                                WalletInstruction::Deposit{ amount,}.try_to_vec().unwrap(),}
+                                                                    }
+                                                                fn withdraw(wallet_program: Pubkey,
+                                                                    authority_address: Pubkey, destination: Pubkey, amount: u64)
+                                                                    ->
+                                                                        Instruction {
+                                                                        let wallet_address =
+                                                                            get_wallet_address(authority_address, wallet_program);
+                                                                        Instruction{
+                                                                            program_id: wallet_program,
+
+                                                                            accounts:
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([AccountMeta::new(wallet_address,
+                                                                                                    false), AccountMeta::new(authority_address, true),
+                                                                                                AccountMeta::new(destination, false),
+                                                                                                AccountMeta::new_readonly(sysvar::rent::id(), false),
+                                                                                                AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                            data:
+                                                                                WalletInstruction::Withdraw{
+                                                                                            amount,}.try_to_vec().unwrap(),}
+                                                                    }
