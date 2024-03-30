@@ -852,9 +852,20 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", array_value + "[" + std::to_string(i) + "]", true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("copy_tuple<")) {
+        std::cout << value << std::endl;
         const std::string tuple_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
-            generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
+            bool found = false;
+            for (const auto& v : all_variables) {
+                if (v.get_ast_data().at("variable") == variable + ".get" + std::to_string(i)) {
+                    found = true;
+                    generate_block_assignment(out, variable + ".get" + std::to_string(i), tuple_value + ".get" + std::to_string(i), true, all_variables, function_name, indents);
+                    break;
+                }
+            }
+            if (!found) {
+                break;
+            }
         }
     } else if (value.starts_with("copy_account_info<")) {
         const std::string info_value = value.substr(18, value.size() - 19);
