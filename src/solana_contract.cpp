@@ -89,74 +89,107 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
 
     std::string line;
     std::regex num_const_regex (R"((.*?)((?:[ui](?:8|16|32|64|size)|f(?:8|16|32|64)))::(MAX|MIN)(.*))");
+    std::regex assert_eq_regex (R"((.*?)assert_eq!\((.+?), (.+)\);(.*))");
+    std::regex assert_regex (R"((.*?)assert!\((.+?)(?:, \".+\")?\);(.*))");
+    std::regex msg_regex (R"((.*?)msg!\(.+\);(.*))");
+    std::regex invoke_regex (R"(.*?(invoke(?:_signed)?\(.*))");
+    std::regex semi_regex (R"(.*?;(.*))");
     std::smatch match;
+
+    bool deleting_to_semi = false;
     while (getline(file, line)) {
-        std::string updated_line;
-        while (std::regex_match(line, match, num_const_regex)) {
-            updated_line += match[1].str();
-            if (match[3].str() == "MAX") {
-                std::string t = match[2].str();
-                if (t == "u8") {
-                    updated_line += "255u8";
-                } else if (t == "u16") {
-                    updated_line += "65535u16";
-                } else if (t == "u32") {
-                    updated_line += "4294967295u32";
-                } else if (t == "u64") {
-                    updated_line += "18446744073709551615u64";
-                } else if (t == "usize") {
-                    updated_line += "18446744073709551615usize";
-                } else if (t == "i8") {
-                    updated_line += "127i8";
-                } else if (t == "i16") {
-                    updated_line += "32767i16";
-                } else if (t == "i32") {
-                    updated_line += "2147483647i32";
-                } else if (t == "i64") {
-                    updated_line += "9223372036854775807i64";
-                } else if (t == "isize") {
-                    updated_line += "9223372036854775807isize";
-                } else if (t == "f64") {
-                    updated_line += "1.7976931348623157E+308f64";
-                } else if (t == "f32") {
-                    updated_line += "3.40282347E+38f32";
+        while (true) {
+            std::string updated_line;
+            if (deleting_to_semi) {
+                if (std::regex_match(line, match, semi_regex)) {
+                    updated_line += match[1].str();
+                    deleting_to_semi = false;
                 } else {
-                    updated_line += match[2].str() + "::" + match[3].str();
+                    line = "";
+                    break;
                 }
+            } else if (std::regex_match(line, match, assert_eq_regex)) {
+                updated_line += match[1].str();
+                updated_line += "if ((" + match[2].str() + ") != (" + match[3].str() + ")) { panic!(); }";
+                updated_line += match[4].str();
+            } else if (std::regex_match(line, match, assert_regex)) {
+                updated_line += match[1].str();
+                updated_line += "if !(" + match[2].str() + ") { panic!(); }";
+                updated_line += match[3].str();
+            } else if (std::regex_match(line, match, msg_regex)) {
+                updated_line += match[1].str();
+                updated_line += match[2].str();
+            } else if (std::regex_match(line, match, invoke_regex)) {
+                deleting_to_semi = true;
+            } else if (std::regex_match(line, match, num_const_regex)) {
+                updated_line += match[1].str();
+                if (match[3].str() == "MAX") {
+                    std::string t = match[2].str();
+                    if (t == "u8") {
+                        updated_line += "255u8";
+                    } else if (t == "u16") {
+                        updated_line += "65535u16";
+                    } else if (t == "u32") {
+                        updated_line += "4294967295u32";
+                    } else if (t == "u64") {
+                        updated_line += "18446744073709551615u64";
+                    } else if (t == "usize") {
+                        updated_line += "18446744073709551615usize";
+                    } else if (t == "i8") {
+                        updated_line += "127i8";
+                    } else if (t == "i16") {
+                        updated_line += "32767i16";
+                    } else if (t == "i32") {
+                        updated_line += "2147483647i32";
+                    } else if (t == "i64") {
+                        updated_line += "9223372036854775807i64";
+                    } else if (t == "isize") {
+                        updated_line += "9223372036854775807isize";
+                    } else if (t == "f64") {
+                        updated_line += "1.7976931348623157E+308f64";
+                    } else if (t == "f32") {
+                        updated_line += "3.40282347E+38f32";
+                    } else {
+                        updated_line += match[2].str() + "::" + match[3].str();
+                    }
+                } else {
+                    std::string t = match[2].str();
+                    if (t == "u8") {
+                        updated_line += "0u8";
+                    } else if (t == "u16") {
+                        updated_line += "0u16";
+                    } else if (t == "u32") {
+                        updated_line += "0u32";
+                    } else if (t == "u64") {
+                        updated_line += "0u64";
+                    } else if (t == "usize") {
+                        updated_line += "0usize";
+                    } else if (t == "i8") {
+                        updated_line += "-128i8";
+                    } else if (t == "i16") {
+                        updated_line += "-32768i16";
+                    } else if (t == "i32") {
+                        updated_line += "-2147483648i32";
+                    } else if (t == "i64") {
+                        updated_line += "-9223372036854775808i64";
+                    } else if (t == "isize") {
+                        updated_line += "-9223372036854775808isize";
+                    } else if (t == "f64") {
+                        updated_line += "-1.7976931348623157E+308f64";
+                    } else if (t == "f32") {
+                        updated_line += "-3.40282347E+38f32";
+                    } else {
+                        updated_line += match[2].str() + "::" + match[3].str();
+                    }
+                }
+                updated_line += match[4].str();
             } else {
-                std::string t = match[2].str();
-                if (t == "u8") {
-                    updated_line += "0u8";
-                } else if (t == "u16") {
-                    updated_line += "0u16";
-                } else if (t == "u32") {
-                    updated_line += "0u32";
-                } else if (t == "u64") {
-                    updated_line += "0u64";
-                } else if (t == "usize") {
-                    updated_line += "0usize";
-                } else if (t == "i8") {
-                    updated_line += "-128i8";
-                } else if (t == "i16") {
-                    updated_line += "-32768i16";
-                } else if (t == "i32") {
-                    updated_line += "-2147483648i32";
-                } else if (t == "i64") {
-                    updated_line += "-9223372036854775808i64";
-                } else if (t == "isize") {
-                    updated_line += "-9223372036854775808isize";
-                } else if (t == "f64") {
-                    updated_line += "-1.7976931348623157E+308f64";
-                } else if (t == "f32") {
-                    updated_line += "-3.40282347E+38f32";
-                } else {
-                    updated_line += match[2].str() + "::" + match[3].str();
-                }
+                break;
             }
-            line = match[4].str();
+            line = updated_line;
         }
-        updated_line += line;
-        temp_file << updated_line << std::endl;
+
+        temp_file << line << std::endl;
     }
 
     file.close();
