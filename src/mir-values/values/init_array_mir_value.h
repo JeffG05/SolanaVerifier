@@ -7,7 +7,7 @@
 class init_array_mir_value : public mir_value {
 public:
     init_array_mir_value() : mir_value(
-        std::regex (R"(^\[(.+)\]$)"),
+        std::regex (R"(^\[(.*)\]$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             const std::list<std::string> contents = utils::split(match[1].str(), ", ");
             std::list<std::string> converted_contents;
