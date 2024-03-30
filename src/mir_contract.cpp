@@ -83,7 +83,16 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
                             if (value.find("checked<") != std::string::npos) {
                                 std::string maths_function = value.substr(value.find("checked<") + 8, value.rfind(')') - value.find("checked<") - 7);
                                 mir_statement maths_statement = mir_statement::parse_maths(maths_function);
-                                statement->add_child(maths_statement);
+                                bool already_exists = false;
+                                for (const auto& existing_maths : statement->get_children({statement_type::maths})) {
+                                    if (existing_maths.get_ast_data().at("value").get<std::string>() == maths_statement.get_ast_data().at("value").get<std::string>()) {
+                                        already_exists = true;
+                                        break;
+                                    }
+                                }
+                                if (!already_exists) {
+                                    statement->add_child(maths_statement);
+                                }
                             }
                         }
                     }
@@ -104,7 +113,16 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
                     if (value.find("checked<") != std::string::npos) {
                         std::string maths_function = value.substr(value.find("checked<") + 8, value.rfind(')') - value.find("checked<") - 7);
                         mir_statement maths_statement = mir_statement::parse_maths(maths_function);
-                        statement->add_child(maths_statement);
+                        bool already_exists = false;
+                        for (const auto& existing_maths : statement->get_children({statement_type::maths})) {
+                            if (existing_maths.get_ast_data().at("value").get<std::string>() == maths_statement.get_ast_data().at("value").get<std::string>()) {
+                                already_exists = true;
+                                break;
+                            }
+                        }
+                        if (!already_exists) {
+                            statement->add_child(maths_statement);
+                        }
                     }
                 }
             }
