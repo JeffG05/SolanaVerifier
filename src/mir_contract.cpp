@@ -292,7 +292,8 @@ std::string mir_contract::get_return_c_type(const std::string &type, const std::
         return c_type.substr(0, c_type.size() - 3);
     }
     if (c_type.ends_with("]")) {
-        return utils::split(c_type, " ").front() + "*";
+        long array_depth = std::count(c_type.begin(), c_type.end(), ']');
+        return utils::split(c_type, " ").front() + std::string(array_depth, '*');
     }
 
     std::throw_with_nested(std::runtime_error("Unsupported return type: " + type));
