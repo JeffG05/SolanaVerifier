@@ -1026,7 +1026,7 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
     generate_verification_statements(out, state_statements, debug_statements, function_return);
 
     // Return value
-    *out << "\treturn state._0;" << std::endl;
+    *out << "\treturn (" + return_type + ") state._0;" << std::endl;
     *out << "}" << std::endl;
     *out << std::endl;
 }
