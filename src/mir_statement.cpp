@@ -350,7 +350,9 @@ std::optional<mir_statements> mir_statement::parse_assignment(const std::string 
     } else if (regex_match(line, match, assert_parts)) {
         data["variable"] = "";
         auto [value, returns] = convert_value(match[1].str(), variables);
-        assertion = "__ESBMC_assert(" + value + ", \"Vulnerability Found: " + match[2].str() + "\")";
+        std::string reason = match[2].str();
+        reason.erase(remove(reason.begin(), reason.end(), ';'), reason.end());
+        assertion = "__ESBMC_assert(" + value + ", \"Vulnerability Found: 13; Reason: " + reason + "\")";
         data["value"] = "true";
         data["returns"] = true;
         branching = match[3].str();
