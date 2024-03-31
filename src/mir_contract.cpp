@@ -854,7 +854,6 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
             generate_block_assignment(out, variable + "[" + std::to_string(i) + "]", array_value + "[" + std::to_string(i) + "]", true, all_variables, function_name, indents);
         }
     } else if (value.starts_with("copy_tuple<")) {
-        std::cout << value << std::endl;
         const std::string tuple_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
             bool found = false;
