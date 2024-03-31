@@ -79,6 +79,7 @@
 #include "values/try_branch_result_mir_value.h"
 #include "values/tuple_indexer_mir_value.h"
 #include "values/variable_mir_value.h"
+#include "mir-values/values/len_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -165,6 +166,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     any_mir_value(),
     into_iter_mir_value(),
     as_some_mir_value(),
+    len_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

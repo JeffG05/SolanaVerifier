@@ -846,6 +846,8 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "\t\tbreak;" << std::endl;
         *out << base_indent << "\t}" << std::endl;
         *out << base_indent << "}" << std::endl;
+    } else if (value.starts_with("len<")) {
+        generate_block_assignment(out, variable, std::to_string(_globals.ARRAY_SIZE), true, all_variables, function_name, indents);
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
