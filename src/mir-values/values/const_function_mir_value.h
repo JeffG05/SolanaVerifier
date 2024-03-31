@@ -9,7 +9,7 @@ public:
     const_function_mir_value() : mir_value(
         std::regex (R"(^const (?:<.+>::)?(.+)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            return std::make_tuple(std::regex_replace(match[1].str(), std::regex(R"(\W)"), "_") + "()", true);
+            return std::make_tuple("const_func<" + std::regex_replace(match[1].str(), std::regex(R"(\W)"), "_") + "()>", true);
         }
     ) {}
 };

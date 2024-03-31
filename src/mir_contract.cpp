@@ -292,8 +292,7 @@ std::string mir_contract::get_return_c_type(const std::string &type, const std::
         return c_type.substr(0, c_type.size() - 3);
     }
     if (c_type.ends_with("]")) {
-        long array_depth = std::count(c_type.begin(), c_type.end(), ']');
-        return utils::split(c_type, " ").front() + std::string(array_depth, '*');
+        return utils::split(c_type, " ").front() + "*";
     }
 
     std::throw_with_nested(std::runtime_error("Unsupported return type: " + type));
@@ -848,6 +847,18 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         *out << base_indent << "}" << std::endl;
     } else if (value.starts_with("len<")) {
         generate_block_assignment(out, variable, std::to_string(_globals.ARRAY_SIZE), true, all_variables, function_name, indents);
+    } else if (value.starts_with("const_func<")) {
+        const std::string subvalue = value.substr(11, value.size() - 14);
+        std::optional<mir_statement> function_return = mir_statement::get_statement(all_variables, variable);
+        std::string return_type;
+        if (function_return.has_value()) {
+            return_type = function_return.value().get_ast_data().at("variable_type");
+        }
+        if (return_type.starts_with("array<")) {
+            generate_block_assignment(out, variable, subvalue + "(*state." + variable + ")", false, all_variables, function_name, indents, true);
+        } else {
+            generate_block_assignment(out, variable, subvalue + "()", true, all_variables, function_name, indents);
+        }
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
@@ -1013,7 +1024,15 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
         parameters.push_back(get_c_type(parameter_type, parameter_name, function_name));
     }
     const std::string return_type = get_return_c_type(function_return, function_name);
-    *out << return_type << " " << function_name << "(" << utils::join(parameters, ", ") << ")";
+    if (return_type.ends_with('*')) {
+        if (parameters.empty()) {
+            *out << "void " << function_name << "(" << return_type << " out)";
+        } else {
+            *out << "void " << function_name << "(" << return_type << " out, " << utils::join(parameters, ", ") << ")";
+        }
+    } else {
+        *out << return_type << " " << function_name << "(" << utils::join(parameters, ", ") << ")";
+    }
 
     if (forward_decl) {
         *out << ";" << std::endl;
@@ -1038,7 +1057,36 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
     generate_verification_statements(out, state_statements, debug_statements, function_return);
 
     // Return value
-    *out << "\treturn (" + return_type + ") state._0;" << std::endl;
+    if (return_type.ends_with('*')) {
+        int depth = 0;
+        std::string type = function_return;
+        while (type.starts_with("array<")) {
+            depth += 1;
+            type = type.substr(6);
+        }
+
+        int indexes[depth];
+        for (int d = 0; d < depth; d++) {
+            indexes[d] = 0;
+        }
+        for (int i = 0; i < pow(_globals.ARRAY_SIZE, depth); i++) {
+            *out << "\tout[" << std::to_string(i) << "] = state._0";
+            for (int d = depth-1; d >= 0; d--) {
+                *out << "[" << indexes[d] << "]";
+            }
+            *out << ";" << std::endl;
+
+            int current_depth = 0;
+            indexes[current_depth] += 1;
+            while(current_depth < depth-1 && indexes[current_depth] >= _globals.ARRAY_SIZE) {
+                indexes[current_depth] = 0;
+                current_depth += 1;
+                indexes[current_depth] += 1;
+            }
+        }
+    } else {
+        *out << "\treturn state._0;" << std::endl;
+    }
     *out << "}" << std::endl;
     *out << std::endl;
 }
