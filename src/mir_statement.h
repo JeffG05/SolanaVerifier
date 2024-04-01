@@ -40,7 +40,7 @@ public:
     static bool line_is_block(const std::string& line);
     static std::string convert_type(const std::string& type);
 
-    static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs);
+    static mir_statements get_all_variables(mir_statement function_header, const mir_statements& structs, const mir_statements& functions);
     static std::string reformat_value_by_type(const std::string& value, const std::string& type);
 
 private:

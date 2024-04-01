@@ -218,7 +218,7 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
         lines.pop_front();
     }
 
-    mir_statements all_variables = get_all_variables(function_header, structs);
+    mir_statements all_variables = get_all_variables(function_header, structs, {});
 
     // Create blocks
     auto current_block_lines = std::list<std::string>();
@@ -579,10 +579,14 @@ std::optional<mir_statement> mir_statement::get_statement(const mir_statements &
     return std::nullopt;
 }
 
-mir_statements mir_statement::get_all_variables(mir_statement function_header, const mir_statements& structs) {
+mir_statements mir_statement::get_all_variables(mir_statement function_header, const mir_statements& structs, const mir_statements& functions) {
     mir_statements all_variables;
     for (const auto& variable: function_header.get_children({statement_type::variable, statement_type::parameter})) {
         utils::extend(&all_variables, get_subvariables(variable, structs));
+    }
+    for (const auto& function : functions) {
+        const mir_statement variable = new_variable(function.get_ast_data().at("name"), function.get_ast_data().at("return_type"));
+        all_variables.push_back(variable);
     }
     return all_variables;
 }
