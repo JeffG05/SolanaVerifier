@@ -84,16 +84,16 @@ fn initialize(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
 
 fn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let wallet_info = next_account_info(account_info_iter)?;
+    let wallet_info__owner = next_account_info(account_info_iter)?;
     let vault_info = next_account_info(account_info_iter)?;
-    let source_info = next_account_info(account_info_iter)?;
-    let wallet = Wallet::deserialize(&mut &(*wallet_info.data).borrow_mut()[..])?;
+    let source_info__signer = next_account_info(account_info_iter)?;
+    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;
 
     assert_eq!(wallet.vault, *vault_info.key);
 
     invoke(
-        &system_instruction::transfer(&source_info.key, &vault_info.key, amount),
-        &[vault_info.clone(), source_info.clone()],
+        &system_instruction::transfer(&source_info__signer.key, &vault_info.key, amount),
+        &[vault_info.clone(), source_info__signer.clone()],
     )?;
 
     Ok(())
