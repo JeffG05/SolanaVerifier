@@ -34,29 +34,29 @@ fn initialize(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
     let wallet_info = next_account_info(account_info_iter)?;
     let authority_info = next_account_info(account_info_iter)?;
-    let owner = next_account_info(account_info_iter)?;
+    let owner__signer = next_account_info(account_info_iter)?;
     let mint = next_account_info(account_info_iter)?;
     let rent_info = next_account_info(account_info_iter)?;
     let spl_token = next_account_info(account_info_iter)?;
 
-    let (wallet_address, wallet_seed) = get_wallet_address(owner.key, program_id);
+    let (wallet_address, wallet_seed) = get_wallet_address(owner__signer.key, program_id);
     let (authority_address, _) = get_authority(program_id);
     let rent = Rent::from_account_info(rent_info)?;
 
     assert_eq!(wallet_info.key, &wallet_address);
     assert_eq!(authority_info.key, &authority_address);
-    assert!(owner.is_signer, "owner must sign!");
+    assert!(owner__signer.is_signer, "owner must sign!");
 
     invoke_signed(
         &system_instruction::create_account(
-            &owner.key,
+            &owner__signer.key,
             &wallet_address,
             rent.minimum_balance(spl_token::state::Account::LEN),
             spl_token::state::Account::LEN as u64,
             &spl_token.key,
         ),
-        &[owner.clone(), wallet_info.clone()],
-        &[&[&owner.key.to_bytes(), &[wallet_seed]]],
+        &[owner__signer.clone(), wallet_info.clone()],
+        &[&[&owner__signer.key.to_bytes(), &[wallet_seed]]],
     )?;
 
     invoke(
