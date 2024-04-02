@@ -38,7 +38,7 @@ fn initialize(
 ) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
     let vault_info = next_account_info(account_info_iter)?;
-    let initializer_info = next_account_info(account_info_iter)?;
+    let initializer_info__signer = next_account_info(account_info_iter)?;
     let rent_info = next_account_info(account_info_iter)?;
     let rent = Rent::from_account_info(rent_info)?;
     let vault_address = Pubkey::create_program_address(&[&[seed]], program_id).unwrap();
@@ -48,22 +48,22 @@ fn initialize(
         vault_info.data_is_empty(),
         "vault info must be empty account!"
     );
-    assert!(initializer_info.is_signer, "initializer must sign!");
+    assert!(initializer_info__signer.is_signer, "initializer must sign!");
 
     invoke_signed(
         &system_instruction::create_account(
-            &initializer_info.key,
+            &initializer_info__signer.key,
             &vault_address,
             rent.minimum_balance(VAULT_LEN as usize),
             VAULT_LEN,
             &program_id,
         ),
-        &[initializer_info.clone(), vault_info.clone()],
+        &[initializer_info__signer.clone(), vault_info.clone()],
         &[&[&[seed]]],
     )?;
 
     let vault = Vault {
-        creator: *initializer_info.key,
+        creator: *initializer_info__signer.key,
         fee,
         fee_recipient,
         seed,
@@ -78,28 +78,28 @@ fn initialize(
 
 fn create_pool(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let vault_info = next_account_info(account_info_iter)?;
-    let withdraw_authority_info = next_account_info(account_info_iter)?;
-    let pool_info = next_account_info(account_info_iter)?;
+    let vault_info__owner = next_account_info(account_info_iter)?;
+    let withdraw_authority_info__signer = next_account_info(account_info_iter)?;
+    let pool_info__owner = next_account_info(account_info_iter)?;
 
-    assert_eq!(vault_info.owner, program_id);
+    assert_eq!(vault_info__owner.owner, program_id);
     assert!(
-        withdraw_authority_info.is_signer,
+        withdraw_authority_info__signer.is_signer,
         "withdraw authority must sign!"
     );
-    assert_eq!(pool_info.owner, program_id);
+    assert_eq!(pool_info__owner.owner, program_id);
     // check that account is uninitialized
-    if pool_info.data.borrow_mut().into_iter().any(|b| *b != 0) {
+    if pool_info__owner.data.borrow_mut().into_iter().any(|b| *b != 0) {
         return Err(ProgramError::AccountAlreadyInitialized);
     }
 
     let pool = TipPool {
-        withdraw_authority: *withdraw_authority_info.key,
+        withdraw_authority: *withdraw_authority_info__signer.key,
         value: 0,
-        vault: *vault_info.key,
+        vault: *vault_info__owner.key,
     };
 
-    pool.serialize(&mut &mut pool_info.data.borrow_mut()[..])
+    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])
         .unwrap();
 
     Ok(())
@@ -107,18 +107,18 @@ fn create_pool(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
 
 fn tip(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let vault_info = next_account_info(account_info_iter)?;
-    let pool_info = next_account_info(account_info_iter)?;
-    let source_info = next_account_info(account_info_iter)?;
-    let mut pool = TipPool::deserialize(&mut &(*pool_info.data).borrow_mut()[..])?;
+    let vault_info__owner = next_account_info(account_info_iter)?;
+    let pool_info__owner = next_account_info(account_info_iter)?;
+    let source_info__signer = next_account_info(account_info_iter)?;
+    let mut pool = TipPool::deserialize(&mut &(*pool_info__owner.data).borrow_mut()[..])?;
 
-    assert_eq!(vault_info.owner, program_id);
-    assert_eq!(pool_info.owner, program_id);
-    assert_eq!(pool.vault, *vault_info.key);
+    assert_eq!(vault_info__owner.owner, program_id);
+    assert_eq!(pool_info__owner.owner, program_id);
+    assert_eq!(pool.vault, *vault_info__owner.key);
 
     invoke(
-        &system_instruction::transfer(&source_info.key, &vault_info.key, amount),
-        &[vault_info.clone(), source_info.clone()],
+        &system_instruction::transfer(&source_info__signer.key, &vault_info__owner.key, amount),
+        &[vault_info__owner.clone(), source_info__signer.clone()],
     )?;
 
     pool.value = match pool.value.checked_add(amount) {
@@ -126,7 +126,7 @@ fn tip(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramRes
         None => return Err(ProgramError::InvalidArgument),
     };
 
-    pool.serialize(&mut &mut pool_info.data.borrow_mut()[..])
+    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])
         .unwrap();
 
     Ok(())
@@ -134,29 +134,29 @@ fn tip(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramRes
 
 fn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let vault_info = next_account_info(account_info_iter)?;
-    let pool_info = next_account_info(account_info_iter)?;
-    let withdraw_authority_info = next_account_info(account_info_iter)?;
-    let mut pool = TipPool::deserialize(&mut &(*pool_info.data).borrow_mut()[..])?;
+    let vault_info__owner = next_account_info(account_info_iter)?;
+    let pool_info__owner = next_account_info(account_info_iter)?;
+    let withdraw_authority_info__signer = next_account_info(account_info_iter)?;
+    let mut pool = TipPool::deserialize(&mut &(*pool_info__owner.data).borrow_mut()[..])?;
 
-    assert_eq!(vault_info.owner, program_id);
-    assert_eq!(pool_info.owner, program_id);
+    assert_eq!(vault_info__owner.owner, program_id);
+    assert_eq!(pool_info__owner.owner, program_id);
     assert!(
-        withdraw_authority_info.is_signer,
+        withdraw_authority_info__signer.is_signer,
         "withdraw authority must sign"
     );
-    assert_eq!(pool.vault, *vault_info.key);
-    assert_eq!(*withdraw_authority_info.key, pool.withdraw_authority);
+    assert_eq!(pool.vault, *vault_info__owner.key);
+    assert_eq!(*withdraw_authority_info__signer.key, pool.withdraw_authority);
 
     pool.value = match pool.value.checked_sub(amount) {
         Some(v) => v,
         None => return Err(ProgramError::InvalidArgument),
     };
 
-    **(*vault_info).lamports.borrow_mut() -= amount;
-    **(*withdraw_authority_info).lamports.borrow_mut() += amount;
+    **(*vault_info__owner).lamports.borrow_mut() -= amount;
+    **(*withdraw_authority_info__signer).lamports.borrow_mut() += amount;
 
-    pool.serialize(&mut &mut pool_info.data.borrow_mut()[..])
+    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])
         .unwrap();
 
     Ok(())
