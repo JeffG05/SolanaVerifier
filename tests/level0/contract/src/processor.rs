@@ -101,14 +101,14 @@ fn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> Progr
 
 fn withdraw(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
-    let wallet_info = next_account_info(account_info_iter)?;
+    let wallet_info__owner = next_account_info(account_info_iter)?;
     let vault_info = next_account_info(account_info_iter)?;
-    let authority_info = next_account_info(account_info_iter)?;
+    let authority_info__signer = next_account_info(account_info_iter)?;
     let destination_info = next_account_info(account_info_iter)?;
-    let wallet = Wallet::deserialize(&mut &(*wallet_info.data).borrow_mut()[..])?;
+    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;
 
-    assert!(authority_info.is_signer);
-    assert_eq!(wallet.authority, *authority_info.key);
+    assert!(authority_info__signer.is_signer);
+    assert_eq!(wallet.authority, *authority_info__signer.key);
     assert_eq!(wallet.vault, *vault_info.key);
 
     if amount > **vault_info.lamports.borrow_mut() {
