@@ -7,7 +7,7 @@
 class system_program_id_mir_value : public mir_value {
 public:
     system_program_id_mir_value() : mir_value(
-        std::regex (R"(^solana_program::system_program::id\(\)$)"),
+        std::regex (R"(^(?:const )?solana_program::system_program::(?:id\(\)|ID)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             return std::make_tuple("SYSTEM_PROGRAM_ID", true);
         }
