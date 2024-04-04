@@ -1,0 +1,81 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use ::{};
+use ::{};
+use solana_program::account_info::next_account_info;
+use solana_program::account_info::AccountInfo;
+use solana_program::entrypoint;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::msg;
+use solana_program::native_token::LAMPORTS_PER_SOL;
+use solana_program::program::invoke;
+use solana_program::pubkey::Pubkey;
+use solana_program::system_instruction;
+use solana_program::system_program;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+fn process_instruction<'_, '_, '_,
+    '_>(_program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+    _instruction_data: &'_ [u8])
+    ->
+        ProgramResult {
+        let accounts_iter = &mut accounts.iter();
+        let payer =
+            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let new_account =
+            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        let system_program =
+            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        Ok(())
+    }

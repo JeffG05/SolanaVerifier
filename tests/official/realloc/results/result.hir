@@ -1,0 +1,993 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+mod instructions {
+
+
+    mod create {
+        use borsh::BorshSerialize;
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::program::invoke;
+        use solana_program::pubkey::Pubkey;
+        use solana_program::rent::Rent;
+        use solana_program::system_instruction;
+        use solana_program::sysvar::Sysvar;
+        use crate::state::AddressInfo;
+        fn create_address_info<'_, '_,
+            '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+            data: AddressInfo)
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let target_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let payer =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let account_span =
+                    match #[lang = "branch"](data.try_to_vec()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.len();
+                let lamports_required =
+                    match #[lang = "branch"](Rent::get()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.minimum_balance(account_span);
+                match #[lang = "branch"](invoke(&system_instruction::create_account(payer.key,
+                                            target_account.key, lamports_required, account_span as u64,
+                                            program_id),
+                                    &[payer.clone(), target_account.clone(),
+                                                system_program.clone()])) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](data.serialize(&mut &mut target_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+    }
+    mod reallocate {
+        use ::{};
+        use borsh::BorshDeserialize;
+        use borsh::BorshSerialize;
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::program::invoke;
+        use solana_program::rent::Rent;
+        use solana_program::system_instruction;
+        use solana_program::sysvar::Sysvar;
+        use ::{};
+        use crate::state::AddressInfo;
+        use crate::state::EnhancedAddressInfo;
+        use crate::state::EnhancedAddressInfoExtender;
+        use crate::state::WorkInfo;
+        fn reallocate_without_zero_init<'_,
+            '_>(accounts: &'_ [AccountInfo<>],
+            args: EnhancedAddressInfoExtender)
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let target_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let payer =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let address_info_data =
+                    match #[lang = "branch"](AddressInfo::try_from_slice(&target_account.data.borrow()))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let enhanced_address_info_data =
+                    EnhancedAddressInfo::from_address_info(address_info_data,
+                        args.state, args.zip);
+                let account_span =
+                    match #[lang = "branch"](enhanced_address_info_data.try_to_vec())
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.len();
+                let lamports_required =
+                    match #[lang = "branch"](Rent::get()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.minimum_balance(account_span);
+                let diff = lamports_required - target_account.lamports();
+                match #[lang = "branch"](invoke(&system_instruction::transfer(payer.key,
+                                            target_account.key, diff),
+                                    &[payer.clone(), target_account.clone(),
+                                                system_program.clone()])) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](target_account.realloc(account_span,
+                                    false)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](enhanced_address_info_data.serialize(&mut &mut target_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+        fn reallocate_zero_init<'_,
+            '_>(accounts: &'_ [AccountInfo<>], data: WorkInfo)
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let target_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let account_span =
+                    match #[lang = "branch"](data.try_to_vec()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.len();
+                match #[lang = "branch"](target_account.realloc(account_span,
+                                    true)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](data.serialize(&mut &mut target_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+    }
+    use create::*;
+    use reallocate::*;
+}
+mod processor {
+    use crate::instructions::*;
+    use crate::state::*;
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    use ::{};
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::pubkey::Pubkey;
+    enum ReallocInstruction {
+        Create(AddressInfo),
+        ReallocateWithoutZeroInit(EnhancedAddressInfoExtender),
+        ReallocateZeroInit(WorkInfo),
+    }
+    impl borsh::ser::BorshSerialize for ReallocInstruction where
+        AddressInfo: borsh::ser::BorshSerialize,
+        EnhancedAddressInfoExtender: borsh::ser::BorshSerialize,
+        WorkInfo: borsh::ser::BorshSerialize {
+        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+            -> core::result::Result<(), borsh::maybestd::io::Error> where
+            W: borsh::maybestd::io::Write {
+                let variant_idx: u8 =
+                    match self {
+                            ReallocInstruction::Create(..) => 0u8,
+                            ReallocInstruction::ReallocateWithoutZeroInit(..) => 1u8,
+                            ReallocInstruction::ReallocateZeroInit(..) => 2u8,
+                        };
+                match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match self {
+                        ReallocInstruction::Create(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                        ReallocInstruction::ReallocateWithoutZeroInit(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                        ReallocInstruction::ReallocateZeroInit(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                    }
+                Ok(())
+            }
+    }
+    impl borsh::de::BorshDeserialize for ReallocInstruction where
+        AddressInfo: borsh::BorshDeserialize,
+        EnhancedAddressInfoExtender: borsh::BorshDeserialize,
+        WorkInfo: borsh::BorshDeserialize {
+        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+            ->
+                core::result::Result<Self,
+                borsh::maybestd::io::Error> {
+                let variant_idx: u8 =
+                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let return_value =
+                    match variant_idx {
+                            0u8 =>
+                                ReallocInstruction::Create(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            1u8 =>
+                                ReallocInstruction::ReallocateWithoutZeroInit(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            2u8 =>
+                                ReallocInstruction::ReallocateZeroInit(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            _ => {
+                                let msg =
+                                    {
+                                            let res =
+                                                ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                        &[format_argument::new_debug(&variant_idx)]));
+                                            res
+                                        };
+                                return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                            msg));
+                            }
+                        };
+                Ok(return_value)
+            }
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ReallocInstruction {
+        #[inline]
+        fn fmt<'_, '_,
+            '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+            ->
+                ::core::fmt::Result {
+                match self {
+                        ReallocInstruction::Create(__self_0) =>
+                            ::core::fmt::Formatter::debug_tuple_field1_finish(f,
+                                "Create", &__self_0),
+                        ReallocInstruction::ReallocateWithoutZeroInit(__self_0) =>
+                            ::core::fmt::Formatter::debug_tuple_field1_finish(f,
+                                "ReallocateWithoutZeroInit", &__self_0),
+                        ReallocInstruction::ReallocateZeroInit(__self_0) =>
+                            ::core::fmt::Formatter::debug_tuple_field1_finish(f,
+                                "ReallocateZeroInit", &__self_0),
+                    }
+            }
+    }
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        input: &'_ [u8])
+        ->
+            ProgramResult {
+            let instruction =
+                match #[lang = "branch"](ReallocInstruction::try_from_slice(input))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            match instruction {
+                    ReallocInstruction::Create(data) =>
+                        create_address_info(program_id, accounts, data),
+                    ReallocInstruction::ReallocateWithoutZeroInit(data) => {
+                        reallocate_without_zero_init(accounts, data)
+                    }
+                    ReallocInstruction::ReallocateZeroInit(data) =>
+                        reallocate_zero_init(accounts, data),
+                }
+        }
+}
+mod state {
+    mod address_info {
+        use ::{};
+        use borsh::BorshDeserialize;
+        use borsh::BorshSerialize;
+        struct AddressInfo {
+            name: String,
+            house_number: u8,
+            street: String,
+            city: String,
+        }
+        impl borsh::de::BorshDeserialize for AddressInfo where
+            String: borsh::BorshDeserialize, u8: borsh::BorshDeserialize,
+            String: borsh::BorshDeserialize, String: borsh::BorshDeserialize {
+            fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                ->
+                    ::core::result::Result<Self,
+                    borsh::maybestd::io::Error> {
+                    Ok(Self{
+                            name:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            house_number:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            street:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            city:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },})
+                }
+        }
+        impl borsh::ser::BorshSerialize for AddressInfo where
+            String: borsh::ser::BorshSerialize,
+            u8: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize {
+            fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                where
+                W: borsh::maybestd::io::Write {
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.house_number,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.street,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.city,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    Ok(())
+                }
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for AddressInfo {
+            #[inline]
+            fn fmt<'_, '_,
+                '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                ->
+                    ::core::fmt::Result {
+                    ::core::fmt::Formatter::debug_struct_field4_finish(f,
+                        "AddressInfo", "name", &self.name, "house_number",
+                        &self.house_number, "street", &self.street, "city",
+                        &&self.city)
+                }
+        }
+        impl AddressInfo {
+            fn new(name: String, house_number: u8, street: String,
+                city: String)
+                -> Self { AddressInfo{ name,  house_number,  street,  city,} }
+        }
+    }
+    mod enhanced_address_info {
+        use ::{};
+        use borsh::BorshDeserialize;
+        use borsh::BorshSerialize;
+        use crate::state::AddressInfo;
+        struct EnhancedAddressInfoExtender {
+            state: String,
+            zip: u32,
+        }
+        impl borsh::de::BorshDeserialize for EnhancedAddressInfoExtender where
+            String: borsh::BorshDeserialize, u32: borsh::BorshDeserialize {
+            fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                ->
+                    ::core::result::Result<Self,
+                    borsh::maybestd::io::Error> {
+                    Ok(Self{
+                            state:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            zip:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },})
+                }
+        }
+        impl borsh::ser::BorshSerialize for EnhancedAddressInfoExtender where
+            String: borsh::ser::BorshSerialize,
+            u32: borsh::ser::BorshSerialize {
+            fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                where
+                W: borsh::maybestd::io::Write {
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.state,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.zip,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    Ok(())
+                }
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for EnhancedAddressInfoExtender {
+            #[inline]
+            fn fmt<'_, '_,
+                '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                ->
+                    ::core::fmt::Result {
+                    ::core::fmt::Formatter::debug_struct_field2_finish(f,
+                        "EnhancedAddressInfoExtender", "state", &self.state, "zip",
+                        &&self.zip)
+                }
+        }
+        struct EnhancedAddressInfo {
+            name: String,
+            house_number: u8,
+            street: String,
+            city: String,
+            state: String,
+            zip: u32,
+        }
+        impl borsh::de::BorshDeserialize for EnhancedAddressInfo where
+            String: borsh::BorshDeserialize, u8: borsh::BorshDeserialize,
+            String: borsh::BorshDeserialize, String: borsh::BorshDeserialize,
+            String: borsh::BorshDeserialize, u32: borsh::BorshDeserialize {
+            fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                ->
+                    ::core::result::Result<Self,
+                    borsh::maybestd::io::Error> {
+                    Ok(Self{
+                            name:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            house_number:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            street:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            city:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            state:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            zip:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },})
+                }
+        }
+        impl borsh::ser::BorshSerialize for EnhancedAddressInfo where
+            String: borsh::ser::BorshSerialize,
+            u8: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize,
+            u32: borsh::ser::BorshSerialize {
+            fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                where
+                W: borsh::maybestd::io::Write {
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.house_number,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.street,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.city,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.state,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.zip,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    Ok(())
+                }
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for EnhancedAddressInfo {
+            #[inline]
+            fn fmt<'_, '_,
+                '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                ->
+                    ::core::fmt::Result {
+                    let names: &'static _ =
+                        &["name", "house_number", "street", "city", "state", "zip"];
+                    let values: &[&dyn ::core::fmt::Debug] =
+                        &[&self.name, &self.house_number, &self.street, &self.city,
+                                    &self.state, &&self.zip];
+                    ::core::fmt::Formatter::debug_struct_fields_finish(f,
+                        "EnhancedAddressInfo", names, values)
+                }
+        }
+        impl EnhancedAddressInfo {
+            fn from_address_info(address_info: AddressInfo, state: String,
+                zip: u32)
+                ->
+                    Self {
+                    EnhancedAddressInfo{
+                        name: address_info.name,
+
+                        house_number: address_info.house_number,
+
+                        street: address_info.street,
+
+                        city: address_info.city,
+
+                        state,
+
+                        zip,}
+                }
+        }
+    }
+    mod work_info {
+        use ::{};
+        use borsh::BorshDeserialize;
+        use borsh::BorshSerialize;
+        struct WorkInfo {
+            name: String,
+            position: String,
+            company: String,
+            years_employed: u8,
+        }
+        impl borsh::de::BorshDeserialize for WorkInfo where
+            String: borsh::BorshDeserialize, String: borsh::BorshDeserialize,
+            String: borsh::BorshDeserialize, u8: borsh::BorshDeserialize {
+            fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                ->
+                    ::core::result::Result<Self,
+                    borsh::maybestd::io::Error> {
+                    Ok(Self{
+                            name:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            position:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            company:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },
+
+                            years_employed:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },})
+                }
+        }
+        impl borsh::ser::BorshSerialize for WorkInfo where
+            String: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize,
+            String: borsh::ser::BorshSerialize, u8: borsh::ser::BorshSerialize
+            {
+            fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                where
+                W: borsh::maybestd::io::Write {
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.position,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.company,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.years_employed,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    Ok(())
+                }
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for WorkInfo {
+            #[inline]
+            fn fmt<'_, '_,
+                '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                ->
+                    ::core::fmt::Result {
+                    ::core::fmt::Formatter::debug_struct_field4_finish(f,
+                        "WorkInfo", "name", &self.name, "position", &self.position,
+                        "company", &self.company, "years_employed",
+                        &&self.years_employed)
+                }
+        }
+        impl WorkInfo {
+            fn new(name: String, position: String, company: String,
+                years_employed: u8)
+                ->
+                    Self {
+                    WorkInfo{ name,  position,  company,  years_employed,}
+                }
+        }
+    }
+    use address_info::*;
+    use enhanced_address_info::*;
+    use work_info::*;
+}
+use ::{};
+use crate::processor::process_instruction;
+use solana_program::entrypoint;
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }

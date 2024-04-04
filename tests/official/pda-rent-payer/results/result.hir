@@ -1,0 +1,366 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use solana_program::entrypoint;
+
+use processor::process_instruction;
+
+mod instructions {
+
+    mod create_new_account {
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::pubkey::Pubkey;
+        use solana_program::rent::Rent;
+        use solana_program::sysvar::Sysvar;
+        use crate::state::RentVault;
+        fn create_new_account<'_, '_,
+            '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>])
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let new_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let rent_vault =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let _system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let (rent_vault_pda, _rent_vault_bump) =
+                    Pubkey::find_program_address(&[RentVault::SEED_PREFIX.as_bytes()],
+                        program_id);
+                if !rent_vault.key.eq(&rent_vault_pda)
+                        {
+                                ::core::panicking::panic("assertion failed: rent_vault.key.eq(&rent_vault_pda)")
+                            };
+                        let lamports_required_for_rent =
+                            match #[lang = "branch"](Rent::get()) {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    }.minimum_balance(0);
+                        **rent_vault.lamports.borrow_mut() -=
+                            lamports_required_for_rent;
+                        **new_account.lamports.borrow_mut() +=
+                            lamports_required_for_rent;
+                        Ok(())
+                    }
+            }
+            mod init_rent_vault {
+                use ::{};
+                use borsh::BorshDeserialize;
+                use borsh::BorshSerialize;
+                use ::{};
+                use ::{};
+                use solana_program::account_info::next_account_info;
+                use solana_program::account_info::AccountInfo;
+                use solana_program::entrypoint::ProgramResult;
+                use solana_program::program::invoke_signed;
+                use solana_program::pubkey::Pubkey;
+                use solana_program::rent::Rent;
+                use solana_program::system_instruction;
+                use solana_program::sysvar::Sysvar;
+                use crate::state::RentVault;
+                struct InitRentVaultArgs {
+                    fund_lamports: u64,
+                }
+                impl borsh::de::BorshDeserialize for InitRentVaultArgs where
+                    u64: borsh::BorshDeserialize {
+                    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                        ->
+                            ::core::result::Result<Self,
+                            borsh::maybestd::io::Error> {
+                            Ok(Self{
+                                    fund_lamports:
+                                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            },})
+                        }
+                }
+                impl borsh::ser::BorshSerialize for InitRentVaultArgs where
+                    u64: borsh::ser::BorshSerialize {
+                    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                        -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                        where
+                        W: borsh::maybestd::io::Write {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.fund_lamports,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                            Ok(())
+                        }
+                }
+                fn init_rent_vault<'_, '_,
+                    '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                    args: InitRentVaultArgs)
+                    ->
+                        ProgramResult {
+                        let accounts_iter = &mut accounts.iter();
+                        let rent_vault =
+                            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        let payer =
+                            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        let system_program =
+                            match #[lang = "branch"](next_account_info(accounts_iter)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        let (rent_vault_pda, rent_vault_bump) =
+                            Pubkey::find_program_address(&[RentVault::SEED_PREFIX.as_bytes()],
+                                program_id);
+                        if !rent_vault.key.eq(&rent_vault_pda)
+                                {
+                                        ::core::panicking::panic("assertion failed: rent_vault.key.eq(&rent_vault_pda)")
+                                    };
+                                let lamports_required =
+                                    match #[lang = "branch"](Rent::get()) {
+                                                    #[lang = "Break"] {  0: residual } =>
+                                                        #[allow(unreachable_code)]
+                                                        return #[lang = "from_residual"](residual),
+                                                    #[lang = "Continue"] {  0: val } =>
+                                                        #[allow(unreachable_code)]
+                                                        val,
+                                                }.minimum_balance(0) + args.fund_lamports;
+                                match #[lang = "branch"](invoke_signed(&system_instruction::create_account(payer.key,
+                                                            rent_vault.key, lamports_required, 0, program_id),
+                                                    &[payer.clone(), rent_vault.clone(),
+                                                                system_program.clone()],
+                                                    &[&[RentVault::SEED_PREFIX.as_bytes(),
+                                                                            &[rent_vault_bump]]])) {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    };
+                                Ok(())
+                            }
+                    }
+                    use create_new_account::*;
+                    use init_rent_vault::*; }
+                mod processor {
+                    use ::{};
+                    use borsh::BorshDeserialize;
+                    use borsh::BorshSerialize;
+                    use ::{};
+                    use solana_program::account_info::AccountInfo;
+                    use solana_program::entrypoint::ProgramResult;
+                    use solana_program::pubkey::Pubkey;
+                    use ::{};
+                    use crate::instructions::create_new_account::create_new_account;
+                    use ::{};
+                    use crate::instructions::init_rent_vault::init_rent_vault;
+                    use crate::instructions::init_rent_vault::InitRentVaultArgs;
+                    enum MyInstruction {
+                        InitRentVault(InitRentVaultArgs),
+                        CreateNewAccount,
+                    }
+                    impl borsh::ser::BorshSerialize for MyInstruction where
+                        InitRentVaultArgs: borsh::ser::BorshSerialize {
+                        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                            -> core::result::Result<(), borsh::maybestd::io::Error>
+                            where
+                            W: borsh::maybestd::io::Write {
+                                let variant_idx: u8 =
+                                    match self {
+                                            MyInstruction::InitRentVault(..) => 0u8,
+                                            MyInstruction::CreateNewAccount => 1u8,
+                                        };
+                                match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    };
+                                match self {
+                                        MyInstruction::InitRentVault(id0) => {
+                                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                                writer)) {
+                                                    #[lang = "Break"] {  0: residual } =>
+                                                        #[allow(unreachable_code)]
+                                                        return #[lang = "from_residual"](residual),
+                                                    #[lang = "Continue"] {  0: val } =>
+                                                        #[allow(unreachable_code)]
+                                                        val,
+                                                };
+                                        }
+                                        MyInstruction::CreateNewAccount => { }
+                                    }
+                                Ok(())
+                            }
+                    }
+                    impl borsh::de::BorshDeserialize for MyInstruction where
+                        InitRentVaultArgs: borsh::BorshDeserialize {
+                        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                            ->
+                                core::result::Result<Self,
+                                borsh::maybestd::io::Error> {
+                                let variant_idx: u8 =
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        };
+                                let return_value =
+                                    match variant_idx {
+                                            0u8 =>
+                                                MyInstruction::InitRentVault(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                {
+                                                            #[lang = "Break"] {  0: residual } =>
+                                                                #[allow(unreachable_code)]
+                                                                return #[lang = "from_residual"](residual),
+                                                            #[lang = "Continue"] {  0: val } =>
+                                                                #[allow(unreachable_code)]
+                                                                val,
+                                                        }),
+                                            1u8 => MyInstruction::CreateNewAccount,
+                                            _ => {
+                                                let msg =
+                                                    {
+                                                            let res =
+                                                                ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                                        &[format_argument::new_debug(&variant_idx)]));
+                                                            res
+                                                        };
+                                                return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                                            msg));
+                                            }
+                                        };
+                                Ok(return_value)
+                            }
+                    }
+                    fn process_instruction<'_, '_, '_,
+                        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                        input: &'_ [u8])
+                        ->
+                            ProgramResult {
+                            let instruction =
+                                match #[lang = "branch"](MyInstruction::try_from_slice(input))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    };
+                            match instruction {
+                                    MyInstruction::InitRentVault(args) =>
+                                        init_rent_vault(program_id, accounts, args),
+                                    MyInstruction::CreateNewAccount =>
+                                        create_new_account(program_id, accounts),
+                                }
+                        }
+                }
+                mod state {
+                    use ::{};
+                    use borsh::BorshDeserialize;
+                    use borsh::BorshSerialize;
+                    struct RentVault {
+                    }
+                    impl borsh::de::BorshDeserialize for RentVault {
+                        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                            ->
+                                ::core::result::Result<Self,
+                                borsh::maybestd::io::Error> { Ok(Self{}) }
+                    }
+                    impl borsh::ser::BorshSerialize for RentVault {
+                        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                            -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                            where W: borsh::maybestd::io::Write { Ok(()) }
+                    }
+                    #[automatically_derived]
+                    impl ::core::fmt::Debug for RentVault {
+                        #[inline]
+                        fn fmt<'_, '_,
+                            '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                            ->
+                                ::core::fmt::Result {
+                                ::core::fmt::Formatter::write_str(f, "RentVault")
+                            }
+                    }
+                    impl RentVault {
+                        const
+                        SEED_PREFIX:
+                        &'static str
+                        =
+                        "rent_vault";
+                    }
+                }
+                /// # Safety
+                #[no_mangle]
+                unsafe extern "C" fn entrypoint(input: *mut u8)
+                    ->
+                        u64 {
+                        let (program_id, accounts, instruction_data) =
+                            unsafe { ::solana_program::entrypoint::deserialize(input) };
+                        match process_instruction(&program_id, &accounts,
+                                        &instruction_data) {
+                                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                                Err(error) => error.into(),
+                            }
+                    }

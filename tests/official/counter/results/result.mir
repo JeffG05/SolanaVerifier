@@ -1,0 +1,654 @@
+// WARNING: This output format is intended for human consumers only
+// and is subject to change without notice. Knock yourself out.
+fn state::<impl at src/state.rs:3:10: 3:24>::serialize(_1: &state::Counter, _2: &mut W) -> Result<(), std::io::Error> {
+    debug self => _1;
+    debug writer => _2;
+    let mut _0: std::result::Result<(), std::io::Error>;
+    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _4: std::result::Result<(), std::io::Error>;
+    let _5: &u64;
+    let mut _6: isize;
+    let _7: std::result::Result<std::convert::Infallible, std::io::Error>;
+    scope 1 {
+        debug residual => _7;
+        scope 2 {
+        }
+    }
+    scope 3 {
+        debug val => const ();
+        scope 4 {
+        }
+    }
+
+    bb0: {
+        _5 = &((*_1).0: u64);
+        _4 = <u64 as BorshSerialize>::serialize::<W>(_5, _2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = <Result<(), std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = discriminant(_3);
+        switchInt(move _6) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _0 = Result::<(), std::io::Error>::Ok(const ());
+        goto -> bb6;
+    }
+
+    bb5: {
+        _7 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _7) -> [return: bb6, unwind continue];
+    }
+
+    bb6: {
+        return;
+    }
+}
+
+fn state::<impl at src/state.rs:3:26: 3:42>::deserialize(_1: &mut &[u8]) -> Result<state::Counter, std::io::Error> {
+    debug buf => _1;
+    let mut _0: std::result::Result<state::Counter, std::io::Error>;
+    let mut _2: state::Counter;
+    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u64>;
+    let mut _4: std::result::Result<u64, std::io::Error>;
+    let mut _5: isize;
+    let _6: std::result::Result<std::convert::Infallible, std::io::Error>;
+    let _7: u64;
+    scope 1 {
+        debug residual => _6;
+        scope 2 {
+        }
+    }
+    scope 3 {
+        debug val => _7;
+        scope 4 {
+        }
+    }
+
+    bb0: {
+        _4 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = <Result<u64, std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = discriminant(_3);
+        switchInt(move _5) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _7 = ((_3 as Continue).0: u64);
+        _2 = state::Counter { count: _7 };
+        _0 = Result::<state::Counter, std::io::Error>::Ok(move _2);
+        goto -> bb6;
+    }
+
+    bb5: {
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<state::Counter, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb6, unwind continue];
+    }
+
+    bb6: {
+        return;
+    }
+}
+
+fn state::<impl at src/state.rs:3:44: 3:49>::fmt(_1: &state::Counter, _2: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    debug self => _1;
+    debug f => _2;
+    let mut _0: std::result::Result<(), std::fmt::Error>;
+    let _3: &str;
+    let _4: &str;
+    let mut _5: &dyn std::fmt::Debug;
+    let _6: &&u64;
+    let _7: &u64;
+
+    bb0: {
+        _3 = const "Counter";
+        _4 = const "count";
+        _7 = &((*_1).0: u64);
+        _6 = &_7;
+        _5 = _6 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _3, _4, move _5) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        return;
+    }
+}
+
+fn state::<impl at src/state.rs:3:51: 3:56>::clone(_1: &state::Counter) -> state::Counter {
+    debug self => _1;
+    let mut _0: state::Counter;
+    let mut _2: u64;
+    let _3: &u64;
+
+    bb0: {
+        _3 = &((*_1).0: u64);
+        _2 = (*_3);
+        _0 = state::Counter { count: move _2 };
+        return;
+    }
+}
+
+const ID: Pubkey = {
+    let mut _0: solana_program::pubkey::Pubkey;
+    let mut _1: [u8; 32];
+
+    bb0: {
+        StorageLive(_1);
+        _1 = [const 218_u8, const 7_u8, const 92_u8, const 178_u8, const u8::MAX, const 94_u8, const 198_u8, const 129_u8, const 118_u8, const 19_u8, const 222_u8, const 83_u8, const 11_u8, const 105_u8, const 42_u8, const 135_u8, const 53_u8, const 71_u8, const 119_u8, const 105_u8, const 218_u8, const 71_u8, const 67_u8, const 12_u8, const 189_u8, const 129_u8, const 84_u8, const 51_u8, const 92_u8, const 74_u8, const 131_u8, const 39_u8];
+        ConstEvalCounter;
+        _0 = Pubkey::new_from_array(move _1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        StorageDead(_1);
+        return;
+    }
+}
+
+fn check_id(_1: &Pubkey) -> bool {
+    debug id => _1;
+    let mut _0: bool;
+    let mut _2: &&solana_program::pubkey::Pubkey;
+    let mut _3: &&solana_program::pubkey::Pubkey;
+
+    bb0: {
+        _2 = &_1;
+        _3 = const check_id::promoted[0];
+        _0 = <&Pubkey as PartialEq>::eq(move _2, _3) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        return;
+    }
+}
+
+const check_id::promoted[0]: &&Pubkey = {
+    let mut _0: &&solana_program::pubkey::Pubkey;
+    let mut _1: &solana_program::pubkey::Pubkey;
+    let mut _2: solana_program::pubkey::Pubkey;
+
+    bb0: {
+        _2 = const ID;
+        _1 = &_2;
+        _0 = &_1;
+        return;
+    }
+}
+
+fn id() -> Pubkey {
+    let mut _0: solana_program::pubkey::Pubkey;
+
+    bb0: {
+        _0 = const ID;
+        return;
+    }
+}
+
+// MIR FOR CTFE
+fn id() -> Pubkey {
+    let mut _0: solana_program::pubkey::Pubkey;
+
+    bb0: {
+        _0 = const ID;
+        return;
+    }
+}
+
+fn entrypoint(_1: *mut u8) -> u64 {
+    debug input => _1;
+    let mut _0: u64;
+    let _2: &solana_program::pubkey::Pubkey;
+    let _3: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _4: &[u8];
+    let mut _5: (&solana_program::pubkey::Pubkey, std::vec::Vec<solana_program::account_info::AccountInfo<'_>>, &[u8]);
+    let mut _6: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _7: &&solana_program::pubkey::Pubkey;
+    let _8: &[solana_program::account_info::AccountInfo<'_>];
+    let _9: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _10: &&[u8];
+    let mut _11: isize;
+    let mut _13: &solana_program::pubkey::Pubkey;
+    let mut _14: &[u8];
+    scope 1 {
+        debug program_id => _2;
+        debug accounts => _3;
+        debug instruction_data => _4;
+        let _12: solana_program::program_error::ProgramError;
+        scope 3 {
+            debug error => _12;
+        }
+    }
+    scope 2 {
+    }
+
+    bb0: {
+        _5 = solana_program::entrypoint::deserialize::<'_>(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _2 = (_5.0: &solana_program::pubkey::Pubkey);
+        _3 = move (_5.1: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>);
+        _4 = (_5.2: &[u8]);
+        _7 = &_2;
+        _13 = deref_copy (*_7);
+        _9 = &_3;
+        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb10];
+    }
+
+    bb2: {
+        _10 = &_4;
+        _14 = deref_copy (*_10);
+        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb10];
+    }
+
+    bb3: {
+        _11 = discriminant(_6);
+        switchInt(move _11) -> [0: bb6, 1: bb5, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb9];
+    }
+
+    bb6: {
+        _0 = const solana_program::entrypoint::SUCCESS;
+        goto -> bb7;
+    }
+
+    bb7: {
+        drop(_3) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+
+    bb9 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb10 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb11 (cleanup): {
+        resume;
+    }
+
+    bb12: {
+        goto -> bb7;
+    }
+}
+
+fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result<(), ProgramError> {
+    debug _program_id => _1;
+    debug accounts => _2;
+    debug instruction_data => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _4: &[u8];
+    let _5: &[u8];
+    let mut _6: (&[u8], &[u8]);
+    let _7: ();
+    let _8: usize;
+    let mut _9: usize;
+    let mut _10: bool;
+    let mut _11: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>>;
+    let mut _12: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let mut _13: isize;
+    let _15: &str;
+    scope 1 {
+        debug instruction_discriminant => _4;
+        debug instruction_data_inner => _5;
+        let _14: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        scope 2 {
+            debug residual => _14;
+            scope 3 {
+            }
+        }
+        scope 4 {
+            debug val => const ();
+            scope 5 {
+            }
+        }
+    }
+
+    bb0: {
+        _6 = core::slice::<impl [u8]>::split_at(_3, const 1_usize) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = (_6.0: &[u8]);
+        _5 = (_6.1: &[u8]);
+        _8 = const 0_usize;
+        _9 = Len((*_4));
+        _10 = Lt(_8, _9);
+        assert(move _10, "index out of bounds: the length is {} but the index is {}", move _9, _8) -> [success: bb2, unwind continue];
+    }
+
+    bb2: {
+        switchInt((*_4)[_8]) -> [0: bb4, otherwise: bb3];
+    }
+
+    bb3: {
+        _15 = const "Error: unknown instruction";
+        _7 = solana_program::log::sol_log(_15) -> [return: bb9, unwind continue];
+    }
+
+    bb4: {
+        _12 = process_increment_counter(_2, _5) -> [return: bb5, unwind continue];
+    }
+
+    bb5: {
+        _11 = <Result<(), ProgramError> as Try>::branch(move _12) -> [return: bb6, unwind continue];
+    }
+
+    bb6: {
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb8, otherwise: bb7];
+    }
+
+    bb7: {
+        unreachable;
+    }
+
+    bb8: {
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb10, unwind continue];
+    }
+
+    bb9: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb10;
+    }
+
+    bb10: {
+        return;
+    }
+}
+
+fn process_increment_counter(_1: &[AccountInfo<'_>], _2: &[u8]) -> Result<(), ProgramError> {
+    debug accounts => _1;
+    debug _instruction_data => _2;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _3: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _4: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _7: isize;
+    let mut _10: bool;
+    let _11: !;
+    let mut _12: std::fmt::Arguments<'_>;
+    let mut _13: &[&str];
+    let mut _15: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, state::Counter>;
+    let mut _16: std::result::Result<state::Counter, std::io::Error>;
+    let mut _17: &[u8];
+    let _18: &&mut [u8];
+    let _19: &std::cell::RefMut<'_, &mut [u8]>;
+    let _20: std::cell::RefMut<'_, &mut [u8]>;
+    let mut _21: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, std::cell::RefMut<'_, &mut [u8]>>;
+    let mut _22: std::result::Result<std::cell::RefMut<'_, &mut [u8]>, solana_program::program_error::ProgramError>;
+    let mut _23: isize;
+    let mut _26: isize;
+    let mut _29: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _30: std::result::Result<(), std::io::Error>;
+    let mut _31: &state::Counter;
+    let mut _32: &mut &mut [u8];
+    let mut _33: &mut std::cell::RefMut<'_, &mut [u8]>;
+    let mut _34: std::cell::RefMut<'_, &mut [u8]>;
+    let _35: &std::cell::RefCell<&mut [u8]>;
+    let mut _36: &std::rc::Rc<std::cell::RefCell<&mut [u8]>>;
+    let mut _37: isize;
+    let mut _40: &mut [u8];
+    scope 1 {
+        debug account_info_iter => _3;
+        let _8: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _9: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug counter_account => _9;
+            let mut _14: state::Counter;
+            let _24: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _25: std::cell::RefMut<'_, &mut [u8]>;
+            let _27: std::result::Result<std::convert::Infallible, std::io::Error>;
+            let _28: state::Counter;
+            let mut _39: &[&str; 1];
+            scope 7 {
+                debug counter => _14;
+                let _38: std::result::Result<std::convert::Infallible, std::io::Error>;
+                scope 16 {
+                    debug residual => _38;
+                    scope 17 {
+                    }
+                }
+                scope 18 {
+                    debug val => const ();
+                    scope 19 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _24;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _25;
+                scope 11 {
+                }
+            }
+            scope 12 {
+                debug residual => _27;
+                scope 13 {
+                }
+            }
+            scope 14 {
+                debug val => _28;
+                scope 15 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _8;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _9;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _4 = core::slice::<impl [AccountInfo<'_>]>::iter(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = &mut _4;
+        _6 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _6) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _7 = discriminant(_5);
+        switchInt(move _7) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _9 = ((_5 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _10 = ((*_9).6: bool);
+        switchInt(move _10) -> [0: bb7, otherwise: bb9];
+    }
+
+    bb6: {
+        _8 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _8) -> [return: bb29, unwind continue];
+    }
+
+    bb7: {
+        _39 = const process_increment_counter::promoted[0];
+        _13 = _39 as &[&str] (PointerCoercion(Unsize));
+        _12 = Arguments::<'_>::new_const(move _13) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _11 = panic_fmt(move _12) -> unwind continue;
+    }
+
+    bb9: {
+        _22 = AccountInfo::<'_>::try_borrow_mut_data(_9) -> [return: bb10, unwind continue];
+    }
+
+    bb10: {
+        _21 = <Result<RefMut<'_, &mut [u8]>, ProgramError> as Try>::branch(move _22) -> [return: bb11, unwind continue];
+    }
+
+    bb11: {
+        _23 = discriminant(_21);
+        switchInt(move _23) -> [0: bb12, 1: bb13, otherwise: bb4];
+    }
+
+    bb12: {
+        _25 = move ((_21 as Continue).0: std::cell::RefMut<'_, &mut [u8]>);
+        _20 = move _25;
+        _19 = &_20;
+        _18 = <RefMut<'_, &mut [u8]> as Deref>::deref(_19) -> [return: bb14, unwind: bb31];
+    }
+
+    bb13: {
+        _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb29, unwind continue];
+    }
+
+    bb14: {
+        _40 = deref_copy (*_18);
+        _17 = &(*_40);
+        _16 = <state::Counter as BorshDeserialize>::try_from_slice(move _17) -> [return: bb15, unwind: bb31];
+    }
+
+    bb15: {
+        _15 = <Result<state::Counter, std::io::Error> as Try>::branch(move _16) -> [return: bb16, unwind: bb31];
+    }
+
+    bb16: {
+        _26 = discriminant(_15);
+        switchInt(move _26) -> [0: bb17, 1: bb18, otherwise: bb4];
+    }
+
+    bb17: {
+        _28 = move ((_15 as Continue).0: state::Counter);
+        _14 = move _28;
+        drop(_20) -> [return: bb33, unwind continue];
+    }
+
+    bb18: {
+        _27 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _27) -> [return: bb19, unwind: bb31];
+    }
+
+    bb19: {
+        drop(_20) -> [return: bb29, unwind continue];
+    }
+
+    bb20: {
+        _34 = RefCell::<&mut [u8]>::borrow_mut(_35) -> [return: bb21, unwind continue];
+    }
+
+    bb21: {
+        _33 = &mut _34;
+        _32 = <RefMut<'_, &mut [u8]> as DerefMut>::deref_mut(move _33) -> [return: bb22, unwind: bb30];
+    }
+
+    bb22: {
+        _30 = <state::Counter as BorshSerialize>::serialize::<&mut [u8]>(move _31, _32) -> [return: bb23, unwind: bb30];
+    }
+
+    bb23: {
+        _29 = <Result<(), std::io::Error> as Try>::branch(move _30) -> [return: bb24, unwind: bb30];
+    }
+
+    bb24: {
+        _37 = discriminant(_29);
+        switchInt(move _37) -> [0: bb25, 1: bb26, otherwise: bb4];
+    }
+
+    bb25: {
+        drop(_34) -> [return: bb28, unwind continue];
+    }
+
+    bb26: {
+        _38 = move ((_29 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _38) -> [return: bb27, unwind: bb30];
+    }
+
+    bb27: {
+        drop(_34) -> [return: bb29, unwind continue];
+    }
+
+    bb28: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb29;
+    }
+
+    bb29: {
+        return;
+    }
+
+    bb30 (cleanup): {
+        drop(_34) -> [return: bb32, unwind terminate(cleanup)];
+    }
+
+    bb31 (cleanup): {
+        drop(_20) -> [return: bb32, unwind terminate(cleanup)];
+    }
+
+    bb32 (cleanup): {
+        resume;
+    }
+
+    bb33: {
+        (_14.0: u64) = Add((_14.0: u64), const 1_u64);
+        _31 = &_14;
+        _36 = &((*_9).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        _35 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _36) -> [return: bb20, unwind continue];
+    }
+}
+
+const process_increment_counter::promoted[0]: &[&str; 1] = {
+    let mut _0: &[&str; 1];
+    let mut _1: [&str; 1];
+
+    bb0: {
+        _1 = [const "Counter account must be writable"];
+        _0 = &_1;
+        return;
+    }
+}

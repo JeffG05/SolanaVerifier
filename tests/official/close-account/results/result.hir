@@ -1,0 +1,350 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+mod instructions {
+
+
+    mod close_user {
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::rent::Rent;
+        use solana_program::sysvar::Sysvar;
+        fn close_user<'_, '_>(accounts: &'_ [AccountInfo<>])
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let target_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let payer =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let account_span = 0usize;
+                let lamports_required =
+                    match #[lang = "branch"](Rent::get()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.minimum_balance(account_span);
+                let diff = target_account.lamports() - lamports_required;
+                **target_account.lamports.borrow_mut() -= diff;
+                **payer.lamports.borrow_mut() += diff;
+                match #[lang = "branch"](target_account.realloc(account_span,
+                                    true)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                target_account.assign(system_program.key);
+                Ok(())
+            }
+    }
+    mod create_user {
+        use borsh::BorshSerialize;
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::program::invoke_signed;
+        use solana_program::pubkey::Pubkey;
+        use solana_program::rent::Rent;
+        use solana_program::system_instruction;
+        use solana_program::sysvar::Sysvar;
+        use crate::state::user::User;
+        fn create_user<'_, '_,
+            '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+            data: User)
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let target_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let payer =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let account_span =
+                    match #[lang = "branch"](data.try_to_vec()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.len();
+                let lamports_required =
+                    match #[lang = "branch"](Rent::get()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.minimum_balance(account_span);
+                let (_, bump) =
+                    Pubkey::find_program_address(&[User::SEED_PREFIX.as_bytes(),
+                                    payer.key.as_ref()], program_id);
+                match #[lang = "branch"](invoke_signed(&system_instruction::create_account(payer.key,
+                                            target_account.key, lamports_required, account_span as u64,
+                                            program_id),
+                                    &[payer.clone(), target_account.clone(),
+                                                system_program.clone()],
+                                    &[&[User::SEED_PREFIX.as_bytes(), payer.key.as_ref(),
+                                                            &[bump]]])) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](data.serialize(&mut &mut target_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+    }
+}
+mod processor {
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    use ::{};
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::pubkey::Pubkey;
+    use ::{};
+    use crate::instructions::close_user::close_user;
+    use crate::instructions::create_user::create_user;
+    use crate::state::user::User;
+    enum MyInstruction { CreateUser(User), CloseUser, }
+    impl borsh::ser::BorshSerialize for MyInstruction where
+        User: borsh::ser::BorshSerialize {
+        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+            -> core::result::Result<(), borsh::maybestd::io::Error> where
+            W: borsh::maybestd::io::Write {
+                let variant_idx: u8 =
+                    match self {
+                            MyInstruction::CreateUser(..) => 0u8,
+                            MyInstruction::CloseUser => 1u8,
+                        };
+                match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match self {
+                        MyInstruction::CreateUser(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                        MyInstruction::CloseUser => { }
+                    }
+                Ok(())
+            }
+    }
+    impl borsh::de::BorshDeserialize for MyInstruction where
+        User: borsh::BorshDeserialize {
+        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+            ->
+                core::result::Result<Self,
+                borsh::maybestd::io::Error> {
+                let variant_idx: u8 =
+                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let return_value =
+                    match variant_idx {
+                            0u8 =>
+                                MyInstruction::CreateUser(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            1u8 => MyInstruction::CloseUser,
+                            _ => {
+                                let msg =
+                                    {
+                                            let res =
+                                                ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                        &[format_argument::new_debug(&variant_idx)]));
+                                            res
+                                        };
+                                return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                            msg));
+                            }
+                        };
+                Ok(return_value)
+            }
+    }
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        input: &'_ [u8])
+        ->
+            ProgramResult {
+            let instruction =
+                match #[lang = "branch"](MyInstruction::try_from_slice(input))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            match instruction {
+                    MyInstruction::CreateUser(data) =>
+                        create_user(program_id, accounts, data),
+                    MyInstruction::CloseUser => close_user(accounts),
+                }
+        }
+}
+mod state {
+    mod user {
+        use ::{};
+        use borsh::BorshDeserialize;
+        use borsh::BorshSerialize;
+        struct User {
+            name: String,
+        }
+        impl borsh::de::BorshDeserialize for User where
+            String: borsh::BorshDeserialize {
+            fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                ->
+                    ::core::result::Result<Self,
+                    borsh::maybestd::io::Error> {
+                    Ok(Self{
+                            name:
+                                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                            {
+                                        #[lang = "Break"] {  0: residual } =>
+                                            #[allow(unreachable_code)]
+                                            return #[lang = "from_residual"](residual),
+                                        #[lang = "Continue"] {  0: val } =>
+                                            #[allow(unreachable_code)]
+                                            val,
+                                    },})
+                }
+        }
+        impl borsh::ser::BorshSerialize for User where
+            String: borsh::ser::BorshSerialize {
+            fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                where
+                W: borsh::maybestd::io::Write {
+                    match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                        writer)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                    Ok(())
+                }
+        }
+        impl User {
+            const
+            SEED_PREFIX:
+            &'static str
+            =
+            "USER";
+        }
+    }
+}
+use ::{};
+use crate::processor::process_instruction;
+use solana_program::entrypoint;
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }

@@ -1,0 +1,284 @@
+// WARNING: This output format is intended for human consumers only
+// and is subject to change without notice. Knock yourself out.
+fn entrypoint(_1: *mut u8) -> u64 {
+    debug input => _1;
+    let mut _0: u64;
+    let _2: &solana_program::pubkey::Pubkey;
+    let _3: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _4: &[u8];
+    let mut _5: (&solana_program::pubkey::Pubkey, std::vec::Vec<solana_program::account_info::AccountInfo<'_>>, &[u8]);
+    let mut _6: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _7: &&solana_program::pubkey::Pubkey;
+    let _8: &[solana_program::account_info::AccountInfo<'_>];
+    let _9: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _10: &&[u8];
+    let mut _11: isize;
+    let mut _13: &solana_program::pubkey::Pubkey;
+    let mut _14: &[u8];
+    scope 1 {
+        debug program_id => _2;
+        debug accounts => _3;
+        debug instruction_data => _4;
+        let _12: solana_program::program_error::ProgramError;
+        scope 3 {
+            debug error => _12;
+        }
+    }
+    scope 2 {
+    }
+
+    bb0: {
+        _5 = solana_program::entrypoint::deserialize::<'_>(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _2 = (_5.0: &solana_program::pubkey::Pubkey);
+        _3 = move (_5.1: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>);
+        _4 = (_5.2: &[u8]);
+        _7 = &_2;
+        _13 = deref_copy (*_7);
+        _9 = &_3;
+        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb10];
+    }
+
+    bb2: {
+        _10 = &_4;
+        _14 = deref_copy (*_10);
+        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb10];
+    }
+
+    bb3: {
+        _11 = discriminant(_6);
+        switchInt(move _11) -> [0: bb6, 1: bb5, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb9];
+    }
+
+    bb6: {
+        _0 = const solana_program::entrypoint::SUCCESS;
+        goto -> bb7;
+    }
+
+    bb7: {
+        drop(_3) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+
+    bb9 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb10 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb11 (cleanup): {
+        resume;
+    }
+
+    bb12: {
+        goto -> bb7;
+    }
+}
+
+fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result<(), ProgramError> {
+    debug _program_id => _1;
+    debug accounts => _2;
+    debug instruction_data => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _4: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _7: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _8: isize;
+    let mut _11: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _12: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _13: isize;
+    let mut _16: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _17: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _18: isize;
+    let mut _23: &solana_program::rent::Rent;
+    let _24: solana_program::rent::Rent;
+    let mut _25: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, solana_program::rent::Rent>;
+    let mut _26: std::result::Result<solana_program::rent::Rent, solana_program::program_error::ProgramError>;
+    let mut _27: isize;
+    scope 1 {
+        debug accounts_iter => _4;
+        let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _10: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug payer => _10;
+            let _14: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _15: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug new_account => _15;
+                let _19: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _20: &solana_program::account_info::AccountInfo<'_>;
+                scope 12 {
+                    debug system_program => _20;
+                    let _21: usize;
+                    scope 17 {
+                        debug account_span => _21;
+                        let _22: u64;
+                        let _28: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                        let _29: solana_program::rent::Rent;
+                        scope 18 {
+                            debug lamports_required => _22;
+                        }
+                        scope 19 {
+                            debug residual => _28;
+                            scope 20 {
+                            }
+                        }
+                        scope 21 {
+                            debug val => _29;
+                            scope 22 {
+                            }
+                        }
+                    }
+                }
+                scope 13 {
+                    debug residual => _19;
+                    scope 14 {
+                    }
+                }
+                scope 15 {
+                    debug val => _20;
+                    scope 16 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _14;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _15;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _9;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _10;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _5 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = &mut _5;
+        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _7) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _8 = discriminant(_6);
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb20, unwind continue];
+    }
+
+    bb7: {
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb20, unwind continue];
+    }
+
+    bb11: {
+        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _18 = discriminant(_16);
+        switchInt(move _18) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _21 = Len((*_3));
+        _26 = <Rent as Sysvar>::get() -> [return: bb15, unwind continue];
+    }
+
+    bb14: {
+        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb20, unwind continue];
+    }
+
+    bb15: {
+        _25 = <Result<Rent, ProgramError> as Try>::branch(move _26) -> [return: bb16, unwind continue];
+    }
+
+    bb16: {
+        _27 = discriminant(_25);
+        switchInt(move _27) -> [0: bb17, 1: bb18, otherwise: bb4];
+    }
+
+    bb17: {
+        _29 = move ((_25 as Continue).0: solana_program::rent::Rent);
+        _24 = move _29;
+        _23 = &_24;
+        _22 = Rent::minimum_balance(move _23, _21) -> [return: bb19, unwind continue];
+    }
+
+    bb18: {
+        _28 = move ((_25 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _28) -> [return: bb20, unwind continue];
+    }
+
+    bb19: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb20;
+    }
+
+    bb20: {
+        return;
+    }
+}

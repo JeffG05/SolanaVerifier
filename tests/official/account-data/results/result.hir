@@ -1,0 +1,272 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use solana_program::entrypoint;
+
+use processor::process_instruction;
+
+mod instructions {
+
+    mod create {
+        use borsh::BorshSerialize;
+        use ::{};
+        use ::{};
+        use solana_program::account_info::next_account_info;
+        use solana_program::account_info::AccountInfo;
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::program::invoke;
+        use solana_program::pubkey::Pubkey;
+        use solana_program::rent::Rent;
+        use solana_program::system_instruction;
+        use solana_program::sysvar::Sysvar;
+        use crate::state::AddressInfo;
+        fn create_address_info<'_, '_,
+            '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+            address_info: AddressInfo)
+            ->
+                ProgramResult {
+                let accounts_iter = &mut accounts.iter();
+                let address_info_account =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let payer =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let system_program =
+                    match #[lang = "branch"](next_account_info(accounts_iter)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let account_span =
+                    match #[lang = "branch"](address_info.try_to_vec()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.len();
+                let lamports_required =
+                    match #[lang = "branch"](Rent::get()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            }.minimum_balance(account_span);
+                match #[lang = "branch"](invoke(&system_instruction::create_account(payer.key,
+                                            address_info_account.key, lamports_required,
+                                            account_span as u64, program_id),
+                                    &[payer.clone(), address_info_account.clone(),
+                                                system_program.clone()])) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match #[lang = "branch"](address_info.serialize(&mut &mut address_info_account.data.borrow_mut()[#[lang = "RangeFull"]{}]))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+    }
+    use create::*;
+}
+mod processor {
+    use borsh::BorshDeserialize;
+    use ::{};
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::program_error::ProgramError;
+    use solana_program::pubkey::Pubkey;
+    use crate::instructions;
+    use crate::state::AddressInfo;
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        instruction_data: &'_ [u8])
+        ->
+            ProgramResult {
+            if let Ok(address_info) =
+                        AddressInfo::try_from_slice(instruction_data)
+                    {
+                            return instructions::create::create_address_info(program_id,
+                                    accounts, address_info);
+                        };
+                    Err(ProgramError::InvalidInstructionData)
+                }
+        }
+        mod state {
+            mod address_info {
+                use ::{};
+                use borsh::BorshDeserialize;
+                use borsh::BorshSerialize;
+                struct AddressInfo {
+                    name: String,
+                    house_number: u8,
+                    street: String,
+                    city: String,
+                }
+                impl borsh::de::BorshDeserialize for AddressInfo where
+                    String: borsh::BorshDeserialize,
+                    u8: borsh::BorshDeserialize,
+                    String: borsh::BorshDeserialize,
+                    String: borsh::BorshDeserialize {
+                    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                        ->
+                            ::core::result::Result<Self,
+                            borsh::maybestd::io::Error> {
+                            Ok(Self{
+                                    name:
+                                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            },
+
+                                    house_number:
+                                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            },
+
+                                    street:
+                                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            },
+
+                                    city:
+                                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            },})
+                        }
+                }
+                impl borsh::ser::BorshSerialize for AddressInfo where
+                    String: borsh::ser::BorshSerialize,
+                    u8: borsh::ser::BorshSerialize,
+                    String: borsh::ser::BorshSerialize,
+                    String: borsh::ser::BorshSerialize {
+                    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                        -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                        where
+                        W: borsh::maybestd::io::Write {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.house_number,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.street,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.city,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                            Ok(())
+                        }
+                }
+                #[automatically_derived]
+                impl ::core::fmt::Debug for AddressInfo {
+                    #[inline]
+                    fn fmt<'_, '_,
+                        '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                        ->
+                            ::core::fmt::Result {
+                            ::core::fmt::Formatter::debug_struct_field4_finish(f,
+                                "AddressInfo", "name", &self.name, "house_number",
+                                &self.house_number, "street", &self.street, "city",
+                                &&self.city)
+                        }
+                }
+                impl AddressInfo {
+                    fn new(name: String, house_number: u8, street: String,
+                        city: String)
+                        ->
+                            Self { AddressInfo{ name,  house_number,  street,  city,} }
+                }
+            }
+            use address_info::*;
+        }
+        /// # Safety
+        #[no_mangle]
+        unsafe extern "C" fn entrypoint(input: *mut u8)
+            ->
+                u64 {
+                let (program_id, accounts, instruction_data) =
+                    unsafe { ::solana_program::entrypoint::deserialize(input) };
+                match process_instruction(&program_id, &accounts,
+                                &instruction_data) {
+                        Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                        Err(error) => error.into(),
+                    }
+            }

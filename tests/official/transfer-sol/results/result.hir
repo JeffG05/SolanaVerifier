@@ -1,0 +1,258 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+mod instruction {
+
+
+    use ::{};
+    use ::{};
+    use solana_program::account_info::next_account_info;
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::program::invoke;
+    use solana_program::pubkey::Pubkey;
+    use solana_program::system_instruction;
+    fn transfer_sol_with_cpi<'_,
+        '_>(accounts: &'_ [AccountInfo<>], amount: u64)
+        ->
+            ProgramResult {
+            let accounts_iter = &mut accounts.iter();
+            let payer =
+                match #[lang = "branch"](next_account_info(accounts_iter)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let recipient =
+                match #[lang = "branch"](next_account_info(accounts_iter)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let system_program =
+                match #[lang = "branch"](next_account_info(accounts_iter)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            Ok(())
+        }
+    fn transfer_sol_with_program<'_, '_,
+        '_>(_program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        amount: u64)
+        ->
+            ProgramResult {
+            let accounts_iter = &mut accounts.iter();
+            let payer =
+                match #[lang = "branch"](next_account_info(accounts_iter)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let recipient =
+                match #[lang = "branch"](next_account_info(accounts_iter)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            **match #[lang = "branch"](payer.try_borrow_mut_lamports()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            } -= amount;
+            **match #[lang = "branch"](recipient.try_borrow_mut_lamports()) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            } += amount;
+            Ok(())
+        }
+}
+mod processor {
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    use ::{};
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use solana_program::pubkey::Pubkey;
+    use crate::instruction::transfer_sol_with_cpi;
+    use crate::instruction::transfer_sol_with_program;
+    enum TransferInstruction { CpiTransfer(u64), ProgramTransfer(u64), }
+    impl borsh::ser::BorshSerialize for TransferInstruction where
+        u64: borsh::ser::BorshSerialize, u64: borsh::ser::BorshSerialize {
+        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+            -> core::result::Result<(), borsh::maybestd::io::Error> where
+            W: borsh::maybestd::io::Write {
+                let variant_idx: u8 =
+                    match self {
+                            TransferInstruction::CpiTransfer(..) => 0u8,
+                            TransferInstruction::ProgramTransfer(..) => 1u8,
+                        };
+                match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                match self {
+                        TransferInstruction::CpiTransfer(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                        TransferInstruction::ProgramTransfer(id0) => {
+                            match #[lang = "branch"](borsh::BorshSerialize::serialize(id0,
+                                                writer)) {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                };
+                        }
+                    }
+                Ok(())
+            }
+    }
+    impl borsh::de::BorshDeserialize for TransferInstruction where
+        u64: borsh::BorshDeserialize, u64: borsh::BorshDeserialize {
+        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+            ->
+                core::result::Result<Self,
+                borsh::maybestd::io::Error> {
+                let variant_idx: u8 =
+                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                let return_value =
+                    match variant_idx {
+                            0u8 =>
+                                TransferInstruction::CpiTransfer(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            1u8 =>
+                                TransferInstruction::ProgramTransfer(match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        }),
+                            _ => {
+                                let msg =
+                                    {
+                                            let res =
+                                                ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                        &[format_argument::new_debug(&variant_idx)]));
+                                            res
+                                        };
+                                return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                            msg));
+                            }
+                        };
+                Ok(return_value)
+            }
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for TransferInstruction {
+        #[inline]
+        fn fmt<'_, '_,
+            '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+            ->
+                ::core::fmt::Result {
+                match self {
+                        TransferInstruction::CpiTransfer(__self_0) =>
+                            ::core::fmt::Formatter::debug_tuple_field1_finish(f,
+                                "CpiTransfer", &__self_0),
+                        TransferInstruction::ProgramTransfer(__self_0) =>
+                            ::core::fmt::Formatter::debug_tuple_field1_finish(f,
+                                "ProgramTransfer", &__self_0),
+                    }
+            }
+    }
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        input: &'_ [u8])
+        ->
+            ProgramResult {
+            let instruction =
+                match #[lang = "branch"](TransferInstruction::try_from_slice(input))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            match instruction {
+                    TransferInstruction::CpiTransfer(args) =>
+                        transfer_sol_with_cpi(accounts, args),
+                    TransferInstruction::ProgramTransfer(args) => {
+                        transfer_sol_with_program(program_id, accounts, args)
+                    }
+                }
+        }
+}
+use ::{};
+use crate::processor::process_instruction;
+use solana_program::entrypoint;
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
