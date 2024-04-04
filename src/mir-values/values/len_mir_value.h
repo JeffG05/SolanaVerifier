@@ -7,7 +7,7 @@
 class len_mir_value : public mir_value {
 public:
     len_mir_value() : mir_value(
-        std::regex (R"(^Len\((.+)\)$)"),
+        std::regex (R"(^(?:Len|.+::len)\((.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
             return std::make_tuple("len<" + value + ">", true);
