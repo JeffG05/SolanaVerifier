@@ -143,7 +143,7 @@ bool controller::run(const int argc, char *argv[]) {
         auto t_contract_start = std::chrono::high_resolution_clock::now();
         const auto contract = solana_contract(_contract_dir, _globals);
         auto t_contract_end = std::chrono::high_resolution_clock::now();
-        print_info("solana contract loaded from '" + contract.get_path() + "' (took " + get_millis(t_contract_start, t_contract_end) + ")");
+        print_info("solana contract '" + contract.get_name() + "' loaded from '" + contract.get_path() + "' (took " + get_millis(t_contract_start, t_contract_end) + ")");
 
         print_info("starting conversion to hir");
         auto t_to_hir_start = std::chrono::high_resolution_clock::now();
