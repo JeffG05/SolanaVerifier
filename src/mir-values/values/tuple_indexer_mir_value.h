@@ -21,6 +21,8 @@ public:
                 value = var.substr(6, var.size() - 7);
             } else if (var.starts_with("some<")) {
                 value = var.substr(5, var.size() - 6);
+            } else if (var.starts_with("as_ok<")) {
+                value = var.substr(6, var.size() - 7);
             } else if (var_statement.has_value() && var_statement.value().get_ast_data().at("variable_type").get<std::string>().starts_with("array<")) {
                 value = var + "[" + match[2].str() + "]";
             } else {
