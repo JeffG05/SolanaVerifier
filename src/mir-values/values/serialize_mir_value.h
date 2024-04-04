@@ -10,7 +10,8 @@ public:
         std::regex (R"(^<(.+) as BorshSerialize>::(?:try_to_vec|serialize::<.+>)\((.+?)(?:, (.+))?\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value1, returns1] = mir_value_converter::convert(match[2].str(), variables);
-            const std::string serialize_func = "serialize<" + match[1].str() + ", ";
+            auto type = mir_type_converter::convert(match[1].str());
+            const std::string serialize_func = "serialize<" + type + ", ";
 
             if (match[3].matched) {
                 auto [value2, returns2] = mir_value_converter::convert(match[3].str(), variables);

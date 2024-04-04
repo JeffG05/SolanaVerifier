@@ -170,6 +170,7 @@ add_executable(SolanaVerifier
         mir-values/values/create_program_address_mir_value.h
         mir-values/values/len_mir_value.h
         mir-values/values/array_indexer_mir_value.h
+        mir-types/types/struct_mir_type.h
 )
 
 target_link_libraries(SolanaVerifier

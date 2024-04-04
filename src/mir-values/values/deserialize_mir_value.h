@@ -10,7 +10,8 @@ public:
         std::regex (R"(^<(.+) as BorshDeserialize>::(?:try_from_slice|deserialize)\((.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns] = mir_value_converter::convert(match[2].str(), variables);
-            const std::string deserialize_func = "deserialize<" + match[1].str() + ", " + value + ">";
+            auto type = mir_type_converter::convert(match[1].str());
+            const std::string deserialize_func = "deserialize<" + type + ", " + value + ">";
             return std::make_tuple(deserialize_func, true);
         }
     ) {}

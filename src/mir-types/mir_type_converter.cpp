@@ -32,6 +32,7 @@
 #include "types/uint_mir_type.h"
 #include "types/vec_mir_type.h"
 #include "types/void_mir_type.h"
+#include "types/struct_mir_type.h"
 
 std::string mir_type_converter::convert(const std::string& mir) {
     for (const auto& type: _all_types) {
@@ -74,5 +75,8 @@ std::vector<mir_type> mir_type_converter::_all_types = {
     arguments_mir_type(),
     float_mir_type(),
     rent_mir_type(),
-    argument_mir_type()
+    argument_mir_type(),
+
+    // KEEP LAST
+    struct_mir_type()
 };
