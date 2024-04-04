@@ -14,10 +14,10 @@ public:
             if (var_statement.has_value()) {
                 std::string var_type = var_statement.value().get_ast_data().at("variable_type");
                 if (var_type.starts_with("controlflow<")) {
-                    return std::make_tuple(value + ".type == _continue ? 0 : (" + value + ".type == _break ? 1 : 2)", true);
+                    return std::make_tuple("(" + value + ".type == _continue ? 0 : (" + value + ".type == _break ? 1 : 2))", true);
                 }
                 if (var_type.starts_with("result<")) {
-                    return std::make_tuple(value + ".is_success ? 0 : 1)", true);
+                    return std::make_tuple("(" + value + ".is_success ? 0 : 1)", true);
                 }
                 return std::make_tuple("enum_discriminant<" + value + ">", true);
             }
