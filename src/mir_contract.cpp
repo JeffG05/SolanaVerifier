@@ -1013,10 +1013,10 @@ void mir_contract::generate_branch(std::ostream *out, const mir_statement &branc
     const std::string branch_condition = branch_data.at("condition").get<std::string>();
     const std::string branch_destination = branch_data.at("destination").get<std::string>();
     const bool branch_ignore_var = branch_data.at("ignore_var").get<bool>();
-    if (variable.empty()) {
-        *out << "\tif (" << value << " == " << branch_condition << ") {" << std::endl;
-    } else if (branch_ignore_var) {
+    if (branch_ignore_var) {
         *out << "\tif (" << branch_condition << ") {" << std::endl;
+    } else if (variable.empty()) {
+        *out << "\tif (" << value << " == " << branch_condition << ") {" << std::endl;
     } else {
         *out << "\tif (state." << variable << " == " << branch_condition << ") {" << std::endl;
     }
