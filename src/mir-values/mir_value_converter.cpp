@@ -84,6 +84,7 @@
 #include "values/as_ok_mir_value.h"
 #include "values/rent_get_mir_value.h"
 #include "values/lamports_mir_value.h"
+#include "values/system_program_check_id_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -150,6 +151,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     init_account_meta_mir_value(),
     invoke_mir_value(),
     system_program_id_mir_value(),
+    system_program_check_id_mir_value(),
     const_bool_mir_value(),
     shallow_init_box_mir_value(),
     size_of_mir_value(),
