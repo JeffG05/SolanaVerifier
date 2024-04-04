@@ -82,6 +82,7 @@
 #include "values/len_mir_value.h"
 #include "values/array_indexer_mir_value.h"
 #include "values/as_ok_mir_value.h"
+#include "values/rent_get_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -171,6 +172,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     as_ok_mir_value(),
     len_mir_value(),
     array_indexer_mir_value(),
+    rent_get_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

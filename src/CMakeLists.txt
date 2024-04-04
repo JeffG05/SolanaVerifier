@@ -172,6 +172,7 @@ add_executable(SolanaVerifier
         mir-values/values/array_indexer_mir_value.h
         mir-types/types/struct_mir_type.h
         mir-values/values/as_ok_mir_value.h
+        mir-values/values/rent_get_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
