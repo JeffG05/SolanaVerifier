@@ -89,6 +89,7 @@
 #include "values/account_info_realloc_mir_value.h"
 #include "values/split_at_mir_value.h"
 #include "values/try_borrow_mutable_data_mir_value.h"
+#include "values/pubkey_from_bytes_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -166,6 +167,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     create_program_address_mir_value(),
     str_as_bytes_mir_value(),
     pubkey_as_bytes_mir_value(),
+    pubkey_from_bytes_mir_value(),
     panic_mir_value(),
     clone_mir_value(),
     transfer_mir_value(),

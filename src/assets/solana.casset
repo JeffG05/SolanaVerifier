@@ -168,6 +168,9 @@ pubkey nondet_pubkey() {
 void pubkey_as_bytes(pubkey in, u8* out) {
     *out = in;
 }
+pubkey pubkey_from_bytes(u8* out) {
+    return out[0];
+}
 
 // PROGRAM ADDRESS
 typedef struct solana_c_program_address_struct {
