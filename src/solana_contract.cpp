@@ -91,13 +91,19 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
     std::regex num_const_regex (R"((.*?)((?:[ui](?:8|16|32|64|size)|f(?:8|16|32|64)))::(MAX|MIN)(.*))");
     std::regex assert_eq_regex (R"((.*?)assert_eq!\((.+?), (.+)\);(.*))");
     std::regex assert_regex (R"((.*?)assert!\((.+?)(?:, \".+\")?\);(.*))");
-    std::regex msg_regex (R"((.*?)msg!\(.+\);(.*))");
+    std::regex msg_regex (R"((.*?)msg!\(.+\);?(.*))");
     std::regex invoke_regex (R"(.*?(invoke(?:_signed)?\(.*))");
     std::regex semi_regex (R"(.*?;(.*))");
     std::smatch match;
 
     bool deleting_to_semi = false;
+    std::string statement;
     while (getline(file, line)) {
+
+        if (!statement.empty()) {
+            line = statement + (statement.ends_with(',') ? " " : "") + utils::trim(line);
+        }
+
         while (true) {
             std::string updated_line;
             if (deleting_to_semi) {
@@ -187,6 +193,13 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
                 break;
             }
             line = updated_line;
+        }
+
+        if (line.find("assert!(") != std::string::npos) {
+            statement = line;
+            continue;
+        } else {
+            statement = "";
         }
 
         temp_file << line << std::endl;

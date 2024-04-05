@@ -26,6 +26,7 @@ mod state {
 
 
 
+
     use ::{};
     use borsh::BorshDeserialize;
     use borsh::BorshSerialize;
@@ -135,9 +136,7 @@ fn process_instruction<'_, '_, '_,
                                 val,
                         };
                 }
-                _ => {
-                    ::solana_program::log::sol_log("Error: unknown instruction")
-                }
+                _ => { }
             }
         Ok(())
     }
@@ -159,9 +158,14 @@ fn process_increment_counter<'_, '_,
         if !counter_account.is_writable
                 {
                         {
-                                ::core::panicking::panic_fmt(format_arguments::new_const(&["Counter account must be writable"]));
-                            }
-                    };
+                                #[cold]
+                                #[track_caller]
+                                #[inline(never)]
+                                const fn panic_cold_explicit()
+                                    -> ! { ::core::panicking::panic_explicit() }
+                                panic_cold_explicit();
+                            };
+                    }
                 let mut counter =
                     match #[lang = "branch"](Counter::try_from_slice(&match #[lang = "branch"](counter_account.try_borrow_mut_data())
                                                         {
