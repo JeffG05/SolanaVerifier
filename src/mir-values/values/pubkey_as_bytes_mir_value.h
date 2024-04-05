@@ -7,7 +7,7 @@
 class pubkey_as_bytes_mir_value : public mir_value {
 public:
     pubkey_as_bytes_mir_value() : mir_value(
-        std::regex (R"(^Pubkey::to_bytes\((.+)\)$)"),
+        std::regex (R"(^(?:Pubkey::to_bytes|<Pubkey as AsRef<\[u8\]>>::as_ref)\((.+)\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             auto [value, returns] = mir_value_converter::convert(match[1].str(), variables);
             return std::make_tuple("pubkey_as_bytes<" + value + ">", true);
