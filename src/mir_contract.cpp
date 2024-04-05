@@ -882,6 +882,18 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         } else {
             generate_block_assignment(out, variable, subvalue + "()", true, all_variables, function_name, indents, no_state);
         }
+    } else if (value.starts_with("func<")) {
+        const std::string subvalue = value.substr(5, value.size() - 6);
+        std::optional<mir_statement> function_return = mir_statement::get_statement(all_variables, variable);
+        std::string return_type = "void";
+        if (function_return.has_value()) {
+            return_type = function_return.value().get_ast_data().at("variable_type");
+        }
+        if (return_type == "void") {
+            generate_block_assignment(out, variable, subvalue, false, all_variables, function_name, indents, no_state, true);
+        } else {
+            generate_block_assignment(out, variable, subvalue, true, all_variables, function_name, indents, no_state);
+        }
     } else if (value.starts_with("account_info_assign<")) {
         const std::string subvalue = value.substr(20, value.size() - 21);
         std::list<std::string> subvalues = utils::split(subvalue, ", ", 2);
@@ -1134,7 +1146,7 @@ void mir_contract::generate_function(std::ostream *out, const mir_statements &st
                 indexes[current_depth] += 1;
             }
         }
-    } else {
+    } else if (return_type != "void") {
         *out << "\treturn state._0;" << std::endl;
     }
     *out << "}" << std::endl;

@@ -246,7 +246,7 @@ std::optional<mir_statement> mir_statement::parse_function(std::list<std::string
 
 std::optional<mir_statement> mir_statement::parse_function_header(const std::string& line) {
     const std::regex imported_lib_function_regex (R"(^fn (<.+?>)::(.+?)(::\{closure#\d+\})?\((.*?)\) -> (.+?) \{$)");
-    const std::regex imported_local_function_regex (R"(^fn (.+?)::(.+?)(::\{closure#\d+\})?\((.*?)\) -> (.+?) \{$)");
+    const std::regex imported_local_function_regex (R"(^fn (.+?)::(?:<.+>::)?(.+?)(::\{closure#\d+\})?\((.*?)\) -> (.+?) \{$)");
     const std::regex local_function_regex (R"(^fn (.+?)(::\{closure#\d+\})?\((.*?)\) -> (.*?) \{$)");
     const std::regex const_regex (R"(^const (?:(<.+?>)::)?(.+): (.+?) = \{$)");
 

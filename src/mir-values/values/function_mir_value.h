@@ -18,10 +18,15 @@ public:
             }
 
             std::string function_name = match[1].str();
+            auto function_name_parts = utils::split(function_name, ":");
+            if (function_name_parts.size() > 1) {
+                function_name = function_name_parts.front() + "__" + function_name_parts.back();
+            }
+
             std::ranges::replace(function_name, ':', '_');
 
             return std::make_tuple(
-                function_name + "(" + utils::join(converted_params, ", ") + ")",
+                "func<" + function_name + "(" + utils::join(converted_params, ", ") + ")>",
                 true
             );
         }
