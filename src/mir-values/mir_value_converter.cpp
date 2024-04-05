@@ -85,6 +85,7 @@
 #include "values/rent_get_mir_value.h"
 #include "values/lamports_mir_value.h"
 #include "values/system_program_check_id_mir_value.h"
+#include "values/account_info_assign_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -177,6 +178,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     array_indexer_mir_value(),
     rent_get_mir_value(),
     lamports_mir_value(),
+    account_info_assign_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),

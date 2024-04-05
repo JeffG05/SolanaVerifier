@@ -882,6 +882,10 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         } else {
             generate_block_assignment(out, variable, subvalue + "()", true, all_variables, function_name, indents, no_state);
         }
+    } else if (value.starts_with("account_info_assign<")) {
+        const std::string subvalue = value.substr(20, value.size() - 21);
+        std::list<std::string> subvalues = utils::split(subvalue, ", ", 2);
+        generate_block_assignment(out, (subvalues.front().starts_with("state.") ? subvalues.front().substr(6) : subvalues.front()) + ".get3", subvalues.back(), true, all_variables, function_name, indents, no_state);
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {
