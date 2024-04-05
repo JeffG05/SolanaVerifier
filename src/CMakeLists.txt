@@ -178,6 +178,7 @@ add_executable(SolanaVerifier
         mir-values/values/account_info_assign_mir_value.h
         mir-values/values/account_info_realloc_mir_value.h
         mir-values/values/split_at_mir_value.h
+        mir-values/values/try_borrow_mutable_data_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
