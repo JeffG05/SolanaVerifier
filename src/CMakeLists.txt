@@ -176,6 +176,7 @@ add_executable(SolanaVerifier
         mir-values/values/lamports_mir_value.h
         mir-values/values/system_program_check_id_mir_value.h
         mir-values/values/account_info_assign_mir_value.h
+        mir-values/values/account_info_realloc_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
