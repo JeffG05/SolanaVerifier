@@ -141,7 +141,7 @@ bool mir_contract::should_write_function(const mir_statement& function, const st
     std::string function_name = function.get_ast_data().at("name");
     bool contains_source = function.get_ast_data().contains("source");
 
-    if (function_name == "entrypoint") {
+    if (function_name == "entrypoint" || function_name == "panic_cold_explicit") {
         return false;
     }
 

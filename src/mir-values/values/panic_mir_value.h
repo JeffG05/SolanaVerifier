@@ -7,7 +7,7 @@
 class panic_mir_value : public mir_value {
 public:
     panic_mir_value() : mir_value(
-        std::regex (R"(^(?:begin_)?panic(?:::<.+>)?\(.+\)$)"),
+        std::regex (R"(^(?:begin_)?panic(?:_cold_explicit)?(?:::<.+>)?\(.*\)$)"),
         [](const std::smatch &match, const mir_statements& variables) {
             return std::make_tuple("return_error<>", false);
         }
