@@ -70,13 +70,19 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
     file.clear();
     file.seekg(0);
 
+    std::set<std::string> generated_function_names;
     auto current_statement_lines = std::list<std::string>();
     while (getline(file, line)) {
         std::string trimmed_line = trim_line(line);
         if (mir_statement::line_is_function(trimmed_line)) {
             if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
                 std::optional<mir_statement> statement = mir_statement::parse_function(current_statement_lines, _structs);
-                if (statement.has_value() && !statement.value().get_ast_data().contains("source") && statement.value().get_ast_data().at("name") != "entrypoint") {
+                if (
+                        statement.has_value() &&
+                        !statement.value().get_ast_data().contains("source") &&
+                        statement.value().get_ast_data().at("name") != "entrypoint" &&
+                        !generated_function_names.contains(statement.value().get_ast_data().at("name"))
+                        ) {
                     for (auto block : statement.value().get_children({statement_type::block})) {
                         for (const auto& assignment : block.get_children({statement_type::assignment})) {
                             std::string value = assignment.get_ast_data().at("value");
@@ -97,6 +103,7 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
                         }
                     }
                     root.add_child(statement.value());
+                    generated_function_names.insert(statement.value().get_ast_data().at("name"));
                 }
             }
             current_statement_lines.clear();
@@ -106,7 +113,12 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
     }
     if (!current_statement_lines.empty() && mir_statement::line_is_function(current_statement_lines.front())) {
         std::optional<mir_statement> statement = mir_statement::parse_function(current_statement_lines, _structs);
-        if (statement.has_value() && !statement.value().get_ast_data().contains("source") && statement.value().get_ast_data().at("name") != "entrypoint") {
+        if (
+                statement.has_value() &&
+                !statement.value().get_ast_data().contains("source") &&
+                statement.value().get_ast_data().at("name") != "entrypoint" &&
+                !generated_function_names.contains(statement.value().get_ast_data().at("name"))
+                ) {
             for (auto block : statement.value().get_children({statement_type::block})) {
                 for (const auto& assignment : block.get_children({statement_type::assignment})) {
                     std::string value = assignment.get_ast_data().at("value");
@@ -127,6 +139,7 @@ mir_statement mir_contract::create_ast_tree(std::istream &file, const std::strin
                 }
             }
             root.add_child(statement.value());
+            generated_function_names.insert(statement.value().get_ast_data().at("name"));
         }
     }
     current_statement_lines.clear();

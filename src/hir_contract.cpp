@@ -4,7 +4,6 @@
 #include <iostream>
 #include <regex>
 
-#include "mir_contract.h"
 #include "utils.h"
 
 hir_contract::hir_contract(const std::filesystem::path &path) {
@@ -56,9 +55,60 @@ mir_statements hir_contract::extract_structs() const {
                     struct_active = true;
                 }
             } else if (trimmed_line.starts_with("enum ")) {
+                std::regex enum_full_regex (R"(^enum (.+) \{ (.+), \}$)");
                 std::regex enum_regex (R"(^enum (.+) \{$)");
                 std::smatch match;
-                if (std::regex_match(trimmed_line, match, enum_regex)) {
+
+                if (std::regex_match(trimmed_line, match, enum_full_regex)) {
+                    nlohmann::json data;
+                    data["name"] = match[1].str();
+                    auto root = mir_statement(statement_type::data_enum, data);
+
+                    std::regex simple_value_regex (R"(^(.+)$)");
+                    std::regex data_value_regex (R"(^(.+)\((.+)\)$)");
+                    int enum_part_value = 1;
+                    for (const auto& enum_part: utils::split(match[2].str(), ", ")) {
+                        std::smatch m;
+                        if (std::regex_match(enum_part, m, data_value_regex)) {
+                            std::string subenum_name = match[1].str() + "_" + m[1].str();
+
+                            nlohmann::json data1;
+                            data1["name"] = utils::to_lower(m[1].str());
+                            data1["value"] = enum_part_value;
+                            auto field1 = mir_statement(statement_type::data_enum_option, data1);
+                            root.add_child(field1);
+                            enum_part_value += 1;
+
+                            nlohmann::json data2;
+                            data2["variable"] = "value_" + utils::to_lower(m[1].str());
+                            data2["variable_type"] = subenum_name;
+                            auto field = mir_statement(statement_type::variable, data2);
+                            root.add_child(field);
+
+                            nlohmann::json subenum_data;
+                            subenum_data["name"] = subenum_name;
+                            auto subenum_field = mir_statement(statement_type::data_enum_struct, subenum_data);
+
+                            nlohmann::json data3;
+                            data3["variable"] = "get0";
+                            data3["variable_type"] = mir_statement::convert_type(m[2].str());
+                            auto field2 = mir_statement(statement_type::variable, data3);
+                            subenum_field.add_child(field2);
+
+                            structs.push_front(subenum_field);
+                        } else if (std::regex_match(enum_part, m, simple_value_regex)) {
+                            nlohmann::json data1;
+                            data1["name"] = utils::to_lower(m[1].str());
+                            data1["value"] = enum_part_value;
+                            auto field1 = mir_statement(statement_type::data_enum_option, data1);
+                            root.add_child(field1);
+                            enum_part_value += 1;
+                        }
+                    }
+
+                    structs.push_back(root);
+                    enum_active = false;
+                } else if (std::regex_match(trimmed_line, match, enum_regex)) {
                     nlohmann::json data;
                     data["name"] = match[1].str();
                     auto root = mir_statement(statement_type::data_enum, data);
