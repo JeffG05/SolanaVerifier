@@ -285,7 +285,7 @@ std::optional<mir_statement> mir_statement::parse_function_header(const std::str
             parameters = match[3].str();
         }
     } else if (regex_match(line, match, const_regex)) {
-        function_data["name"] = std::regex_replace(match[2].str(), std::regex(R"(\W)"), "_");
+        function_data["name"] = std::regex_replace(utils::split(match[2].str(), "::").back(), std::regex(R"(\W)"), "_");
         function_data["return_type"] = convert_type(match[3].str());
         parameters = "";
     }
