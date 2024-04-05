@@ -886,6 +886,17 @@ void mir_contract::generate_block_assignment(std::ostream *out, const std::strin
         const std::string subvalue = value.substr(20, value.size() - 21);
         std::list<std::string> subvalues = utils::split(subvalue, ", ", 2);
         generate_block_assignment(out, (subvalues.front().starts_with("state.") ? subvalues.front().substr(6) : subvalues.front()) + ".get3", subvalues.back(), true, all_variables, function_name, indents, no_state);
+    } else if (value.starts_with("split_at<")) {
+        const std::string subvalue = value.substr(9, value.size() - 10);
+        std::list<std::string> subvalues = utils::split(subvalue, ", ", 2);
+
+        int mid = std::stoi(subvalues.back());
+        for (int i = 0; i < mid; i++) {
+            generate_block_assignment(out, variable + ".get0[" + std::to_string(i) + "]", subvalues.front() + "[" + std::to_string(i) + "]", true, all_variables, function_name, indents, no_state);
+        }
+        for (int i = mid; i < _globals.ARRAY_SIZE; i++) {
+            generate_block_assignment(out, variable + ".get1[" + std::to_string(i) + "]", subvalues.front() + "[" + std::to_string(i) + "]", true, all_variables, function_name, indents, no_state);
+        }
     } else if (value.starts_with("copy_array<")) {
         const std::string array_value = value.substr(11, value.size() - 12);
         for (int i = 0; i < _globals.ARRAY_SIZE; i++) {

@@ -425,7 +425,7 @@ std::string mir_statement::reformat_value_by_type(const std::string &value, cons
         return value;
     }
     if (type.starts_with("tuple<")) {
-        if (!value.starts_with("init_tuple<") && !value.starts_with("find_program_address<") && !value.starts_with("checked<") && !value.starts_with("unchecked<")) {
+        if (!value.starts_with("init_tuple<") && !value.starts_with("find_program_address<") && !value.starts_with("checked<") && !value.starts_with("unchecked<") && !value.starts_with("split_at<")) {
             return "copy_tuple<" + value + ">";
         }
         return value;
