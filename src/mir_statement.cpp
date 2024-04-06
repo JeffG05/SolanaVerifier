@@ -588,6 +588,10 @@ mir_statements mir_statement::get_all_variables(mir_statement function_header, c
         const mir_statement variable = new_variable(function.get_ast_data().at("name"), function.get_ast_data().at("return_type"));
         all_variables.push_back(variable);
     }
+    for (const auto& s : structs) {
+        const mir_statement variable = new_variable(s.get_ast_data().at("name"), s.get_string_type());
+        all_variables.push_back(variable);
+    }
     return all_variables;
 }
 

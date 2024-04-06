@@ -31,7 +31,7 @@
 #include "values/deref_mir_value.h"
 #include "values/deserialize_mir_value.h"
 #include "values/discriminant_mir_value.h"
-#include "values/enum_mir_value.h"
+#include "values/init_enum_mir_value.h"
 #include "values/equal_mir_value.h"
 #include "values/exchange_malloc_mir_value.h"
 #include "values/find_program_address_mir_value.h"
@@ -194,6 +194,6 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     conversion_mir_value(),
     const_function_mir_value(),
     function_mir_value(),
-    enum_mir_value(),
+    init_enum_mir_value(),
     init_struct_mir_value()
 };

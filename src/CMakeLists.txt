@@ -137,7 +137,7 @@ add_executable(SolanaVerifier
         mir-values/values/conversion_mir_value.h
         mir-types/types/rent_mir_type.h
         mir-values/values/result_unwrap_mir_value.h
-        mir-values/values/enum_mir_value.h
+        mir-values/values/init_enum_mir_value.h
         mir-values/values/box_indexer_mir_value.h
         mir-values/values/as_box_mir_value.h
         mir-values/values/into_vec_mir_value.h
