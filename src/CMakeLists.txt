@@ -181,6 +181,7 @@ add_executable(SolanaVerifier
         mir-values/values/try_borrow_mutable_data_mir_value.h
         mir-values/values/pubkey_from_bytes_mir_value.h
         mir-values/values/result_is_ok_mir_value.h
+        mir-values/values/drop_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
