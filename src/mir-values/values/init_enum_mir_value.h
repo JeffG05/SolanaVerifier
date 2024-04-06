@@ -10,10 +10,13 @@ public:
     init_enum_mir_value() : mir_value(
         std::regex (R"(^([^:\s]+)::([^:\s]+?)(?: \{ (.+) \})?$)"),
         [](const std::smatch &match, const mir_statements& variables) {
-            statement_type struct_type = mir_statement::get_statement(variables, match[2].str()).value().get_type();
+            std::optional<mir_statement> struct_statement = mir_statement::get_statement(variables, utils::to_lower(match[2].str()));
 
-            if (struct_type != statement_type::data_enum) {
-                return init_struct_mir_value().try_parse(match[0].str(), variables).value();
+            if (struct_statement.has_value()) {
+                std::string struct_type = struct_statement.value().get_ast_data().at("variable_type");
+                if (struct_type != "Enum" && struct_type != "Enum Option") {
+                    return init_struct_mir_value().try_parse(match[0].str(), variables).value();
+                }
             }
 
             std::string value = "init_enum<" + utils::to_lower(match[2].str());
