@@ -589,11 +589,11 @@ mir_statements mir_statement::get_all_variables(mir_statement function_header, c
         all_variables.push_back(variable);
     }
     for (auto s : structs) {
-        const mir_statement variable = new_variable(s.get_ast_data().at("name"), s.get_string_type());
+        const mir_statement variable = new_variable(utils::to_lower(s.get_ast_data().at("name")), s.get_string_type());
         all_variables.push_back(variable);
 
         for (const auto& s_child : s.get_children({statement_type::data_enum_option})) {
-            const mir_statement child = new_variable(s_child.get_ast_data().at("name"), s_child.get_string_type());
+            const mir_statement child = new_variable(utils::to_lower(s_child.get_ast_data().at("name")), s_child.get_string_type());
             all_variables.push_back(child);
         }
     }
