@@ -26,7 +26,7 @@ public:
             std::ranges::replace(function_name, ':', '_');
 
             return std::make_tuple(
-                "func<" + function_name + "(" + utils::join(converted_params, ", ") + ")>",
+                "func<" + utils::to_lower(function_name) + "(" + utils::join(converted_params, ", ") + ")>",
                 true
             );
         }
