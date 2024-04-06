@@ -89,6 +89,7 @@
 #include "values/account_info_realloc_mir_value.h"
 #include "values/split_at_mir_value.h"
 #include "values/try_borrow_mutable_data_mir_value.h"
+#include "values/try_borrow_mutable_lamports_mir_value.h"
 #include "values/pubkey_from_bytes_mir_value.h"
 #include "values/result_is_ok_mir_value.h"
 #include "values/drop_mir_value.h"
@@ -190,6 +191,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     account_info_realloc_mir_value(),
     split_at_mir_value(),
     try_borrow_mutable_data_mir_value(),
+    try_borrow_mutable_lamports_mir_value(),
     result_is_ok_mir_value(),
     drop_mir_value(),
     as_string_mir_value(),

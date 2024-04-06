@@ -183,6 +183,7 @@ add_executable(SolanaVerifier
         mir-values/values/result_is_ok_mir_value.h
         mir-values/values/drop_mir_value.h
         mir-values/values/as_string_mir_value.h
+        mir-values/values/try_borrow_mutable_lamports_mir_value.h
 )
 
 target_link_libraries(SolanaVerifier
