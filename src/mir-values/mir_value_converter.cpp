@@ -92,6 +92,7 @@
 #include "values/pubkey_from_bytes_mir_value.h"
 #include "values/result_is_ok_mir_value.h"
 #include "values/drop_mir_value.h"
+#include "values/as_string_mir_value.h"
 
 std::tuple<std::string, bool> mir_value_converter::convert(const std::string& mir, const mir_statements& variables) {
     for (const auto& value: _all_values) {
@@ -191,6 +192,7 @@ std::vector<mir_value> mir_value_converter::_all_values = {
     try_borrow_mutable_data_mir_value(),
     result_is_ok_mir_value(),
     drop_mir_value(),
+    as_string_mir_value(),
 
     // KEEP LAST
     conversion_mir_value(),
