@@ -81,3 +81,11 @@ std::string utils::to_lower(const std::string &s) {
     }
     return new_s;
 }
+
+std::string utils::to_upper(const std::string &s) {
+    std::string new_s = s;
+    for (auto& c: new_s) {
+        c = static_cast<char>(toupper(c));
+    }
+    return new_s;
+}
