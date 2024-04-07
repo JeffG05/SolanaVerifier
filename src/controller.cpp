@@ -109,6 +109,7 @@ bool controller::run(const int argc, char *argv[]) {
         ("mir", boost::program_options::value<std::string>(&_mir_file), "MIR representation of Solana smart contract")
         ("hir", boost::program_options::value<std::string>(&_hir_file), "HIR representation of Solana smart contract")
         ("esbmc", boost::program_options::value<std::string>(&_esbmc_path)->default_value("esbmc"), "Path of the esbmc executable")
+        ("solver", boost::program_options::value<std::string>(&_globals.SOLVER)->default_value("boolector"), "SMT Solver to use")
         ("no-debug", boost::program_options::bool_switch(&_globals.NO_DEBUG), "Turn off all debug statements")
         ("array-size", boost::program_options::value<int>(&_globals.ARRAY_SIZE)->default_value(10), "Max size of arrays in SMT model")
     ;
@@ -211,14 +212,14 @@ bool controller::run(const int argc, char *argv[]) {
 
     // return true;
 
-    print_info("starting smt verification using boolector");
-    const auto t_boolector_start = std::chrono::high_resolution_clock::now();
-    const verification_result boolector_result = solana_c.verify_boolector(temp_dir, _esbmc_path);
-    const auto t_boolector_end = std::chrono::high_resolution_clock::now();
-    print_info("completed smt verification (took " + get_millis(t_boolector_start, t_boolector_end) + ")");
+    print_info("starting smt verification using " + _globals.SOLVER);
+    const auto t_smt_start = std::chrono::high_resolution_clock::now();
+    const verification_result smt_result = solana_c.verify(temp_dir, _esbmc_path, _globals.SOLVER);
+    const auto t_smt_end = std::chrono::high_resolution_clock::now();
+    print_info("completed smt verification (took " + get_millis(t_smt_start, t_smt_end) + ")");
 
     print_info("printing vulnerability report");
-    print_report(boolector_result);
+    print_report(smt_result);
 
     return true;
 }

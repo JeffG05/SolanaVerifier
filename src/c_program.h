@@ -12,14 +12,11 @@ public:
     [[nodiscard]] std::string get_path() const;
     [[nodiscard]] std::string get_dir() const;
 
-    [[nodiscard]] verification_result verify_boolector(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
-    [[nodiscard]] verification_result verify_z3(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const;
+    [[nodiscard]] verification_result verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const;
 
 private:
     std::string _contract_name;
     std::filesystem::path _path;
-
-    [[nodiscard]] verification_result verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const;
 };
 
 #endif //C_PROGRAM_H

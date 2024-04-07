@@ -6,6 +6,7 @@ class config {
 public:
     bool NO_DEBUG;
     int ARRAY_SIZE;
+    std::string SOLVER;
 };
 
 

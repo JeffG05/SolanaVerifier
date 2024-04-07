@@ -18,14 +18,6 @@ std::string c_program::get_dir() const {
     return _path.parent_path().string();
 }
 
-verification_result c_program::verify_boolector(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const {
-    return verify(target, esbmc_path, "boolector");
-}
-
-verification_result c_program::verify_z3(const std::filesystem::path& target, const std::filesystem::path& esbmc_path) const {
-    return verify(target, esbmc_path, "z3");
-}
-
 verification_result c_program::verify(const std::filesystem::path& target, const std::filesystem::path& esbmc_path, const std::string& smt_solver) const {
     const std::filesystem::path log_out = target / (_contract_name + "_" + smt_solver + "_log.txt");
 
