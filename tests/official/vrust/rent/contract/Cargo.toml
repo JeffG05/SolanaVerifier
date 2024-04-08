@@ -1,0 +1,16 @@
+[package]
+name = "program"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+solana-program = "=1.8.2"
+borsh = "=0.9.1"
+borsh-derive = "=0.9.1"
+
+zeroize = "=1.6.0"
+log = "=0.4.18"
+byteorder = "=1.4.3"
+
+[lib]
+crate-type = ["cdylib", "lib"]

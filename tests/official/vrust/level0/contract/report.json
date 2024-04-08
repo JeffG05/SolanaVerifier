@@ -1,0 +1,53 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "level0",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712582073",
+  "int_cnt": 1,
+  "chk_cnt": 2,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 3,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:118:5: 118:49 \n\t**vault_info.lamports.borrow_mut() -= amount",
+      "context": "src/processor.rs:102:1: 122:2 \n\tfn withdraw(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info__owner = next_account_info(account_info_iter)?;\n    let vault_info = next_account_info(account_info_iter)?;\n    let authority_info__signer = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;\n\n    assert!(authority_info__signer.is_signer);\n    assert_eq!(wallet.authority, *authority_info__signer.key);\n    assert_eq!(wallet.vault, *vault_info.key);\n\n    if amount > **vault_info.lamports.borrow_mut() {\n        return Err(ProgramError::InsufficientFunds);\n    }\n\n    **vault_info.lamports.borrow_mut() -= amount;\n    **destination_info.lamports.borrow_mut() += amount;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:102:1: 122:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:108:46: 108:69 \n\twallet_info__owner.data",
+      "context": "src/processor.rs:102:1: 122:2 \n\tfn withdraw(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info__owner = next_account_info(account_info_iter)?;\n    let vault_info = next_account_info(account_info_iter)?;\n    let authority_info__signer = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;\n\n    assert!(authority_info__signer.is_signer);\n    assert_eq!(wallet.authority, *authority_info__signer.key);\n    assert_eq!(wallet.vault, *vault_info.key);\n\n    if amount > **vault_info.lamports.borrow_mut() {\n        return Err(ProgramError::InsufficientFunds);\n    }\n\n    **vault_info.lamports.borrow_mut() -= amount;\n    **destination_info.lamports.borrow_mut() += amount;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:102:1: 122:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "2",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::deposit",
+      "code": "src/processor.rs:90:46: 90:69 \n\twallet_info__owner.data",
+      "context": "src/processor.rs:85:1: 100:2 \n\tfn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info__owner = next_account_info(account_info_iter)?;\n    let vault_info = next_account_info(account_info_iter)?;\n    let source_info__signer = next_account_info(account_info_iter)?;\n    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;\n\n    assert_eq!(wallet.vault, *vault_info.key);\n\n    invoke(\n        &system_instruction::transfer(&source_info__signer.key, &vault_info.key, amount),\n        &[vault_info.clone(), source_info__signer.clone()],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn processor::deposit(){// src/processor.rs:85:1: 100:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

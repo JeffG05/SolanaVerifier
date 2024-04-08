@@ -1,0 +1,40 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "transfer_sol_program",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528990",
+  "int_cnt": 1,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 2,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "instruction::transfer_sol_with_program",
+      "code": "src/instruction.rs:32:5: 32:49 \n\t**payer.try_borrow_mut_lamports()? -= amount",
+      "context": "src/instruction.rs:23:1: 36:2 \n\tpub fn transfer_sol_with_program(\n    _program_id: &Pubkey,\n    accounts: &[AccountInfo],\n    amount: u64,\n) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let payer = next_account_info(accounts_iter)?;\n    let recipient = next_account_info(accounts_iter)?;\n\n    **payer.try_borrow_mut_lamports()? -= amount;\n    **recipient.try_borrow_mut_lamports()? += amount;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:13:1: 25:2 }\n\t\tfn instruction::transfer_sol_with_program(){// src/instruction.rs:23:1: 36:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "solana_program::account_info::AccountInfo::<'a>::try_borrow_mut_lamports",
+      "code": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:100:9: 101:30 \n\tself.lamports\n            .try_borrow_mut()",
+      "context": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:99:5: 103:6 \n\tpub fn try_borrow_mut_lamports(&self) -> Result<RefMut<&'a mut u64>, ProgramError> {\n        self.lamports\n            .try_borrow_mut()\n            .map_err(|_| ProgramError::AccountBorrowFailed)\n    }",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:13:1: 25:2 }\n\t\tfn instruction::transfer_sol_with_program(){// src/instruction.rs:23:1: 36:2 }\n\t\t\tfn solana_program::account_info::AccountInfo::<'a>::try_borrow_mut_lamports(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:99:5: 103:6 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

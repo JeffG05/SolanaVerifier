@@ -1,0 +1,2064 @@
+// WARNING: This output format is intended for human consumers only
+// and is subject to change without notice. Knock yourself out.
+fn <impl at src/lib.rs:13:10: 13:15>::fmt(_1: &WalletInstruction, _2: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    debug self => _1;
+    debug f => _2;
+    let mut _0: std::result::Result<(), std::fmt::Error>;
+    let mut _3: isize;
+    let _4: &str;
+    let _5: &u64;
+    let _6: &str;
+    let _7: &str;
+    let mut _8: &dyn std::fmt::Debug;
+    let _9: &&u64;
+    let _10: &u64;
+    let _11: &str;
+    let _12: &str;
+    let mut _13: &dyn std::fmt::Debug;
+    let _14: &&u64;
+    scope 1 {
+        debug __self_0 => _5;
+    }
+    scope 2 {
+        debug __self_0 => _10;
+    }
+
+    bb0: {
+        _3 = discriminant((*_1));
+        switchInt(move _3) -> [0: bb3, 1: bb4, 2: bb2, otherwise: bb1];
+    }
+
+    bb1: {
+        unreachable;
+    }
+
+    bb2: {
+        _10 = &(((*_1) as Withdraw).0: u64);
+        _11 = const "Withdraw";
+        _12 = const "amount";
+        _14 = &_10;
+        _13 = _14 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _11, _12, move _13) -> [return: bb5, unwind continue];
+    }
+
+    bb3: {
+        _4 = const "Initialize";
+        _0 = Formatter::<'_>::write_str(_2, _4) -> [return: bb5, unwind continue];
+    }
+
+    bb4: {
+        _5 = &(((*_1) as Deposit).0: u64);
+        _6 = const "Deposit";
+        _7 = const "amount";
+        _9 = &_5;
+        _8 = _9 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        _0 = Formatter::<'_>::debug_struct_field1_finish(_2, _6, _7, move _8) -> [return: bb5, unwind continue];
+    }
+
+    bb5: {
+        return;
+    }
+}
+
+fn <impl at src/lib.rs:13:17: 13:33>::deserialize(_1: &mut &[u8]) -> Result<WalletInstruction, std::io::Error> {
+    debug buf => _1;
+    let mut _0: std::result::Result<WalletInstruction, std::io::Error>;
+    let _2: u8;
+    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u8>;
+    let mut _4: std::result::Result<u8, std::io::Error>;
+    let mut _5: isize;
+    let _6: std::result::Result<std::convert::Infallible, std::io::Error>;
+    let _7: u8;
+    let mut _9: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u64>;
+    let mut _10: std::result::Result<u64, std::io::Error>;
+    let mut _11: isize;
+    let mut _14: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u64>;
+    let mut _15: std::result::Result<u64, std::io::Error>;
+    let mut _16: isize;
+    let mut _20: std::fmt::Arguments<'_>;
+    let mut _21: &[&str];
+    let mut _22: &[core::fmt::rt::Argument<'_>];
+    let _23: &[core::fmt::rt::Argument<'_>; 1];
+    let _24: [core::fmt::rt::Argument<'_>; 1];
+    let mut _25: core::fmt::rt::Argument<'_>;
+    let _26: &u8;
+    let mut _27: std::io::Error;
+    let mut _28: std::io::ErrorKind;
+    let mut _29: WalletInstruction;
+    scope 1 {
+        debug variant_idx => _2;
+        let _8: WalletInstruction;
+        let _12: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _13: u64;
+        let _17: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _18: u64;
+        let _19: std::string::String;
+        let mut _30: &[&str; 1];
+        scope 6 {
+            debug return_value => _8;
+        }
+        scope 7 {
+            debug residual => _12;
+            scope 8 {
+            }
+        }
+        scope 9 {
+            debug val => _13;
+            scope 10 {
+            }
+        }
+        scope 11 {
+            debug residual => _17;
+            scope 12 {
+            }
+        }
+        scope 13 {
+            debug val => _18;
+            scope 14 {
+            }
+        }
+        scope 15 {
+            debug msg => _19;
+        }
+        scope 16 {
+            debug res => _19;
+        }
+    }
+    scope 2 {
+        debug residual => _6;
+        scope 3 {
+        }
+    }
+    scope 4 {
+        debug val => _7;
+        scope 5 {
+        }
+    }
+
+    bb0: {
+        _4 = <u8 as BorshDeserialize>::deserialize(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = <Result<u8, std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = discriminant(_3);
+        switchInt(move _5) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _7 = ((_3 as Continue).0: u8);
+        _2 = _7;
+        switchInt(_2) -> [0: bb7, 1: bb8, 2: bb13, otherwise: bb6];
+    }
+
+    bb5: {
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb23, unwind continue];
+    }
+
+    bb6: {
+        _30 = const <WalletInstruction as borsh::BorshDeserialize>::deserialize::promoted[0];
+        _21 = _30 as &[&str] (PointerCoercion(Unsize));
+        _26 = &_2;
+        _25 = core::fmt::rt::Argument::<'_>::new_debug::<u8>(_26) -> [return: bb18, unwind continue];
+    }
+
+    bb7: {
+        _8 = WalletInstruction::Initialize;
+        goto -> bb22;
+    }
+
+    bb8: {
+        _10 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb9, unwind continue];
+    }
+
+    bb9: {
+        _9 = <Result<u64, std::io::Error> as Try>::branch(move _10) -> [return: bb10, unwind continue];
+    }
+
+    bb10: {
+        _11 = discriminant(_9);
+        switchInt(move _11) -> [0: bb11, 1: bb12, otherwise: bb3];
+    }
+
+    bb11: {
+        _13 = ((_9 as Continue).0: u64);
+        _8 = WalletInstruction::Deposit { amount: _13 };
+        goto -> bb22;
+    }
+
+    bb12: {
+        _12 = move ((_9 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb23, unwind continue];
+    }
+
+    bb13: {
+        _15 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb14, unwind continue];
+    }
+
+    bb14: {
+        _14 = <Result<u64, std::io::Error> as Try>::branch(move _15) -> [return: bb15, unwind continue];
+    }
+
+    bb15: {
+        _16 = discriminant(_14);
+        switchInt(move _16) -> [0: bb16, 1: bb17, otherwise: bb3];
+    }
+
+    bb16: {
+        _18 = ((_14 as Continue).0: u64);
+        _8 = WalletInstruction::Withdraw { amount: _18 };
+        goto -> bb22;
+    }
+
+    bb17: {
+        _17 = move ((_14 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<WalletInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _17) -> [return: bb23, unwind continue];
+    }
+
+    bb18: {
+        _24 = [move _25];
+        _23 = &_24;
+        _22 = _23 as &[core::fmt::rt::Argument<'_>] (PointerCoercion(Unsize));
+        _20 = Arguments::<'_>::new_v1(move _21, move _22) -> [return: bb19, unwind continue];
+    }
+
+    bb19: {
+        _19 = format(move _20) -> [return: bb20, unwind continue];
+    }
+
+    bb20: {
+        _28 = InvalidInput;
+        _27 = std::io::Error::new::<String>(move _28, move _19) -> [return: bb21, unwind continue];
+    }
+
+    bb21: {
+        _0 = Result::<WalletInstruction, std::io::Error>::Err(move _27);
+        goto -> bb23;
+    }
+
+    bb22: {
+        _29 = move _8;
+        _0 = Result::<WalletInstruction, std::io::Error>::Ok(move _29);
+        goto -> bb23;
+    }
+
+    bb23: {
+        return;
+    }
+}
+
+const <impl at src/lib.rs:13:17: 13:33>::deserialize::promoted[0]: &[&str; 1] = {
+    let mut _0: &[&str; 1];
+    let mut _1: [&str; 1];
+
+    bb0: {
+        _1 = [const "Unexpected variant index: "];
+        _0 = &_1;
+        return;
+    }
+}
+
+fn <impl at src/lib.rs:13:35: 13:49>::serialize(_1: &WalletInstruction, _2: &mut W) -> Result<(), std::io::Error> {
+    debug self => _1;
+    debug writer => _2;
+    let mut _0: std::result::Result<(), std::io::Error>;
+    let _3: u8;
+    let mut _4: isize;
+    let mut _5: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _6: std::result::Result<(), std::io::Error>;
+    let mut _7: &[u8];
+    let _8: &[u8; 1];
+    let _9: [u8; 1];
+    let mut _10: u8;
+    let mut _11: isize;
+    let mut _13: isize;
+    let mut _15: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _16: std::result::Result<(), std::io::Error>;
+    let mut _17: isize;
+    let mut _20: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _21: std::result::Result<(), std::io::Error>;
+    let mut _22: isize;
+    scope 1 {
+        debug variant_idx => _3;
+        let _12: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _14: &u64;
+        let _19: &u64;
+        scope 2 {
+            debug residual => _12;
+            scope 3 {
+            }
+        }
+        scope 4 {
+            debug val => const ();
+            scope 5 {
+            }
+        }
+        scope 6 {
+            debug amount => _14;
+            let _18: std::result::Result<std::convert::Infallible, std::io::Error>;
+            scope 7 {
+                debug residual => _18;
+                scope 8 {
+                }
+            }
+            scope 9 {
+                debug val => const ();
+                scope 10 {
+                }
+            }
+        }
+        scope 11 {
+            debug amount => _19;
+            let _23: std::result::Result<std::convert::Infallible, std::io::Error>;
+            scope 12 {
+                debug residual => _23;
+                scope 13 {
+                }
+            }
+            scope 14 {
+                debug val => const ();
+                scope 15 {
+                }
+            }
+        }
+    }
+
+    bb0: {
+        _4 = discriminant((*_1));
+        switchInt(move _4) -> [0: bb3, 1: bb4, 2: bb2, otherwise: bb1];
+    }
+
+    bb1: {
+        unreachable;
+    }
+
+    bb2: {
+        _3 = const 2_u8;
+        goto -> bb5;
+    }
+
+    bb3: {
+        _3 = const 0_u8;
+        goto -> bb5;
+    }
+
+    bb4: {
+        _3 = const 1_u8;
+        goto -> bb5;
+    }
+
+    bb5: {
+        _10 = _3;
+        _9 = core::num::<impl u8>::to_le_bytes(move _10) -> [return: bb6, unwind continue];
+    }
+
+    bb6: {
+        _8 = &_9;
+        _7 = _8 as &[u8] (PointerCoercion(Unsize));
+        _6 = <W as std::io::Write>::write_all(_2, move _7) -> [return: bb7, unwind continue];
+    }
+
+    bb7: {
+        _5 = <Result<(), std::io::Error> as Try>::branch(move _6) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _11 = discriminant(_5);
+        switchInt(move _11) -> [0: bb9, 1: bb10, otherwise: bb1];
+    }
+
+    bb9: {
+        _13 = discriminant((*_1));
+        switchInt(move _13) -> [0: bb19, 1: bb12, 2: bb11, otherwise: bb1];
+    }
+
+    bb10: {
+        _12 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb20, unwind continue];
+    }
+
+    bb11: {
+        _19 = &(((*_1) as Withdraw).0: u64);
+        _21 = <u64 as BorshSerialize>::serialize::<W>(_19, _2) -> [return: bb16, unwind continue];
+    }
+
+    bb12: {
+        _14 = &(((*_1) as Deposit).0: u64);
+        _16 = <u64 as BorshSerialize>::serialize::<W>(_14, _2) -> [return: bb13, unwind continue];
+    }
+
+    bb13: {
+        _15 = <Result<(), std::io::Error> as Try>::branch(move _16) -> [return: bb14, unwind continue];
+    }
+
+    bb14: {
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb19, 1: bb15, otherwise: bb1];
+    }
+
+    bb15: {
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _18) -> [return: bb20, unwind continue];
+    }
+
+    bb16: {
+        _20 = <Result<(), std::io::Error> as Try>::branch(move _21) -> [return: bb17, unwind continue];
+    }
+
+    bb17: {
+        _22 = discriminant(_20);
+        switchInt(move _22) -> [0: bb19, 1: bb18, otherwise: bb1];
+    }
+
+    bb18: {
+        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _23) -> [return: bb20, unwind continue];
+    }
+
+    bb19: {
+        _0 = Result::<(), std::io::Error>::Ok(const ());
+        goto -> bb20;
+    }
+
+    bb20: {
+        return;
+    }
+}
+
+fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result<(), ProgramError> {
+    debug program_id => _1;
+    debug accounts => _2;
+    debug instruction_data => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let mut _4: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, WalletInstruction>;
+    let mut _5: std::result::Result<WalletInstruction, std::io::Error>;
+    let mut _6: &mut &[u8];
+    let mut _7: isize;
+    let _8: std::result::Result<std::convert::Infallible, std::io::Error>;
+    let _9: WalletInstruction;
+    let mut _10: isize;
+    let _11: u64;
+    let _12: u64;
+    scope 1 {
+        debug residual => _8;
+        scope 2 {
+        }
+    }
+    scope 3 {
+        debug val => _9;
+        scope 4 {
+        }
+    }
+    scope 5 {
+        debug amount => _11;
+    }
+    scope 6 {
+        debug amount => _12;
+    }
+
+    bb0: {
+        _6 = &mut _3;
+        _5 = <WalletInstruction as BorshDeserialize>::deserialize(_6) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = <Result<WalletInstruction, std::io::Error> as Try>::branch(move _5) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _7 = discriminant(_4);
+        switchInt(move _7) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _9 = move ((_4 as Continue).0: WalletInstruction);
+        _10 = discriminant(_9);
+        switchInt(move _10) -> [0: bb7, 1: bb8, 2: bb6, otherwise: bb3];
+    }
+
+    bb5: {
+        _8 = move ((_4 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _8) -> [return: bb9, unwind continue];
+    }
+
+    bb6: {
+        _12 = ((_9 as Withdraw).0: u64);
+        _0 = processor::withdraw(_1, _2, _12) -> [return: bb9, unwind continue];
+    }
+
+    bb7: {
+        _0 = processor::initialize(_1, _2) -> [return: bb9, unwind continue];
+    }
+
+    bb8: {
+        _11 = ((_9 as Deposit).0: u64);
+        _0 = processor::deposit(_1, _2, _11) -> [return: bb9, unwind continue];
+    }
+
+    bb9: {
+        return;
+    }
+}
+
+fn processor::initialize(_1: &Pubkey, _2: &[AccountInfo<'_>]) -> Result<(), ProgramError> {
+    debug program_id => _1;
+    debug accounts => _2;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _3: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _4: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _7: isize;
+    let mut _10: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _11: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _12: isize;
+    let mut _15: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _16: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _17: isize;
+    let mut _20: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _21: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _22: isize;
+    let mut _25: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _26: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _27: isize;
+    let mut _30: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _31: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _32: isize;
+    let mut _37: (solana_program::pubkey::Pubkey, u8);
+    let mut _39: (solana_program::pubkey::Pubkey, u8);
+    let mut _40: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, solana_program::rent::Rent>;
+    let mut _41: std::result::Result<solana_program::rent::Rent, solana_program::program_error::ProgramError>;
+    let mut _42: isize;
+    let mut _45: bool;
+    let mut _46: &&solana_program::pubkey::Pubkey;
+    let mut _47: &&solana_program::pubkey::Pubkey;
+    let _48: &solana_program::pubkey::Pubkey;
+    let mut _49: !;
+    let mut _50: bool;
+    let mut _51: &&solana_program::pubkey::Pubkey;
+    let mut _52: &&solana_program::pubkey::Pubkey;
+    let _53: &solana_program::pubkey::Pubkey;
+    let mut _54: !;
+    let mut _55: bool;
+    let mut _56: !;
+    let mut _57: &solana_program::pubkey::Pubkey;
+    scope 1 {
+        debug account_info_iter => _3;
+        let _8: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _9: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug wallet_info => _9;
+            let _13: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _14: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug authority_info => _14;
+                let _18: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _19: &solana_program::account_info::AccountInfo<'_>;
+                scope 12 {
+                    debug owner => _19;
+                    let _23: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                    let _24: &solana_program::account_info::AccountInfo<'_>;
+                    scope 17 {
+                        debug mint => _24;
+                        let _28: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                        let _29: &solana_program::account_info::AccountInfo<'_>;
+                        scope 22 {
+                            debug rent_info => _29;
+                            let _33: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                            let _34: &solana_program::account_info::AccountInfo<'_>;
+                            scope 27 {
+                                debug spl_token => _34;
+                                let _35: solana_program::pubkey::Pubkey;
+                                let _36: u8;
+                                scope 32 {
+                                    debug wallet_address => _35;
+                                    debug wallet_seed => _36;
+                                    let _38: solana_program::pubkey::Pubkey;
+                                    scope 33 {
+                                        debug authority_address => _38;
+                                        let _43: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                                        let _44: solana_program::rent::Rent;
+                                        scope 34 {
+                                            debug rent => _44;
+                                        }
+                                        scope 35 {
+                                            debug residual => _43;
+                                            scope 36 {
+                                            }
+                                        }
+                                        scope 37 {
+                                            debug val => _44;
+                                            scope 38 {
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            scope 28 {
+                                debug residual => _33;
+                                scope 29 {
+                                }
+                            }
+                            scope 30 {
+                                debug val => _34;
+                                scope 31 {
+                                }
+                            }
+                        }
+                        scope 23 {
+                            debug residual => _28;
+                            scope 24 {
+                            }
+                        }
+                        scope 25 {
+                            debug val => _29;
+                            scope 26 {
+                            }
+                        }
+                    }
+                    scope 18 {
+                        debug residual => _23;
+                        scope 19 {
+                        }
+                    }
+                    scope 20 {
+                        debug val => _24;
+                        scope 21 {
+                        }
+                    }
+                }
+                scope 13 {
+                    debug residual => _18;
+                    scope 14 {
+                    }
+                }
+                scope 15 {
+                    debug val => _19;
+                    scope 16 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _13;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _14;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _8;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _9;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _4 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = &mut _4;
+        _6 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _6) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _7 = discriminant(_5);
+        switchInt(move _7) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _9 = ((_5 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _11 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _8 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _8) -> [return: bb41, unwind continue];
+    }
+
+    bb7: {
+        _10 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _11) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _12 = discriminant(_10);
+        switchInt(move _12) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _14 = ((_10 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _16 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _13 = move ((_10 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _13) -> [return: bb41, unwind continue];
+    }
+
+    bb11: {
+        _15 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _16) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _19 = ((_15 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _21 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb15, unwind continue];
+    }
+
+    bb14: {
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _18) -> [return: bb41, unwind continue];
+    }
+
+    bb15: {
+        _20 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _21) -> [return: bb16, unwind continue];
+    }
+
+    bb16: {
+        _22 = discriminant(_20);
+        switchInt(move _22) -> [0: bb17, 1: bb18, otherwise: bb4];
+    }
+
+    bb17: {
+        _24 = ((_20 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _26 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb19, unwind continue];
+    }
+
+    bb18: {
+        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _23) -> [return: bb41, unwind continue];
+    }
+
+    bb19: {
+        _25 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _26) -> [return: bb20, unwind continue];
+    }
+
+    bb20: {
+        _27 = discriminant(_25);
+        switchInt(move _27) -> [0: bb21, 1: bb22, otherwise: bb4];
+    }
+
+    bb21: {
+        _29 = ((_25 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _31 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb23, unwind continue];
+    }
+
+    bb22: {
+        _28 = move ((_25 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _28) -> [return: bb41, unwind continue];
+    }
+
+    bb23: {
+        _30 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _31) -> [return: bb24, unwind continue];
+    }
+
+    bb24: {
+        _32 = discriminant(_30);
+        switchInt(move _32) -> [0: bb25, 1: bb26, otherwise: bb4];
+    }
+
+    bb25: {
+        _34 = ((_30 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _57 = deref_copy ((*_19).0: &solana_program::pubkey::Pubkey);
+        _37 = get_wallet_address(_57, _1) -> [return: bb27, unwind continue];
+    }
+
+    bb26: {
+        _33 = move ((_30 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _33) -> [return: bb41, unwind continue];
+    }
+
+    bb27: {
+        _35 = (_37.0: solana_program::pubkey::Pubkey);
+        _36 = (_37.1: u8);
+        _39 = get_authority(_1) -> [return: bb28, unwind continue];
+    }
+
+    bb28: {
+        _38 = (_39.0: solana_program::pubkey::Pubkey);
+        _41 = <Rent as Sysvar>::from_account_info(_29) -> [return: bb29, unwind continue];
+    }
+
+    bb29: {
+        _40 = <Result<Rent, ProgramError> as Try>::branch(move _41) -> [return: bb30, unwind continue];
+    }
+
+    bb30: {
+        _42 = discriminant(_40);
+        switchInt(move _42) -> [0: bb31, 1: bb32, otherwise: bb4];
+    }
+
+    bb31: {
+        _44 = move ((_40 as Continue).0: solana_program::rent::Rent);
+        _46 = &((*_9).0: &solana_program::pubkey::Pubkey);
+        _48 = &_35;
+        _47 = &_48;
+        _45 = <&Pubkey as PartialEq>::ne(move _46, move _47) -> [return: bb33, unwind continue];
+    }
+
+    bb32: {
+        _43 = move ((_40 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _43) -> [return: bb41, unwind continue];
+    }
+
+    bb33: {
+        switchInt(move _45) -> [0: bb35, otherwise: bb34];
+    }
+
+    bb34: {
+        _49 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb35: {
+        _51 = &((*_14).0: &solana_program::pubkey::Pubkey);
+        _53 = &_38;
+        _52 = &_53;
+        _50 = <&Pubkey as PartialEq>::ne(move _51, move _52) -> [return: bb36, unwind continue];
+    }
+
+    bb36: {
+        switchInt(move _50) -> [0: bb38, otherwise: bb37];
+    }
+
+    bb37: {
+        _54 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb38: {
+        _55 = ((*_19).5: bool);
+        switchInt(move _55) -> [0: bb40, otherwise: bb39];
+    }
+
+    bb39: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb41;
+    }
+
+    bb40: {
+        _56 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb41: {
+        return;
+    }
+}
+
+fn processor::deposit(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(), ProgramError> {
+    debug _program_id => _1;
+    debug accounts => _2;
+    debug amount => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _4: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _7: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _8: isize;
+    let mut _11: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _12: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _13: isize;
+    let mut _16: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _17: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _18: isize;
+    let mut _21: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _22: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _23: isize;
+    let mut _26: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _27: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _28: isize;
+    let mut _32: &&mut [u8];
+    let mut _33: &std::cell::Ref<'_, &mut [u8]>;
+    let _34: std::cell::Ref<'_, &mut [u8]>;
+    let _35: &std::cell::RefCell<&mut [u8]>;
+    let mut _36: &std::rc::Rc<std::cell::RefCell<&mut [u8]>>;
+    let _37: usize;
+    let mut _38: usize;
+    let mut _39: bool;
+    let mut _40: &mut [u8];
+    let mut _41: &mut [u8];
+    scope 1 {
+        debug account_info_iter => _4;
+        let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _10: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug wallet_info => _10;
+            let _14: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _15: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug source_info => _15;
+                let _19: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _20: &solana_program::account_info::AccountInfo<'_>;
+                scope 12 {
+                    debug user_authority_info => _20;
+                    let _24: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                    let _25: &solana_program::account_info::AccountInfo<'_>;
+                    scope 17 {
+                        debug mint => _25;
+                        let _29: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                        let _30: &solana_program::account_info::AccountInfo<'_>;
+                        scope 22 {
+                            debug spl_token => _30;
+                            let _31: u8;
+                            scope 27 {
+                                debug decimals => _31;
+                            }
+                        }
+                        scope 23 {
+                            debug residual => _29;
+                            scope 24 {
+                            }
+                        }
+                        scope 25 {
+                            debug val => _30;
+                            scope 26 {
+                            }
+                        }
+                    }
+                    scope 18 {
+                        debug residual => _24;
+                        scope 19 {
+                        }
+                    }
+                    scope 20 {
+                        debug val => _25;
+                        scope 21 {
+                        }
+                    }
+                }
+                scope 13 {
+                    debug residual => _19;
+                    scope 14 {
+                    }
+                }
+                scope 15 {
+                    debug val => _20;
+                    scope 16 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _14;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _15;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _9;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _10;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _5 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = &mut _5;
+        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _7) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _8 = discriminant(_6);
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb28, unwind continue];
+    }
+
+    bb7: {
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb28, unwind continue];
+    }
+
+    bb11: {
+        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _18 = discriminant(_16);
+        switchInt(move _18) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _22 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb15, unwind continue];
+    }
+
+    bb14: {
+        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb28, unwind continue];
+    }
+
+    bb15: {
+        _21 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _22) -> [return: bb16, unwind continue];
+    }
+
+    bb16: {
+        _23 = discriminant(_21);
+        switchInt(move _23) -> [0: bb17, 1: bb18, otherwise: bb4];
+    }
+
+    bb17: {
+        _25 = ((_21 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _27 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb19, unwind continue];
+    }
+
+    bb18: {
+        _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb28, unwind continue];
+    }
+
+    bb19: {
+        _26 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _27) -> [return: bb20, unwind continue];
+    }
+
+    bb20: {
+        _28 = discriminant(_26);
+        switchInt(move _28) -> [0: bb21, 1: bb22, otherwise: bb4];
+    }
+
+    bb21: {
+        _30 = ((_26 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _36 = &((*_25).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        _35 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _36) -> [return: bb23, unwind continue];
+    }
+
+    bb22: {
+        _29 = move ((_26 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _29) -> [return: bb28, unwind continue];
+    }
+
+    bb23: {
+        _34 = RefCell::<&mut [u8]>::borrow(_35) -> [return: bb24, unwind continue];
+    }
+
+    bb24: {
+        _33 = &_34;
+        _32 = <Ref<'_, &mut [u8]> as Deref>::deref(move _33) -> [return: bb25, unwind: bb29];
+    }
+
+    bb25: {
+        _37 = const 44_usize;
+        _40 = deref_copy (*_32);
+        _38 = Len((*_40));
+        _39 = Lt(_37, _38);
+        assert(move _39, "index out of bounds: the length is {} but the index is {}", move _38, _37) -> [success: bb26, unwind: bb29];
+    }
+
+    bb26: {
+        _41 = deref_copy (*_32);
+        _31 = (*_41)[_37];
+        drop(_34) -> [return: bb27, unwind continue];
+    }
+
+    bb27: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb28;
+    }
+
+    bb28: {
+        return;
+    }
+
+    bb29 (cleanup): {
+        drop(_34) -> [return: bb30, unwind terminate(cleanup)];
+    }
+
+    bb30 (cleanup): {
+        resume;
+    }
+}
+
+fn processor::withdraw(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(), ProgramError> {
+    debug program_id => _1;
+    debug accounts => _2;
+    debug amount => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _4: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _7: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _8: isize;
+    let mut _11: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _12: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _13: isize;
+    let mut _16: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _17: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _18: isize;
+    let mut _21: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _22: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _23: isize;
+    let mut _26: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _27: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _28: isize;
+    let mut _31: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _32: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _33: isize;
+    let mut _37: (solana_program::pubkey::Pubkey, u8);
+    let mut _40: (solana_program::pubkey::Pubkey, u8);
+    let mut _41: bool;
+    let mut _42: &&solana_program::pubkey::Pubkey;
+    let mut _43: &&solana_program::pubkey::Pubkey;
+    let _44: &solana_program::pubkey::Pubkey;
+    let mut _45: !;
+    let mut _46: bool;
+    let mut _47: &&solana_program::pubkey::Pubkey;
+    let mut _48: &&solana_program::pubkey::Pubkey;
+    let _49: &solana_program::pubkey::Pubkey;
+    let mut _50: !;
+    let mut _51: bool;
+    let mut _52: !;
+    let mut _54: &&mut [u8];
+    let mut _55: &std::cell::Ref<'_, &mut [u8]>;
+    let _56: std::cell::Ref<'_, &mut [u8]>;
+    let _57: &std::cell::RefCell<&mut [u8]>;
+    let mut _58: &std::rc::Rc<std::cell::RefCell<&mut [u8]>>;
+    let _59: usize;
+    let mut _60: usize;
+    let mut _61: bool;
+    let mut _62: &solana_program::pubkey::Pubkey;
+    let mut _63: &mut [u8];
+    let mut _64: &mut [u8];
+    scope 1 {
+        debug account_info_iter => _4;
+        let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _10: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug wallet_info => _10;
+            let _14: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _15: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug authority_info => _15;
+                let _19: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _20: &solana_program::account_info::AccountInfo<'_>;
+                scope 12 {
+                    debug owner_info => _20;
+                    let _24: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                    let _25: &solana_program::account_info::AccountInfo<'_>;
+                    scope 17 {
+                        debug destination_info => _25;
+                        let _29: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                        let _30: &solana_program::account_info::AccountInfo<'_>;
+                        scope 22 {
+                            debug mint => _30;
+                            let _34: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                            let _35: &solana_program::account_info::AccountInfo<'_>;
+                            scope 27 {
+                                debug spl_token => _35;
+                                let _36: solana_program::pubkey::Pubkey;
+                                scope 32 {
+                                    debug wallet_address => _36;
+                                    let _38: solana_program::pubkey::Pubkey;
+                                    let _39: u8;
+                                    scope 33 {
+                                        debug authority_address => _38;
+                                        debug authority_seed => _39;
+                                        let _53: u8;
+                                        scope 34 {
+                                            debug decimals => _53;
+                                        }
+                                    }
+                                }
+                            }
+                            scope 28 {
+                                debug residual => _34;
+                                scope 29 {
+                                }
+                            }
+                            scope 30 {
+                                debug val => _35;
+                                scope 31 {
+                                }
+                            }
+                        }
+                        scope 23 {
+                            debug residual => _29;
+                            scope 24 {
+                            }
+                        }
+                        scope 25 {
+                            debug val => _30;
+                            scope 26 {
+                            }
+                        }
+                    }
+                    scope 18 {
+                        debug residual => _24;
+                        scope 19 {
+                        }
+                    }
+                    scope 20 {
+                        debug val => _25;
+                        scope 21 {
+                        }
+                    }
+                }
+                scope 13 {
+                    debug residual => _19;
+                    scope 14 {
+                    }
+                }
+                scope 15 {
+                    debug val => _20;
+                    scope 16 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _14;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _15;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _9;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _10;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _5 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = &mut _5;
+        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _7) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _8 = discriminant(_6);
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb42, unwind continue];
+    }
+
+    bb7: {
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _17 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb42, unwind continue];
+    }
+
+    bb11: {
+        _16 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _17) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _18 = discriminant(_16);
+        switchInt(move _18) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _20 = ((_16 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _22 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb15, unwind continue];
+    }
+
+    bb14: {
+        _19 = move ((_16 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _19) -> [return: bb42, unwind continue];
+    }
+
+    bb15: {
+        _21 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _22) -> [return: bb16, unwind continue];
+    }
+
+    bb16: {
+        _23 = discriminant(_21);
+        switchInt(move _23) -> [0: bb17, 1: bb18, otherwise: bb4];
+    }
+
+    bb17: {
+        _25 = ((_21 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _27 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb19, unwind continue];
+    }
+
+    bb18: {
+        _24 = move ((_21 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _24) -> [return: bb42, unwind continue];
+    }
+
+    bb19: {
+        _26 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _27) -> [return: bb20, unwind continue];
+    }
+
+    bb20: {
+        _28 = discriminant(_26);
+        switchInt(move _28) -> [0: bb21, 1: bb22, otherwise: bb4];
+    }
+
+    bb21: {
+        _30 = ((_26 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _32 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb23, unwind continue];
+    }
+
+    bb22: {
+        _29 = move ((_26 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _29) -> [return: bb42, unwind continue];
+    }
+
+    bb23: {
+        _31 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _32) -> [return: bb24, unwind continue];
+    }
+
+    bb24: {
+        _33 = discriminant(_31);
+        switchInt(move _33) -> [0: bb25, 1: bb26, otherwise: bb4];
+    }
+
+    bb25: {
+        _35 = ((_31 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _62 = deref_copy ((*_20).0: &solana_program::pubkey::Pubkey);
+        _37 = get_wallet_address(_62, _1) -> [return: bb27, unwind continue];
+    }
+
+    bb26: {
+        _34 = move ((_31 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _34) -> [return: bb42, unwind continue];
+    }
+
+    bb27: {
+        _36 = (_37.0: solana_program::pubkey::Pubkey);
+        _40 = get_authority(_1) -> [return: bb28, unwind continue];
+    }
+
+    bb28: {
+        _38 = (_40.0: solana_program::pubkey::Pubkey);
+        _39 = (_40.1: u8);
+        _42 = &((*_10).0: &solana_program::pubkey::Pubkey);
+        _44 = &_36;
+        _43 = &_44;
+        _41 = <&Pubkey as PartialEq>::ne(move _42, move _43) -> [return: bb29, unwind continue];
+    }
+
+    bb29: {
+        switchInt(move _41) -> [0: bb31, otherwise: bb30];
+    }
+
+    bb30: {
+        _45 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb31: {
+        _47 = &((*_15).0: &solana_program::pubkey::Pubkey);
+        _49 = &_38;
+        _48 = &_49;
+        _46 = <&Pubkey as PartialEq>::ne(move _47, move _48) -> [return: bb32, unwind continue];
+    }
+
+    bb32: {
+        switchInt(move _46) -> [0: bb34, otherwise: bb33];
+    }
+
+    bb33: {
+        _50 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb34: {
+        _51 = ((*_20).5: bool);
+        switchInt(move _51) -> [0: bb36, otherwise: bb35];
+    }
+
+    bb35: {
+        _58 = &((*_30).2: std::rc::Rc<std::cell::RefCell<&mut [u8]>>);
+        _57 = <Rc<RefCell<&mut [u8]>> as Deref>::deref(move _58) -> [return: bb37, unwind continue];
+    }
+
+    bb36: {
+        _52 = begin_panic::<&str>(const "explicit panic") -> unwind continue;
+    }
+
+    bb37: {
+        _56 = RefCell::<&mut [u8]>::borrow(_57) -> [return: bb38, unwind continue];
+    }
+
+    bb38: {
+        _55 = &_56;
+        _54 = <Ref<'_, &mut [u8]> as Deref>::deref(move _55) -> [return: bb39, unwind: bb43];
+    }
+
+    bb39: {
+        _59 = const 44_usize;
+        _63 = deref_copy (*_54);
+        _60 = Len((*_63));
+        _61 = Lt(_59, _60);
+        assert(move _61, "index out of bounds: the length is {} but the index is {}", move _60, _59) -> [success: bb40, unwind: bb43];
+    }
+
+    bb40: {
+        _64 = deref_copy (*_54);
+        _53 = (*_64)[_59];
+        drop(_56) -> [return: bb41, unwind continue];
+    }
+
+    bb41: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb42;
+    }
+
+    bb42: {
+        return;
+    }
+
+    bb43 (cleanup): {
+        drop(_56) -> [return: bb44, unwind terminate(cleanup)];
+    }
+
+    bb44 (cleanup): {
+        resume;
+    }
+}
+
+fn entrypoint(_1: *mut u8) -> u64 {
+    debug input => _1;
+    let mut _0: u64;
+    let _2: &solana_program::pubkey::Pubkey;
+    let _3: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _4: &[u8];
+    let mut _5: (&solana_program::pubkey::Pubkey, std::vec::Vec<solana_program::account_info::AccountInfo<'_>>, &[u8]);
+    let mut _6: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _7: &&solana_program::pubkey::Pubkey;
+    let _8: &[solana_program::account_info::AccountInfo<'_>];
+    let _9: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _10: &&[u8];
+    let mut _11: isize;
+    let mut _13: &solana_program::pubkey::Pubkey;
+    let mut _14: &[u8];
+    scope 1 {
+        debug program_id => _2;
+        debug accounts => _3;
+        debug instruction_data => _4;
+        let _12: solana_program::program_error::ProgramError;
+        scope 3 {
+            debug error => _12;
+        }
+    }
+    scope 2 {
+    }
+
+    bb0: {
+        _5 = solana_program::entrypoint::deserialize::<'_>(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _2 = (_5.0: &solana_program::pubkey::Pubkey);
+        _3 = move (_5.1: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>);
+        _4 = (_5.2: &[u8]);
+        _7 = &_2;
+        _13 = deref_copy (*_7);
+        _9 = &_3;
+        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb10];
+    }
+
+    bb2: {
+        _10 = &_4;
+        _14 = deref_copy (*_10);
+        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb10];
+    }
+
+    bb3: {
+        _11 = discriminant(_6);
+        switchInt(move _11) -> [0: bb6, 1: bb5, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb9];
+    }
+
+    bb6: {
+        _0 = const solana_program::entrypoint::SUCCESS;
+        goto -> bb7;
+    }
+
+    bb7: {
+        drop(_3) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+
+    bb9 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb10 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb11 (cleanup): {
+        resume;
+    }
+
+    bb12: {
+        goto -> bb7;
+    }
+}
+
+fn get_wallet_address(_1: &Pubkey, _2: &Pubkey) -> (Pubkey, u8) {
+    debug owner => _1;
+    debug wallet_program => _2;
+    let mut _0: (solana_program::pubkey::Pubkey, u8);
+    let mut _3: &[&[u8]];
+    let _4: &[&[u8]; 1];
+    let _5: [&[u8]; 1];
+    let mut _6: &[u8];
+    let _7: &[u8; 32];
+    let _8: [u8; 32];
+    let mut _9: solana_program::pubkey::Pubkey;
+
+    bb0: {
+        _9 = (*_1);
+        _8 = Pubkey::to_bytes(move _9) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _7 = &_8;
+        _6 = _7 as &[u8] (PointerCoercion(Unsize));
+        _5 = [move _6];
+        _4 = &_5;
+        _3 = _4 as &[&[u8]] (PointerCoercion(Unsize));
+        _0 = Pubkey::find_program_address(move _3, _2) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        return;
+    }
+}
+
+fn get_authority(_1: &Pubkey) -> (Pubkey, u8) {
+    debug wallet_program => _1;
+    let mut _0: (solana_program::pubkey::Pubkey, u8);
+    let mut _2: &[&[u8]];
+    let mut _3: &[&[u8]; 0];
+
+    bb0: {
+        _3 = const get_authority::promoted[0];
+        _2 = _3 as &[&[u8]] (PointerCoercion(Unsize));
+        _0 = Pubkey::find_program_address(move _2, _1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        return;
+    }
+}
+
+const get_authority::promoted[0]: &[&[u8]; 0] = {
+    let mut _0: &[&[u8]; 0];
+    let mut _1: [&[u8]; 0];
+
+    bb0: {
+        _1 = [];
+        _0 = &_1;
+        return;
+    }
+}
+
+fn initialize(_1: Pubkey, _2: Pubkey, _3: Pubkey) -> Instruction {
+    debug wallet_program => _1;
+    debug owner_address => _2;
+    debug mint => _3;
+    let mut _0: solana_program::instruction::Instruction;
+    let _4: solana_program::pubkey::Pubkey;
+    let mut _5: (solana_program::pubkey::Pubkey, u8);
+    let _6: &solana_program::pubkey::Pubkey;
+    let _7: &solana_program::pubkey::Pubkey;
+    let mut _9: (solana_program::pubkey::Pubkey, u8);
+    let _10: &solana_program::pubkey::Pubkey;
+    let mut _11: solana_program::pubkey::Pubkey;
+    let mut _12: std::vec::Vec<solana_program::instruction::AccountMeta>;
+    let mut _13: std::boxed::Box<[solana_program::instruction::AccountMeta]>;
+    let mut _14: std::boxed::Box<[solana_program::instruction::AccountMeta; 7]>;
+    let mut _15: usize;
+    let mut _16: usize;
+    let mut _17: *mut u8;
+    let mut _18: std::boxed::Box<[solana_program::instruction::AccountMeta; 7]>;
+    let mut _19: solana_program::instruction::AccountMeta;
+    let mut _20: solana_program::instruction::AccountMeta;
+    let mut _21: solana_program::instruction::AccountMeta;
+    let mut _22: solana_program::pubkey::Pubkey;
+    let mut _23: solana_program::instruction::AccountMeta;
+    let mut _24: solana_program::instruction::AccountMeta;
+    let mut _25: solana_program::pubkey::Pubkey;
+    let mut _26: solana_program::instruction::AccountMeta;
+    let mut _27: solana_program::pubkey::Pubkey;
+    let mut _28: solana_program::instruction::AccountMeta;
+    let mut _29: solana_program::pubkey::Pubkey;
+    let mut _30: std::vec::Vec<u8>;
+    let mut _31: std::result::Result<std::vec::Vec<u8>, std::io::Error>;
+    let mut _33: *const [solana_program::instruction::AccountMeta; 7];
+    scope 1 {
+        debug wallet_address => _4;
+        let _8: solana_program::pubkey::Pubkey;
+        scope 2 {
+            debug authority_address => _8;
+            let mut _32: &WalletInstruction;
+            scope 3 {
+            }
+        }
+    }
+
+    bb0: {
+        _6 = &_2;
+        _7 = &_1;
+        _5 = get_wallet_address(_6, _7) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = (_5.0: solana_program::pubkey::Pubkey);
+        _10 = &_1;
+        _9 = get_authority(_10) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _8 = (_9.0: solana_program::pubkey::Pubkey);
+        _11 = _1;
+        _15 = SizeOf([solana_program::instruction::AccountMeta; 7]);
+        _16 = AlignOf([solana_program::instruction::AccountMeta; 7]);
+        _17 = alloc::alloc::exchange_malloc(move _15, move _16) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _18 = ShallowInitBox(move _17, [solana_program::instruction::AccountMeta; 7]);
+        _19 = AccountMeta::new(_4, const false) -> [return: bb4, unwind: bb18];
+    }
+
+    bb4: {
+        _20 = AccountMeta::new_readonly(_8, const false) -> [return: bb5, unwind: bb18];
+    }
+
+    bb5: {
+        _22 = _2;
+        _21 = AccountMeta::new(move _22, const true) -> [return: bb6, unwind: bb18];
+    }
+
+    bb6: {
+        _23 = AccountMeta::new(_3, const false) -> [return: bb7, unwind: bb18];
+    }
+
+    bb7: {
+        _25 = solana_program::sysvar::rent::id() -> [return: bb8, unwind: bb18];
+    }
+
+    bb8: {
+        _24 = AccountMeta::new_readonly(move _25, const false) -> [return: bb9, unwind: bb18];
+    }
+
+    bb9: {
+        _27 = vendored_spl_token::id() -> [return: bb10, unwind: bb18];
+    }
+
+    bb10: {
+        _26 = AccountMeta::new_readonly(move _27, const false) -> [return: bb11, unwind: bb18];
+    }
+
+    bb11: {
+        _29 = solana_program::system_program::id() -> [return: bb12, unwind: bb18];
+    }
+
+    bb12: {
+        _28 = AccountMeta::new_readonly(move _29, const false) -> [return: bb13, unwind: bb18];
+    }
+
+    bb13: {
+        _33 = (((_18.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 7]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 7]>).0: *const [solana_program::instruction::AccountMeta; 7]);
+        (*_33) = [move _19, move _20, move _21, move _23, move _24, move _26, move _28];
+        _14 = move _18;
+        _13 = move _14 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _12 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _13) -> [return: bb14, unwind continue];
+    }
+
+    bb14: {
+        _32 = const initialize::promoted[0];
+        _31 = <WalletInstruction as BorshSerialize>::try_to_vec(_32) -> [return: bb15, unwind: bb17];
+    }
+
+    bb15: {
+        _30 = Result::<Vec<u8>, std::io::Error>::unwrap(move _31) -> [return: bb16, unwind: bb17];
+    }
+
+    bb16: {
+        _0 = Instruction { program_id: move _11, accounts: move _12, data: move _30 };
+        return;
+    }
+
+    bb17 (cleanup): {
+        drop(_12) -> [return: bb19, unwind terminate(cleanup)];
+    }
+
+    bb18 (cleanup): {
+        drop(_18) -> [return: bb19, unwind terminate(cleanup)];
+    }
+
+    bb19 (cleanup): {
+        resume;
+    }
+}
+
+const initialize::promoted[0]: &WalletInstruction = {
+    let mut _0: &WalletInstruction;
+    let mut _1: WalletInstruction;
+
+    bb0: {
+        _1 = WalletInstruction::Initialize;
+        _0 = &_1;
+        return;
+    }
+}
+
+fn deposit(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: Pubkey, _5: Pubkey, _6: u64) -> Instruction {
+    debug wallet_program => _1;
+    debug owner_address => _2;
+    debug source => _3;
+    debug source_authority => _4;
+    debug mint => _5;
+    debug amount => _6;
+    let mut _0: solana_program::instruction::Instruction;
+    let _7: solana_program::pubkey::Pubkey;
+    let mut _8: (solana_program::pubkey::Pubkey, u8);
+    let _9: &solana_program::pubkey::Pubkey;
+    let _10: &solana_program::pubkey::Pubkey;
+    let mut _11: solana_program::pubkey::Pubkey;
+    let mut _12: std::vec::Vec<solana_program::instruction::AccountMeta>;
+    let mut _13: std::boxed::Box<[solana_program::instruction::AccountMeta]>;
+    let mut _14: std::boxed::Box<[solana_program::instruction::AccountMeta; 5]>;
+    let mut _15: usize;
+    let mut _16: usize;
+    let mut _17: *mut u8;
+    let mut _18: std::boxed::Box<[solana_program::instruction::AccountMeta; 5]>;
+    let mut _19: solana_program::instruction::AccountMeta;
+    let mut _20: solana_program::instruction::AccountMeta;
+    let mut _21: solana_program::instruction::AccountMeta;
+    let mut _22: solana_program::instruction::AccountMeta;
+    let mut _23: solana_program::instruction::AccountMeta;
+    let mut _24: solana_program::pubkey::Pubkey;
+    let mut _25: std::vec::Vec<u8>;
+    let mut _26: std::result::Result<std::vec::Vec<u8>, std::io::Error>;
+    let mut _27: &WalletInstruction;
+    let _28: WalletInstruction;
+    let mut _29: *const [solana_program::instruction::AccountMeta; 5];
+    scope 1 {
+        debug wallet_address => _7;
+        scope 2 {
+        }
+    }
+
+    bb0: {
+        _9 = &_2;
+        _10 = &_1;
+        _8 = get_wallet_address(_9, _10) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _7 = (_8.0: solana_program::pubkey::Pubkey);
+        _11 = _1;
+        _15 = SizeOf([solana_program::instruction::AccountMeta; 5]);
+        _16 = AlignOf([solana_program::instruction::AccountMeta; 5]);
+        _17 = alloc::alloc::exchange_malloc(move _15, move _16) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _18 = ShallowInitBox(move _17, [solana_program::instruction::AccountMeta; 5]);
+        _19 = AccountMeta::new(_7, const false) -> [return: bb3, unwind: bb13];
+    }
+
+    bb3: {
+        _20 = AccountMeta::new(_3, const false) -> [return: bb4, unwind: bb13];
+    }
+
+    bb4: {
+        _21 = AccountMeta::new_readonly(_4, const true) -> [return: bb5, unwind: bb13];
+    }
+
+    bb5: {
+        _22 = AccountMeta::new_readonly(_5, const false) -> [return: bb6, unwind: bb13];
+    }
+
+    bb6: {
+        _24 = vendored_spl_token::id() -> [return: bb7, unwind: bb13];
+    }
+
+    bb7: {
+        _23 = AccountMeta::new_readonly(move _24, const false) -> [return: bb8, unwind: bb13];
+    }
+
+    bb8: {
+        _29 = (((_18.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 5]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 5]>).0: *const [solana_program::instruction::AccountMeta; 5]);
+        (*_29) = [move _19, move _20, move _21, move _22, move _23];
+        _14 = move _18;
+        _13 = move _14 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _12 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _13) -> [return: bb9, unwind continue];
+    }
+
+    bb9: {
+        _28 = WalletInstruction::Deposit { amount: _6 };
+        _27 = &_28;
+        _26 = <WalletInstruction as BorshSerialize>::try_to_vec(move _27) -> [return: bb10, unwind: bb12];
+    }
+
+    bb10: {
+        _25 = Result::<Vec<u8>, std::io::Error>::unwrap(move _26) -> [return: bb11, unwind: bb12];
+    }
+
+    bb11: {
+        _0 = Instruction { program_id: move _11, accounts: move _12, data: move _25 };
+        return;
+    }
+
+    bb12 (cleanup): {
+        drop(_12) -> [return: bb14, unwind terminate(cleanup)];
+    }
+
+    bb13 (cleanup): {
+        drop(_18) -> [return: bb14, unwind terminate(cleanup)];
+    }
+
+    bb14 (cleanup): {
+        resume;
+    }
+}
+
+fn withdraw(_1: Pubkey, _2: Pubkey, _3: Pubkey, _4: Pubkey, _5: u64) -> Instruction {
+    debug wallet_program => _1;
+    debug owner_address => _2;
+    debug destination => _3;
+    debug mint => _4;
+    debug amount => _5;
+    let mut _0: solana_program::instruction::Instruction;
+    let _6: solana_program::pubkey::Pubkey;
+    let mut _7: (solana_program::pubkey::Pubkey, u8);
+    let _8: &solana_program::pubkey::Pubkey;
+    let _9: &solana_program::pubkey::Pubkey;
+    let mut _11: (solana_program::pubkey::Pubkey, u8);
+    let _12: &solana_program::pubkey::Pubkey;
+    let mut _13: solana_program::pubkey::Pubkey;
+    let mut _14: std::vec::Vec<solana_program::instruction::AccountMeta>;
+    let mut _15: std::boxed::Box<[solana_program::instruction::AccountMeta]>;
+    let mut _16: std::boxed::Box<[solana_program::instruction::AccountMeta; 6]>;
+    let mut _17: usize;
+    let mut _18: usize;
+    let mut _19: *mut u8;
+    let mut _20: std::boxed::Box<[solana_program::instruction::AccountMeta; 6]>;
+    let mut _21: solana_program::instruction::AccountMeta;
+    let mut _22: solana_program::instruction::AccountMeta;
+    let mut _23: solana_program::instruction::AccountMeta;
+    let mut _24: solana_program::pubkey::Pubkey;
+    let mut _25: solana_program::instruction::AccountMeta;
+    let mut _26: solana_program::instruction::AccountMeta;
+    let mut _27: solana_program::instruction::AccountMeta;
+    let mut _28: solana_program::pubkey::Pubkey;
+    let mut _29: std::vec::Vec<u8>;
+    let mut _30: std::result::Result<std::vec::Vec<u8>, std::io::Error>;
+    let mut _31: &WalletInstruction;
+    let _32: WalletInstruction;
+    let mut _33: *const [solana_program::instruction::AccountMeta; 6];
+    scope 1 {
+        debug wallet_address => _6;
+        let _10: solana_program::pubkey::Pubkey;
+        scope 2 {
+            debug authority_address => _10;
+            scope 3 {
+            }
+        }
+    }
+
+    bb0: {
+        _8 = &_2;
+        _9 = &_1;
+        _7 = get_wallet_address(_8, _9) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _6 = (_7.0: solana_program::pubkey::Pubkey);
+        _12 = &_1;
+        _11 = get_authority(_12) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _10 = (_11.0: solana_program::pubkey::Pubkey);
+        _13 = _1;
+        _17 = SizeOf([solana_program::instruction::AccountMeta; 6]);
+        _18 = AlignOf([solana_program::instruction::AccountMeta; 6]);
+        _19 = alloc::alloc::exchange_malloc(move _17, move _18) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _20 = ShallowInitBox(move _19, [solana_program::instruction::AccountMeta; 6]);
+        _21 = AccountMeta::new(_6, const false) -> [return: bb4, unwind: bb15];
+    }
+
+    bb4: {
+        _22 = AccountMeta::new_readonly(_10, const false) -> [return: bb5, unwind: bb15];
+    }
+
+    bb5: {
+        _24 = _2;
+        _23 = AccountMeta::new_readonly(move _24, const true) -> [return: bb6, unwind: bb15];
+    }
+
+    bb6: {
+        _25 = AccountMeta::new(_3, const false) -> [return: bb7, unwind: bb15];
+    }
+
+    bb7: {
+        _26 = AccountMeta::new_readonly(_4, const false) -> [return: bb8, unwind: bb15];
+    }
+
+    bb8: {
+        _28 = vendored_spl_token::id() -> [return: bb9, unwind: bb15];
+    }
+
+    bb9: {
+        _27 = AccountMeta::new_readonly(move _28, const false) -> [return: bb10, unwind: bb15];
+    }
+
+    bb10: {
+        _33 = (((_20.0: std::ptr::Unique<[solana_program::instruction::AccountMeta; 6]>).0: std::ptr::NonNull<[solana_program::instruction::AccountMeta; 6]>).0: *const [solana_program::instruction::AccountMeta; 6]);
+        (*_33) = [move _21, move _22, move _23, move _25, move _26, move _27];
+        _16 = move _20;
+        _15 = move _16 as std::boxed::Box<[solana_program::instruction::AccountMeta]> (PointerCoercion(Unsize));
+        _14 = std::slice::<impl [AccountMeta]>::into_vec::<std::alloc::Global>(move _15) -> [return: bb11, unwind continue];
+    }
+
+    bb11: {
+        _32 = WalletInstruction::Withdraw { amount: _5 };
+        _31 = &_32;
+        _30 = <WalletInstruction as BorshSerialize>::try_to_vec(move _31) -> [return: bb12, unwind: bb14];
+    }
+
+    bb12: {
+        _29 = Result::<Vec<u8>, std::io::Error>::unwrap(move _30) -> [return: bb13, unwind: bb14];
+    }
+
+    bb13: {
+        _0 = Instruction { program_id: move _13, accounts: move _14, data: move _29 };
+        return;
+    }
+
+    bb14 (cleanup): {
+        drop(_14) -> [return: bb16, unwind terminate(cleanup)];
+    }
+
+    bb15 (cleanup): {
+        drop(_20) -> [return: bb16, unwind terminate(cleanup)];
+    }
+
+    bb16 (cleanup): {
+        resume;
+    }
+}

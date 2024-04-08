@@ -1,0 +1,40 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "level2",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712582173",
+  "int_cnt": 1,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 2,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:97:8: 97:28 \n\tmin_balance + amount",
+      "context": "src/processor.rs:81:1: 109:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"withdraw {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info__owner = next_account_info(account_info_iter)?;\n    let authority_info__signer = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let rent_info = next_account_info(account_info_iter)?;\n\n    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;\n    let rent = Rent::from_account_info(rent_info)?;\n\n    assert_eq!(wallet_info__owner.owner, program_id);\n    assert_eq!(wallet.authority, *authority_info__signer.key);\n    assert!(authority_info__signer.is_signer, \"authority must sign!\");\n\n    let min_balance = rent.minimum_balance(WALLET_LEN as usize);\n    if min_balance + amount > **wallet_info__owner.lamports.borrow_mut() {\n        return Err(ProgramError::InsufficientFunds);\n    }\n\n    **wallet_info__owner.lamports.borrow_mut() -= amount;\n    **destination_info.lamports.borrow_mut() += amount;\n\n    wallet\n        .serialize(&mut &mut (*wallet_info__owner.data).borrow_mut()[..])\n        .unwrap();\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:16:1: 26:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:81:1: 109:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:89:46: 89:69 \n\twallet_info__owner.data",
+      "context": "src/processor.rs:81:1: 109:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"withdraw {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info__owner = next_account_info(account_info_iter)?;\n    let authority_info__signer = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let rent_info = next_account_info(account_info_iter)?;\n\n    let wallet = Wallet::deserialize(&mut &(*wallet_info__owner.data).borrow_mut()[..])?;\n    let rent = Rent::from_account_info(rent_info)?;\n\n    assert_eq!(wallet_info__owner.owner, program_id);\n    assert_eq!(wallet.authority, *authority_info__signer.key);\n    assert!(authority_info__signer.is_signer, \"authority must sign!\");\n\n    let min_balance = rent.minimum_balance(WALLET_LEN as usize);\n    if min_balance + amount > **wallet_info__owner.lamports.borrow_mut() {\n        return Err(ProgramError::InsufficientFunds);\n    }\n\n    **wallet_info__owner.lamports.borrow_mut() -= amount;\n    **destination_info.lamports.borrow_mut() += amount;\n\n    wallet\n        .serialize(&mut &mut (*wallet_info__owner.data).borrow_mut()[..])\n        .unwrap();\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:16:1: 26:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:81:1: 109:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

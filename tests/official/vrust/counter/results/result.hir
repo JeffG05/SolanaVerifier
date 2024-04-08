@@ -1,0 +1,197 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+use ::{};
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use ::{};
+use ::{};
+use solana_program::account_info::next_account_info;
+use solana_program::account_info::AccountInfo;
+use solana_program::declare_id;
+use solana_program::entrypoint::ProgramResult;
+use solana_program::msg;
+use solana_program::program_error::ProgramError;
+use solana_program::pubkey::Pubkey;
+
+mod state {
+
+
+
+
+
+
+
+
+
+
+
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    struct Counter {
+        count: u64,
+    }
+    impl borsh::ser::BorshSerialize for Counter where
+        u64: borsh::ser::BorshSerialize {
+        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+            -> ::core::result::Result<(), borsh::maybestd::io::Error> where
+            W: borsh::maybestd::io::Write {
+                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.count,
+                                    writer)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }
+    }
+    impl borsh::de::BorshDeserialize for Counter where
+        u64: borsh::BorshDeserialize {
+        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+            ->
+                ::core::result::Result<Self,
+                borsh::maybestd::io::Error> {
+                Ok(Self{
+                        count:
+                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                        {
+                                    #[lang = "Break"] {  0: residual } =>
+                                        #[allow(unreachable_code)]
+                                        return #[lang = "from_residual"](residual),
+                                    #[lang = "Continue"] {  0: val } =>
+                                        #[allow(unreachable_code)]
+                                        val,
+                                },})
+            }
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for Counter {
+        #[inline]
+        fn fmt<'_, '_,
+            '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+            ->
+                ::core::fmt::Result {
+                ::core::fmt::Formatter::debug_struct_field1_finish(f,
+                    "Counter", "count", &&self.count)
+            }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for Counter {
+        #[inline]
+        fn clone<'_>(self: &'_ Self)
+            ->
+                Counter {
+                Counter{ count: ::core::clone::Clone::clone(&self.count),}
+            }
+    }
+}
+use state::*;
+#[doc = r" The const program ID."]
+const ID: ::solana_program::pubkey::Pubkey =
+    ::solana_program::pubkey::Pubkey::new_from_array([218u8, 7u8, 92u8, 178u8,
+                255u8, 94u8, 198u8, 129u8, 118u8, 19u8, 222u8, 83u8, 11u8,
+                105u8, 42u8, 135u8, 53u8, 71u8, 119u8, 105u8, 218u8, 71u8,
+                67u8, 12u8, 189u8, 129u8, 84u8, 51u8, 92u8, 74u8, 131u8,
+                39u8]);
+#[doc = r" Returns `true` if given pubkey is the program ID."]
+fn check_id<'_>(id: &'_ ::solana_program::pubkey::Pubkey)
+    -> bool { id == &ID }
+#[doc = r" Returns the program ID."]
+const fn id() -> ::solana_program::pubkey::Pubkey { ID }
+#[cfg(not(feature = "no-entrypoint"))]
+use solana_program::entrypoint;
+/// # Safety
+#[no_mangle]
+unsafe extern "C" fn entrypoint(input: *mut u8)
+    ->
+        u64 {
+        let (program_id, accounts, instruction_data) =
+            unsafe { ::solana_program::entrypoint::deserialize(input) };
+        match process_instruction(&program_id, &accounts, &instruction_data) {
+                Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                Err(error) => error.into(),
+            }
+    }
+fn process_instruction<'_, '_, '_,
+    '_>(_program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+    instruction_data: &'_ [u8])
+    ->
+        ProgramResult {
+        let (instruction_discriminant, instruction_data_inner) =
+            instruction_data.split_at(1);
+        match instruction_discriminant[0] {
+                0 => {
+                    match #[lang = "branch"](process_increment_counter(accounts,
+                                        instruction_data_inner)) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                }
+                _ => { }
+            }
+        Ok(())
+    }
+fn process_increment_counter<'_, '_,
+    '_>(accounts: &'_ [AccountInfo<>], _instruction_data: &'_ [u8])
+    ->
+        Result<(),
+        ProgramError> {
+        let account_info_iter = &mut accounts.iter();
+        let counter_account =
+            match #[lang = "branch"](next_account_info(account_info_iter)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+        if !counter_account.is_writable
+                {
+                        {
+                                #[cold]
+                                #[track_caller]
+                                #[inline(never)]
+                                const fn panic_cold_explicit()
+                                    -> ! { ::core::panicking::panic_explicit() }
+                                panic_cold_explicit();
+                            };
+                    }
+                let mut counter =
+                    match #[lang = "branch"](Counter::try_from_slice(&match #[lang = "branch"](counter_account.try_borrow_mut_data())
+                                                        {
+                                                    #[lang = "Break"] {  0: residual } =>
+                                                        #[allow(unreachable_code)]
+                                                        return #[lang = "from_residual"](residual),
+                                                    #[lang = "Continue"] {  0: val } =>
+                                                        #[allow(unreachable_code)]
+                                                        val,
+                                                })) {
+                            #[lang = "Break"] {  0: residual } =>
+                                #[allow(unreachable_code)]
+                                return #[lang = "from_residual"](residual),
+                            #[lang = "Continue"] {  0: val } =>
+                                #[allow(unreachable_code)]
+                                val,
+                        };
+                counter.count += 1;
+                match #[lang = "branch"](counter.serialize(&mut *counter_account.data.borrow_mut()))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+                Ok(())
+            }

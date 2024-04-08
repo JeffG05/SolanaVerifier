@@ -1,0 +1,27 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "checking_accounts_program",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528612",
+  "int_cnt": 0,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 1,
+  "errors": [
+    {
+      "id": "0",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "solana_program::account_info::AccountInfo::<'a>::lamports",
+      "code": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:70:11: 70:33 \n\tself.lamports.borrow()",
+      "context": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:69:5: 71:6 \n\tpub fn lamports(&self) -> u64 {\n        **self.lamports.borrow()\n    }",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn process_instruction(){// src/lib.rs:13:1: 68:2 }\n\t\tfn solana_program::account_info::AccountInfo::<'a>::lamports(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:69:5: 71:6 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

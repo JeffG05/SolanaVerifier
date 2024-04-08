@@ -1,0 +1,959 @@
+#[prelude_import]
+use std::prelude::rust_2018::*;
+#[macro_use]
+extern crate std;
+use ::{};
+use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use ::{};
+use solana_program::entrypoint;
+use ::{};
+use solana_program::instruction::AccountMeta;
+use solana_program::instruction::Instruction;
+use solana_program::pubkey::Pubkey;
+use solana_program::system_program;
+use solana_program::sysvar;
+
+enum TipInstruction {
+
+    /// Initialize a vault
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Vault account
+    /// (2) initializer (must sign)
+    /// (3) Rent sysvar
+    /// (4) System Program
+    Initialize {
+            seed: u8,
+            fee: f64,
+            fee_recipient: Pubkey,
+        },
+
+    /// Initialize a TipPool
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Vault account
+    /// (2) withdraw_authority (must sign)
+    /// (3) Pool account
+    CreatePool,
+
+    /// Tip
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Vault account
+    /// (2) Pool
+    /// (3) Tip Source
+    /// (4) System program
+    Tip {
+            amount: u64,
+        },
+
+    /// Withdraw from Pool
+    ///
+    /// Passed accounts:
+    ///
+    /// (1) Vault account
+    /// (2) Pool account
+    /// (3) withdraw_authority (must sign)
+    Withdraw {
+            amount: u64,
+        },
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for TipInstruction {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            match self {
+                    TipInstruction::Initialize {
+                         seed: __self_0,  fee: __self_1,  fee_recipient: __self_2 }
+                        =>
+                        ::core::fmt::Formatter::debug_struct_field3_finish(f,
+                            "Initialize", "seed", __self_0, "fee", __self_1,
+                            "fee_recipient", &__self_2),
+                    TipInstruction::CreatePool =>
+                        ::core::fmt::Formatter::write_str(f, "CreatePool"),
+                    TipInstruction::Tip {  amount: __self_0 } =>
+                        ::core::fmt::Formatter::debug_struct_field1_finish(f, "Tip",
+                            "amount", &__self_0),
+                    TipInstruction::Withdraw {  amount: __self_0 } =>
+                        ::core::fmt::Formatter::debug_struct_field1_finish(f,
+                            "Withdraw", "amount", &__self_0),
+                }
+        }
+}
+impl borsh::de::BorshDeserialize for TipInstruction where
+    u8: borsh::BorshDeserialize, f64: borsh::BorshDeserialize,
+    Pubkey: borsh::BorshDeserialize, u64: borsh::BorshDeserialize,
+    u64: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            let variant_idx: u8 =
+                match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let return_value =
+                match variant_idx {
+                        0u8 =>
+                            TipInstruction::Initialize{
+                                seed:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },
+
+                                fee:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },
+
+                                fee_recipient:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },},
+                        1u8 => TipInstruction::CreatePool,
+                        2u8 =>
+                            TipInstruction::Tip{
+                                amount:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },},
+                        3u8 =>
+                            TipInstruction::Withdraw{
+                                amount:
+                                    match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                {
+                                            #[lang = "Break"] {  0: residual } =>
+                                                #[allow(unreachable_code)]
+                                                return #[lang = "from_residual"](residual),
+                                            #[lang = "Continue"] {  0: val } =>
+                                                #[allow(unreachable_code)]
+                                                val,
+                                        },},
+                        _ => {
+                            let msg =
+
+
+                                //reserved for future use
+                                //reserved for future use
+
+
+
+
+
+                                {
+                                        let res =
+                                            ::alloc::fmt::format(format_arguments::new_v1(&["Unexpected variant index: "],
+                                                    &[format_argument::new_debug(&variant_idx)]));
+                                        res
+                                    };
+                            return Err(borsh::maybestd::io::Error::new(borsh::maybestd::io::ErrorKind::InvalidInput,
+                                        msg));
+                        }
+                    };
+            Ok(return_value)
+        }
+}
+impl borsh::ser::BorshSerialize for TipInstruction where
+    u8: borsh::ser::BorshSerialize, f64: borsh::ser::BorshSerialize,
+    Pubkey: borsh::ser::BorshSerialize, u64: borsh::ser::BorshSerialize,
+    u64: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            let variant_idx: u8 =
+                match self {
+                        TipInstruction::Initialize { .. } => 0u8,
+                        TipInstruction::CreatePool => 1u8,
+                        TipInstruction::Tip { .. } => 2u8,
+                        TipInstruction::Withdraw { .. } => 3u8,
+                    };
+            match #[lang = "branch"](writer.write_all(&variant_idx.to_le_bytes()))
+                        {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match self {
+                    TipInstruction::Initialize {  seed,  fee,  fee_recipient }
+                        => {
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(seed,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(fee,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(fee_recipient,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                    }
+                    TipInstruction::CreatePool => { }
+                    TipInstruction::Tip {  amount } => {
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(amount,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                    }
+                    TipInstruction::Withdraw {  amount } => {
+                        match #[lang = "branch"](borsh::BorshSerialize::serialize(amount,
+                                            writer)) {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            };
+                    }
+                }
+            Ok(())
+        }
+}
+#[repr(C)]
+struct TipPool {
+    withdraw_authority: Pubkey,
+    value: u64,
+    vault: Pubkey,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for TipPool {
+    #[inline]
+    fn clone<'_>(self: &'_ Self)
+        ->
+            TipPool {
+            let _: ::core::clone::AssertParamIsClone<Pubkey>;
+            let _: ::core::clone::AssertParamIsClone<u64>;
+            *self
+        }
+}
+#[automatically_derived]
+impl ::core::marker::Copy for TipPool { }
+#[automatically_derived]
+impl ::core::fmt::Debug for TipPool {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field3_finish(f, "TipPool",
+                "withdraw_authority", &self.withdraw_authority, "value",
+                &self.value, "vault", &&self.vault)
+        }
+}
+#[automatically_derived]
+impl ::core::default::Default for TipPool {
+    #[inline]
+    fn default()
+        ->
+            TipPool {
+            TipPool{
+                withdraw_authority: ::core::default::Default::default(),
+
+                value: ::core::default::Default::default(),
+
+                vault: ::core::default::Default::default(),}
+        }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for TipPool { }
+#[automatically_derived]
+impl ::core::cmp::PartialEq for TipPool {
+    #[inline]
+    fn eq<'_, '_>(self: &'_ Self, other: &'_ TipPool)
+        ->
+            bool {
+            self.withdraw_authority == other.withdraw_authority &&
+                    self.value == other.value && self.vault == other.vault
+        }
+}
+impl borsh::ser::BorshSerialize for TipPool where
+    Pubkey: borsh::ser::BorshSerialize, u64: borsh::ser::BorshSerialize,
+    Pubkey: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.withdraw_authority,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.value,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.vault,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for TipPool where
+    Pubkey: borsh::BorshDeserialize, u64: borsh::BorshDeserialize,
+    Pubkey: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            ::core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            Ok(Self{
+                    withdraw_authority:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },
+
+                    value:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },
+
+                    vault:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+const TIP_POOL_LEN: u64 = 32 + 8 + 32;
+#[repr(C)]
+struct Vault {
+    creator: Pubkey,
+    fee: f64,
+    fee_recipient: Pubkey,
+    seed: u8,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for Vault {
+    #[inline]
+    fn clone<'_>(self: &'_ Self)
+        ->
+            Vault {
+            let _: ::core::clone::AssertParamIsClone<Pubkey>;
+            let _: ::core::clone::AssertParamIsClone<f64>;
+            let _: ::core::clone::AssertParamIsClone<u8>;
+            *self
+        }
+}
+#[automatically_derived]
+impl ::core::marker::Copy for Vault { }
+#[automatically_derived]
+impl ::core::fmt::Debug for Vault {
+    #[inline]
+    fn fmt<'_, '_, '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+        ->
+            ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field4_finish(f, "Vault",
+                "creator", &self.creator, "fee", &self.fee, "fee_recipient",
+                &self.fee_recipient, "seed", &&self.seed)
+        }
+}
+#[automatically_derived]
+impl ::core::default::Default for Vault {
+    #[inline]
+    fn default()
+        ->
+            Vault {
+            Vault{
+                creator: ::core::default::Default::default(),
+
+                fee: ::core::default::Default::default(),
+
+                fee_recipient: ::core::default::Default::default(),
+
+                seed: ::core::default::Default::default(),}
+        }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for Vault { }
+#[automatically_derived]
+impl ::core::cmp::PartialEq for Vault {
+    #[inline]
+    fn eq<'_, '_>(self: &'_ Self, other: &'_ Vault)
+        ->
+            bool {
+            self.creator == other.creator && self.fee == other.fee &&
+                    self.fee_recipient == other.fee_recipient &&
+                self.seed == other.seed
+        }
+}
+impl borsh::ser::BorshSerialize for Vault where
+    Pubkey: borsh::ser::BorshSerialize, f64: borsh::ser::BorshSerialize,
+    Pubkey: borsh::ser::BorshSerialize, u8: borsh::ser::BorshSerialize {
+    fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+        -> ::core::result::Result<(), borsh::maybestd::io::Error> where
+        W: borsh::maybestd::io::Write {
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.creator,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.fee,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.fee_recipient,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.seed,
+                                writer)) {
+                    #[lang = "Break"] {  0: residual } =>
+                        #[allow(unreachable_code)]
+                        return #[lang = "from_residual"](residual),
+                    #[lang = "Continue"] {  0: val } =>
+                        #[allow(unreachable_code)]
+                        val,
+                };
+            Ok(())
+        }
+}
+impl borsh::de::BorshDeserialize for Vault where
+    Pubkey: borsh::BorshDeserialize, f64: borsh::BorshDeserialize,
+    Pubkey: borsh::BorshDeserialize, u8: borsh::BorshDeserialize {
+    fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+        ->
+            ::core::result::Result<Self,
+            borsh::maybestd::io::Error> {
+            Ok(Self{
+                    creator:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },
+
+                    fee:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },
+
+                    fee_recipient:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },
+
+                    seed:
+                        match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            },})
+        }
+}
+const VAULT_LEN: u64 = 32 + 8 + 32 + 1;
+mod processor {
+    use ::{};
+    use borsh::BorshDeserialize;
+    use borsh::BorshSerialize;
+    use ::{};
+    use ::{};
+    use solana_program::account_info::next_account_info;
+    use solana_program::account_info::AccountInfo;
+    use solana_program::entrypoint::ProgramResult;
+    use ::{};
+    use solana_program::program::invoke;
+    use solana_program::program::invoke_signed;
+    use solana_program::program_error::ProgramError;
+    use solana_program::pubkey::Pubkey;
+    use solana_program::rent::Rent;
+    use solana_program::system_instruction;
+    use solana_program::sysvar::Sysvar;
+    use ::{};
+    use crate::TipInstruction;
+    use crate::TipPool;
+    use crate::Vault;
+    use crate::VAULT_LEN;
+    fn process_instruction<'_, '_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+        mut instruction_data: &'_ [u8])
+        ->
+            ProgramResult {
+            match match #[lang = "branch"](TipInstruction::deserialize(&mut instruction_data))
+                                    {
+                                #[lang = "Break"] {  0: residual } =>
+                                    #[allow(unreachable_code)]
+                                    return #[lang = "from_residual"](residual),
+                                #[lang = "Continue"] {  0: val } =>
+                                    #[allow(unreachable_code)]
+                                    val,
+                            } {
+                    TipInstruction::Initialize {  seed,  fee,  fee_recipient }
+                        =>
+                        initialize(program_id, accounts, seed, fee, fee_recipient),
+                    TipInstruction::Tip {  amount } =>
+                        tip(program_id, accounts, amount),
+                    TipInstruction::Withdraw {  amount } =>
+                        withdraw(program_id, accounts, amount),
+                    TipInstruction::CreatePool =>
+                        create_pool(program_id, accounts),
+                }
+        }
+    fn initialize<'_, '_,
+        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>], seed: u8,
+        fee: f64, fee_recipient: Pubkey)
+        ->
+            ProgramResult {
+            let account_info_iter = &mut accounts.iter();
+            let vault_info =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let initializer_info =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let rent_info =
+                match #[lang = "branch"](next_account_info(account_info_iter))
+                            {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let rent =
+                match #[lang = "branch"](Rent::from_account_info(rent_info)) {
+                        #[lang = "Break"] {  0: residual } =>
+                            #[allow(unreachable_code)]
+                            return #[lang = "from_residual"](residual),
+                        #[lang = "Continue"] {  0: val } =>
+                            #[allow(unreachable_code)]
+                            val,
+                    };
+            let vault_address =
+                Pubkey::create_program_address(&[&[seed]],
+                        program_id).unwrap();
+            if *vault_info.key != vault_address
+                    { { ::std::rt::begin_panic("explicit panic") }; }
+                    if !vault_info.data_is_empty()
+                            {
+                                    {
+                                            ::std::rt::begin_panic("vault info must be empty account!");
+                                        }
+                                };
+                            if !initializer_info.is_signer
+                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                    let vault =
+                                        Vault{
+                                            creator: *initializer_info.key,
+
+                                            fee,
+
+                                            fee_recipient,
+
+                                            seed,};
+                                    vault.serialize(&mut &mut vault_info.data.borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                    Ok(())
+                                }
+                            fn create_pool<'_, '_,
+                                '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>])
+                                ->
+                                    ProgramResult {
+                                    let account_info_iter = &mut accounts.iter();
+                                    let vault_info =
+                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            };
+                                    let withdraw_authority_info =
+                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            };
+                                    let pool_info =
+                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                    {
+                                                #[lang = "Break"] {  0: residual } =>
+                                                    #[allow(unreachable_code)]
+                                                    return #[lang = "from_residual"](residual),
+                                                #[lang = "Continue"] {  0: val } =>
+                                                    #[allow(unreachable_code)]
+                                                    val,
+                                            };
+                                    if vault_info.owner != program_id
+                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                            if !withdraw_authority_info.is_signer
+                                                    {
+                                                            { ::std::rt::begin_panic("withdraw authority must sign!"); }
+                                                        };
+                                                    if pool_info.owner != program_id
+                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                            if pool_info.data.borrow_mut().into_iter().any(|b| *b != 0)
+                                                                    { return Err(ProgramError::AccountAlreadyInitialized); }
+                                                                    let pool =
+                                                                        TipPool{
+                                                                            withdraw_authority: *withdraw_authority_info.key,
+
+                                                                            value: 0,
+
+                                                                            vault: *vault_info.key,};
+                                                                    pool.serialize(&mut &mut pool_info.data.borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                                                    Ok(())
+                                                                }
+                                                            fn tip<'_, '_,
+                                                                '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                                                                amount: u64)
+                                                                ->
+                                                                    ProgramResult {
+                                                                    let account_info_iter = &mut accounts.iter();
+                                                                    let vault_info =
+                                                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                    {
+                                                                                #[lang = "Break"] {  0: residual } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    return #[lang = "from_residual"](residual),
+                                                                                #[lang = "Continue"] {  0: val } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    val,
+                                                                            };
+                                                                    let pool_info =
+                                                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                    {
+                                                                                #[lang = "Break"] {  0: residual } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    return #[lang = "from_residual"](residual),
+                                                                                #[lang = "Continue"] {  0: val } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    val,
+                                                                            };
+                                                                    let source_info =
+                                                                        match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                    {
+                                                                                #[lang = "Break"] {  0: residual } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    return #[lang = "from_residual"](residual),
+                                                                                #[lang = "Continue"] {  0: val } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    val,
+                                                                            };
+                                                                    let mut pool =
+                                                                        match #[lang = "branch"](TipPool::deserialize(&mut &(*pool_info.data).borrow_mut()[#[lang = "RangeFull"]{}]))
+                                                                                    {
+                                                                                #[lang = "Break"] {  0: residual } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    return #[lang = "from_residual"](residual),
+                                                                                #[lang = "Continue"] {  0: val } =>
+                                                                                    #[allow(unreachable_code)]
+                                                                                    val,
+                                                                            };
+                                                                    if vault_info.owner != program_id
+                                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                            if pool_info.owner != program_id
+                                                                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                    if pool.vault != *vault_info.key
+                                                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                            pool.value =
+                                                                                                match pool.value.checked_add(amount) {
+                                                                                                        Some(v) => v,
+                                                                                                        None => return Err(ProgramError::InvalidArgument),
+                                                                                                    };
+                                                                                            pool.serialize(&mut &mut pool_info.data.borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                                                                            Ok(())
+                                                                                        }
+                                                                                    fn withdraw<'_, '_,
+                                                                                        '_>(program_id: &'_ Pubkey, accounts: &'_ [AccountInfo<>],
+                                                                                        amount: u64)
+                                                                                        ->
+                                                                                            ProgramResult {
+                                                                                            let account_info_iter = &mut accounts.iter();
+                                                                                            let vault_info =
+                                                                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                                            {
+                                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            return #[lang = "from_residual"](residual),
+                                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            val,
+                                                                                                    };
+                                                                                            let pool_info =
+                                                                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                                            {
+                                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            return #[lang = "from_residual"](residual),
+                                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            val,
+                                                                                                    };
+                                                                                            let withdraw_authority_info =
+                                                                                                match #[lang = "branch"](next_account_info(account_info_iter))
+                                                                                                            {
+                                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            return #[lang = "from_residual"](residual),
+                                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            val,
+                                                                                                    };
+                                                                                            let mut pool =
+                                                                                                match #[lang = "branch"](TipPool::deserialize(&mut &(*pool_info.data).borrow_mut()[#[lang = "RangeFull"]{}]))
+                                                                                                            {
+                                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            return #[lang = "from_residual"](residual),
+                                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                                            #[allow(unreachable_code)]
+                                                                                                            val,
+                                                                                                    };
+                                                                                            if vault_info.owner != program_id
+                                                                                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                                    if pool_info.owner != program_id
+                                                                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                                            if !withdraw_authority_info.is_signer
+                                                                                                                    {
+                                                                                                                            { ::std::rt::begin_panic("withdraw authority must sign"); }
+                                                                                                                        };
+                                                                                                                    if pool.vault != *vault_info.key
+                                                                                                                            { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                                                            if *withdraw_authority_info.key != pool.withdraw_authority
+                                                                                                                                    { { ::std::rt::begin_panic("explicit panic") }; }
+                                                                                                                                    pool.value =
+                                                                                                                                        match pool.value.checked_sub(amount) {
+                                                                                                                                                Some(v) => v,
+                                                                                                                                                None => return Err(ProgramError::InvalidArgument),
+                                                                                                                                            };
+                                                                                                                                    **(*vault_info).lamports.borrow_mut() -= amount;
+                                                                                                                                    **(*withdraw_authority_info).lamports.borrow_mut() +=
+                                                                                                                                        amount;
+                                                                                                                                    pool.serialize(&mut &mut pool_info.data.borrow_mut()[#[lang = "RangeFull"]{}]).unwrap();
+                                                                                                                                    Ok(())
+                                                                                                                                }
+                                                                                                                        }
+                                                                                                                        use processor::process_instruction;
+                                                                                                                        /// # Safety
+                                                                                                                        #[no_mangle]
+                                                                                                                        unsafe extern "C" fn entrypoint(input: *mut u8)
+                                                                                                                            ->
+                                                                                                                                u64 {
+                                                                                                                                let (program_id, accounts, instruction_data) =
+                                                                                                                                    unsafe { ::solana_program::entrypoint::deserialize(input) };
+                                                                                                                                match process_instruction(&program_id, &accounts,
+                                                                                                                                                &instruction_data) {
+                                                                                                                                        Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                                                                                                                                        Err(error) => error.into(),
+                                                                                                                                    }
+                                                                                                                            }
+                                                                                                                        fn initialize(tip_program: Pubkey, vault_address: Pubkey,
+                                                                                                                            initializer_address: Pubkey, seed: u8, fee: f64,
+                                                                                                                            fee_recipient: Pubkey)
+                                                                                                                            ->
+                                                                                                                                Instruction {
+                                                                                                                                Instruction{
+                                                                                                                                    program_id: tip_program,
+
+                                                                                                                                    accounts:
+                                                                                                                                        <[_]>::into_vec(
+                                                                                                                                            #[rustc_box]
+                                                                                                                                            ::alloc::boxed::Box::new([AccountMeta::new(vault_address,
+                                                                                                                                                            false), AccountMeta::new(initializer_address, true),
+                                                                                                                                                        AccountMeta::new_readonly(sysvar::rent::id(), false),
+                                                                                                                                                        AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                                                                                    data:
+                                                                                                                                        TipInstruction::Initialize{
+                                                                                                                                                    seed,
+
+                                                                                                                                                    fee,
+
+                                                                                                                                                    fee_recipient,}.try_to_vec().unwrap(),}
+                                                                                                                            }
+                                                                                                                        fn create_pool(tip_program: Pubkey, vault_address: Pubkey,
+                                                                                                                            withdraw_authority: Pubkey, pool_address: Pubkey)
+                                                                                                                            ->
+                                                                                                                                Instruction {
+                                                                                                                                Instruction{
+                                                                                                                                    program_id: tip_program,
+
+                                                                                                                                    accounts:
+                                                                                                                                        <[_]>::into_vec(
+                                                                                                                                            #[rustc_box]
+                                                                                                                                            ::alloc::boxed::Box::new([AccountMeta::new(vault_address,
+                                                                                                                                                            false), AccountMeta::new_readonly(withdraw_authority, true),
+                                                                                                                                                        AccountMeta::new(pool_address, false)])),
+
+                                                                                                                                    data: TipInstruction::CreatePool.try_to_vec().unwrap(),}
+                                                                                                                            }
+                                                                                                                        fn tip(tip_program: Pubkey, vault_address: Pubkey,
+                                                                                                                            pool_address: Pubkey, source: Pubkey, amount: u64)
+                                                                                                                            ->
+                                                                                                                                Instruction {
+                                                                                                                                Instruction{
+                                                                                                                                    program_id: tip_program,
+
+                                                                                                                                    accounts:
+                                                                                                                                        <[_]>::into_vec(
+                                                                                                                                            #[rustc_box]
+                                                                                                                                            ::alloc::boxed::Box::new([AccountMeta::new(vault_address,
+                                                                                                                                                            false), AccountMeta::new(pool_address, false),
+                                                                                                                                                        AccountMeta::new(source, true),
+                                                                                                                                                        AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                                                                                    data: TipInstruction::Tip{ amount,}.try_to_vec().unwrap(),}
+                                                                                                                            }
+                                                                                                                        fn withdraw(tip_program: Pubkey, vault_address: Pubkey,
+                                                                                                                            pool_address: Pubkey, withdraw_authority: Pubkey,
+                                                                                                                            amount: u64)
+                                                                                                                            ->
+                                                                                                                                Instruction {
+                                                                                                                                Instruction{
+                                                                                                                                    program_id: tip_program,
+
+                                                                                                                                    accounts:
+                                                                                                                                        <[_]>::into_vec(
+                                                                                                                                            #[rustc_box]
+                                                                                                                                            ::alloc::boxed::Box::new([AccountMeta::new(vault_address,
+                                                                                                                                                            false), AccountMeta::new(pool_address, false),
+                                                                                                                                                        AccountMeta::new(withdraw_authority, true),
+                                                                                                                                                        AccountMeta::new_readonly(system_program::id(), false)])),
+
+                                                                                                                                    data:
+                                                                                                                                        TipInstruction::Withdraw{ amount,}.try_to_vec().unwrap(),}
+                                                                                                                            }

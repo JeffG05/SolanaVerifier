@@ -1,0 +1,53 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "pda_rent_payer_program",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528778",
+  "int_cnt": 2,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 3,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "instructions::create_new_account::create_new_account",
+      "code": "src/instructions/create_new_account.rs:25:5: 25:69 \n\t**rent_vault.lamports.borrow_mut() -= lamports_required_for_rent",
+      "context": "src/instructions/create_new_account.rs:11:1: 29:2 \n\tpub fn create_new_account(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let new_account = next_account_info(accounts_iter)?;\n    let rent_vault = next_account_info(accounts_iter)?;\n    let _system_program = next_account_info(accounts_iter)?;\n\n    let (rent_vault_pda, _rent_vault_bump) =\n        Pubkey::find_program_address(&[RentVault::SEED_PREFIX.as_bytes()], program_id);\n    assert!(rent_vault.key.eq(&rent_vault_pda));\n\n    // Assuming this account has no inner data (size 0)\n    //\n    let lamports_required_for_rent = (Rent::get()?).minimum_balance(0);\n\n    **rent_vault.lamports.borrow_mut() -= lamports_required_for_rent;\n    **new_account.lamports.borrow_mut() += lamports_required_for_rent;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn instructions::create_new_account::create_new_account(){// src/instructions/create_new_account.rs:11:1: 29:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "instructions::init_rent_vault::init_rent_vault",
+      "code": "src/instructions/init_rent_vault.rs:35:29: 35:83 \n\t(Rent::get()?).minimum_balance(0) + args.fund_lamports",
+      "context": "src/instructions/init_rent_vault.rs:19:1: 50:2 \n\tpub fn init_rent_vault(\n    program_id: &Pubkey,\n    accounts: &[AccountInfo],\n    args: InitRentVaultArgs,\n) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let rent_vault = next_account_info(accounts_iter)?;\n    let payer = next_account_info(accounts_iter)?;\n    let system_program = next_account_info(accounts_iter)?;\n\n    let (rent_vault_pda, rent_vault_bump) =\n        Pubkey::find_program_address(&[RentVault::SEED_PREFIX.as_bytes()], program_id);\n    assert!(rent_vault.key.eq(&rent_vault_pda));\n\n    // Lamports for rent on the vault, plus the desired additional funding\n    //\n    let lamports_required = (Rent::get()?).minimum_balance(0) + args.fund_lamports;\n\n    invoke_signed(\n        &system_instruction::create_account(\n            payer.key,\n            rent_vault.key,\n            lamports_required,\n            0,\n            program_id,\n        ),\n        &[payer.clone(), rent_vault.clone(), system_program.clone()],\n        &[&[RentVault::SEED_PREFIX.as_bytes(), &[rent_vault_bump]]],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn instructions::init_rent_vault::init_rent_vault(){// src/instructions/init_rent_vault.rs:19:1: 50:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "2",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "instructions::create_new_account::create_new_account",
+      "code": "src/instructions/create_new_account.rs:26:7: 26:40 \n\tnew_account.lamports.borrow_mut()",
+      "context": "src/instructions/create_new_account.rs:11:1: 29:2 \n\tpub fn create_new_account(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let new_account = next_account_info(accounts_iter)?;\n    let rent_vault = next_account_info(accounts_iter)?;\n    let _system_program = next_account_info(accounts_iter)?;\n\n    let (rent_vault_pda, _rent_vault_bump) =\n        Pubkey::find_program_address(&[RentVault::SEED_PREFIX.as_bytes()], program_id);\n    assert!(rent_vault.key.eq(&rent_vault_pda));\n\n    // Assuming this account has no inner data (size 0)\n    //\n    let lamports_required_for_rent = (Rent::get()?).minimum_balance(0);\n\n    **rent_vault.lamports.borrow_mut() -= lamports_required_for_rent;\n    **new_account.lamports.borrow_mut() += lamports_required_for_rent;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 25:2 }\n\t\tfn instructions::create_new_account::create_new_account(){// src/instructions/create_new_account.rs:11:1: 29:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

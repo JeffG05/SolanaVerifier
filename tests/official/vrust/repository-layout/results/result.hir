@@ -1,0 +1,502 @@
+#[prelude_import]
+use std::prelude::rust_2021::*;
+#[macro_use]
+extern crate std;
+// For setting up modules & configs
+
+mod error { }
+mod instructions {
+    mod eat_food {
+        use ::{};
+        use solana_program::entrypoint::ProgramResult;
+        use solana_program::msg;
+        use solana_program::program_error::ProgramError;
+        use crate::state::food;
+        struct EatFoodInstructionData {
+            eater_name: String,
+            eater_ticket_count: u32,
+            food_stand: String,
+        }
+        fn eat_food(ix: EatFoodInstructionData)
+            ->
+                ProgramResult {
+                let food_stands_list = food::get_food_stands();
+                {
+                        let _t =
+                            match #[lang = "into_iter"](food_stands_list.iter()) {
+                                    mut iter =>
+                                        loop {
+                                                match #[lang = "next"](&mut iter) {
+                                                        #[lang = "None"] {} => break,
+                                                        #[lang = "Some"] {  0: food_stand } => {
+                                                            if ix.food_stand.eq(&food_stand.name)
+                                                                    {
+                                                                            ::solana_program::log::sol_log(&{
+                                                                                            let res =
+                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["Welcome to ",
+                                                                                                                    "! What can I get you?"],
+                                                                                                        &[format_argument::new_display(&food_stand.name)]));
+                                                                                            res
+                                                                                        });
+                                                                            if ix.eater_ticket_count < food_stand.tickets
+                                                                                    {
+                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                            let res =
+                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["  Sorry ",
+                                                                                                                                    ", our ", " is ", " tickets!"],
+                                                                                                                        &[format_argument::new_display(&ix.eater_name),
+                                                                                                                                    format_argument::new_display(&food_stand.food_type),
+                                                                                                                                    format_argument::new_display(&food_stand.tickets)]));
+                                                                                                            res
+                                                                                                        });
+                                                                                        } else {
+                                                                                       ::solana_program::log::sol_log(&{
+                                                                                                       let res =
+                                                                                                           ::alloc::fmt::format(format_arguments::new_v1(&["  Enjoy your ",
+                                                                                                                               "!"],
+                                                                                                                   &[format_argument::new_display(&food_stand.food_type)]));
+                                                                                                       res
+                                                                                                   });
+                                                                                   };
+                                                                                    return Ok(());
+                                                                                } } } }, };
+                                        _t
+                                    }; Err(ProgramError::InvalidInstructionData) }
+                    }
+                    mod get_on_ride {
+                        use ::{};
+                        use solana_program::entrypoint::ProgramResult;
+                        use solana_program::msg;
+                        use solana_program::program_error::ProgramError;
+                        use crate::state::ride;
+                        struct GetOnRideInstructionData {
+                            rider_name: String,
+                            rider_height: u32,
+                            rider_ticket_count: u32,
+                            ride: String,
+                        }
+                        fn get_on_ride(ix: GetOnRideInstructionData)
+                            ->
+                                ProgramResult {
+                                let rides_list = ride::get_rides();
+                                {
+                                        let _t =
+                                            match #[lang = "into_iter"](rides_list.iter()) {
+                                                    mut iter =>
+                                                        loop {
+                                                                match #[lang = "next"](&mut iter) {
+                                                                        #[lang = "None"] {} => break,
+                                                                        #[lang = "Some"] {  0: ride } => {
+                                                                            if ix.ride.eq(&ride.name)
+                                                                                    {
+                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                            let res =
+                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["You\'re about to ride the ",
+                                                                                                                                    "!"], &[format_argument::new_display(&ride.name)]));
+                                                                                                            res
+                                                                                                        });
+                                                                                            if ix.rider_ticket_count < ride.tickets
+                                                                                                    {
+                                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                                            let res =
+                                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["  Sorry ",
+                                                                                                                                                    ", you need ", " tickets to ride the ", "!"],
+                                                                                                                                        &[format_argument::new_display(&ix.rider_name),
+                                                                                                                                                    format_argument::new_display(&ride.tickets),
+                                                                                                                                                    format_argument::new_display(&ride.name)]));
+                                                                                                                            res
+                                                                                                                        });
+                                                                                                            return Ok(());
+                                                                                                        };
+                                                                                                    if ix.rider_height < ride.min_height
+                                                                                                            {
+                                                                                                                    ::solana_program::log::sol_log(&{
+                                                                                                                                    let res =
+                                                                                                                                        ::alloc::fmt::format(format_arguments::new_v1(&["  Sorry ",
+                                                                                                                                                            ", you need to be ", "\" tall to ride the ", "!"],
+                                                                                                                                                &[format_argument::new_display(&ix.rider_name),
+                                                                                                                                                            format_argument::new_display(&ride.min_height),
+                                                                                                                                                            format_argument::new_display(&ride.name)]));
+                                                                                                                                    res
+                                                                                                                                });
+                                                                                                                    return Ok(());
+                                                                                                                };
+                                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                                            let res =
+                                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["  Welcome aboard the ",
+                                                                                                                                                    "!"], &[format_argument::new_display(&ride.name)]));
+                                                                                                                            res
+                                                                                                                        });
+                                                                                                            if ride.upside_down
+                                                                                                                    {
+                                                                                                                            ::solana_program::log::sol_log("  Btw, this ride goes upside down. Hold on tight!");
+                                                                                                                        };
+                                                                                                                    return Ok(());
+                                                                                                                } }
+                                                                                                }
+                                                                                        },
+                                                                                };
+                                                                        _t
+                                                                    };
+                                                                Err(ProgramError::InvalidInstructionData)
+                                                            }
+                                                    }
+                                                    mod play_game {
+                                                        use ::{};
+                                                        use solana_program::entrypoint::ProgramResult;
+                                                        use solana_program::msg;
+                                                        use solana_program::program_error::ProgramError;
+                                                        use crate::state::game;
+                                                        struct PlayGameInstructionData {
+                                                            gamer_name: String,
+                                                            gamer_ticket_count: u32,
+                                                            game: String,
+                                                        }
+                                                        fn play_game(ix: PlayGameInstructionData)
+                                                            ->
+                                                                ProgramResult {
+                                                                let games_list = game::get_games();
+                                                                {
+                                                                        let _t =
+                                                                            match #[lang = "into_iter"](games_list.iter()) {
+                                                                                    mut iter =>
+                                                                                        loop {
+                                                                                                match #[lang = "next"](&mut iter) {
+                                                                                                        #[lang = "None"] {} => break,
+                                                                                                        #[lang = "Some"] {  0: game } => {
+                                                                                                            if ix.game.eq(&game.name)
+                                                                                                                    {
+                                                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                                                            let res =
+                                                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["You\'re about to play ",
+                                                                                                                                                                    "!"], &[format_argument::new_display(&game.name)]));
+                                                                                                                                            res
+                                                                                                                                        });
+                                                                                                                            if ix.gamer_ticket_count < game.tickets
+                                                                                                                                    {
+                                                                                                                                            ::solana_program::log::sol_log(&{
+                                                                                                                                                            let res =
+                                                                                                                                                                ::alloc::fmt::format(format_arguments::new_v1(&["  Sorry ",
+                                                                                                                                                                                    ", you need ", " tickets to play ", "!"],
+                                                                                                                                                                        &[format_argument::new_display(&ix.gamer_name),
+                                                                                                                                                                                    format_argument::new_display(&game.tickets),
+                                                                                                                                                                                    format_argument::new_display(&game.name)]));
+                                                                                                                                                            res
+                                                                                                                                                        });
+                                                                                                                                        } else {
+                                                                                                                                       ::solana_program::log::sol_log("  Let\'s see what you got!");
+                                                                                                                                       ::solana_program::log::sol_log(&{
+                                                                                                                                                       let res =
+                                                                                                                                                           ::alloc::fmt::format(format_arguments::new_v1(&["  You get ",
+                                                                                                                                                                               " attempts and the prize is a ", "!"],
+                                                                                                                                                                   &[format_argument::new_display(&game.tries),
+                                                                                                                                                                               format_argument::new_display(&game.prize)]));
+                                                                                                                                                       res
+                                                                                                                                                   });
+                                                                                                                                   };
+                                                                                                                                    return Ok(());
+                                                                                                                                } } } }, };
+                                                                                        _t
+                                                                                    }; Err(ProgramError::InvalidInstructionData) }
+                                                                    } }
+                                                                mod processor {
+                                                                    use ::{};
+                                                                    use borsh::BorshDeserialize;
+                                                                    use borsh::BorshSerialize;
+                                                                    use ::{};
+                                                                    use solana_program::account_info::AccountInfo;
+                                                                    use solana_program::entrypoint;
+                                                                    use solana_program::entrypoint::ProgramResult;
+                                                                    use solana_program::msg;
+                                                                    use solana_program::program_error::ProgramError;
+                                                                    use solana_program::pubkey::Pubkey;
+                                                                    use ::{};
+                                                                    use crate::instructions::eat_food;
+                                                                    use crate::instructions::get_on_ride;
+                                                                    use crate::instructions::play_game;
+                                                                    /// # Safety
+                                                                    #[no_mangle]
+                                                                    unsafe extern "C" fn entrypoint(input: *mut u8)
+                                                                        ->
+                                                                            u64 {
+                                                                            let (program_id, accounts, instruction_data) =
+                                                                                unsafe { ::solana_program::entrypoint::deserialize(input) };
+                                                                            match process_instruction(&program_id, &accounts,
+                                                                                            &instruction_data) {
+                                                                                    Ok(()) => ::solana_program::entrypoint::SUCCESS,
+                                                                                    Err(error) => error.into(),
+                                                                                }
+                                                                        }
+                                                                    struct CarnivalInstructionData {
+                                                                        name: String,
+                                                                        height: u32,
+                                                                        ticket_count: u32,
+                                                                        attraction: String,
+                                                                        attraction_name: String,
+                                                                    }
+                                                                    impl borsh::ser::BorshSerialize for CarnivalInstructionData
+                                                                        where String: borsh::ser::BorshSerialize,
+                                                                        u32: borsh::ser::BorshSerialize,
+                                                                        u32: borsh::ser::BorshSerialize,
+                                                                        String: borsh::ser::BorshSerialize,
+                                                                        String: borsh::ser::BorshSerialize {
+                                                                        fn serialize<W, '_, '_>(self: &'_ Self, writer: &'_ mut W)
+                                                                            -> ::core::result::Result<(), borsh::maybestd::io::Error>
+                                                                            where
+                                                                            W: borsh::maybestd::io::Write {
+                                                                                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.name,
+                                                                                                    writer)) {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.height,
+                                                                                                    writer)) {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.ticket_count,
+                                                                                                    writer)) {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.attraction,
+                                                                                                    writer)) {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                                match #[lang = "branch"](borsh::BorshSerialize::serialize(&self.attraction_name,
+                                                                                                    writer)) {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                                Ok(())
+                                                                            }
+                                                                    }
+                                                                    impl borsh::de::BorshDeserialize for CarnivalInstructionData
+                                                                        where String: borsh::BorshDeserialize,
+                                                                        u32: borsh::BorshDeserialize, u32: borsh::BorshDeserialize,
+                                                                        String: borsh::BorshDeserialize,
+                                                                        String: borsh::BorshDeserialize {
+                                                                        fn deserialize<'_, '_>(buf: &'_ mut &'_ [u8])
+                                                                            ->
+                                                                                ::core::result::Result<Self,
+                                                                                borsh::maybestd::io::Error> {
+                                                                                Ok(Self{
+                                                                                        name:
+                                                                                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                                                        {
+                                                                                                    #[lang = "Break"] {  0: residual } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        return #[lang = "from_residual"](residual),
+                                                                                                    #[lang = "Continue"] {  0: val } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        val,
+                                                                                                },
+
+                                                                                        height:
+                                                                                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                                                        {
+                                                                                                    #[lang = "Break"] {  0: residual } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        return #[lang = "from_residual"](residual),
+                                                                                                    #[lang = "Continue"] {  0: val } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        val,
+                                                                                                },
+
+                                                                                        ticket_count:
+                                                                                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                                                        {
+                                                                                                    #[lang = "Break"] {  0: residual } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        return #[lang = "from_residual"](residual),
+                                                                                                    #[lang = "Continue"] {  0: val } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        val,
+                                                                                                },
+
+                                                                                        attraction:
+                                                                                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                                                        {
+                                                                                                    #[lang = "Break"] {  0: residual } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        return #[lang = "from_residual"](residual),
+                                                                                                    #[lang = "Continue"] {  0: val } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        val,
+                                                                                                },
+
+                                                                                        attraction_name:
+                                                                                            match #[lang = "branch"](borsh::BorshDeserialize::deserialize(buf))
+                                                                                                        {
+                                                                                                    #[lang = "Break"] {  0: residual } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        return #[lang = "from_residual"](residual),
+                                                                                                    #[lang = "Continue"] {  0: val } =>
+                                                                                                        #[allow(unreachable_code)]
+                                                                                                        val,
+                                                                                                },})
+                                                                            }
+                                                                    }
+                                                                    #[automatically_derived]
+                                                                    impl ::core::fmt::Debug for CarnivalInstructionData {
+                                                                        #[inline]
+                                                                        fn fmt<'_, '_,
+                                                                            '_>(self: &'_ Self, f: &'_ mut ::core::fmt::Formatter<>)
+                                                                            ->
+                                                                                ::core::fmt::Result {
+                                                                                ::core::fmt::Formatter::debug_struct_field5_finish(f,
+                                                                                    "CarnivalInstructionData", "name", &self.name, "height",
+                                                                                    &self.height, "ticket_count", &self.ticket_count,
+                                                                                    "attraction", &self.attraction, "attraction_name",
+                                                                                    &&self.attraction_name)
+                                                                            }
+                                                                    }
+                                                                    fn process_instruction<'_, '_, '_,
+                                                                        '_>(_program_id: &'_ Pubkey, _accounts: &'_ [AccountInfo<>],
+                                                                        instruction_data: &'_ [u8])
+                                                                        ->
+                                                                            ProgramResult {
+                                                                            let ix_data_object =
+                                                                                match #[lang = "branch"](CarnivalInstructionData::try_from_slice(instruction_data))
+                                                                                            {
+                                                                                        #[lang = "Break"] {  0: residual } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            return #[lang = "from_residual"](residual),
+                                                                                        #[lang = "Continue"] {  0: val } =>
+                                                                                            #[allow(unreachable_code)]
+                                                                                            val,
+                                                                                    };
+                                                                            match ix_data_object.attraction.as_str() {
+                                                                                    "ride" =>
+                                                                                        get_on_ride::get_on_ride(get_on_ride::GetOnRideInstructionData{
+                                                                                                rider_name: ix_data_object.name,
+
+                                                                                                rider_height: ix_data_object.height,
+
+                                                                                                rider_ticket_count: ix_data_object.ticket_count,
+
+                                                                                                ride: ix_data_object.attraction_name,}),
+                                                                                    "game" =>
+                                                                                        play_game::play_game(play_game::PlayGameInstructionData{
+                                                                                                gamer_name: ix_data_object.name,
+
+                                                                                                gamer_ticket_count: ix_data_object.ticket_count,
+
+                                                                                                game: ix_data_object.attraction_name,}),
+                                                                                    "food" =>
+                                                                                        eat_food::eat_food(eat_food::EatFoodInstructionData{
+                                                                                                eater_name: ix_data_object.name,
+
+                                                                                                eater_ticket_count: ix_data_object.ticket_count,
+
+                                                                                                food_stand: ix_data_object.attraction_name,}),
+                                                                                    _ => Err(ProgramError::InvalidInstructionData),
+                                                                                }
+                                                                        }
+                                                                }
+                                                                mod state {
+                                                                    mod food {
+                                                                        struct FoodStand {
+                                                                            name: String,
+                                                                            food_type: String,
+                                                                            tickets: u32,
+                                                                        }
+                                                                        impl FoodStand {
+                                                                            fn new(name: String, food_type: String, tickets: u32)
+                                                                                -> FoodStand { FoodStand{ name,  food_type,  tickets,} }
+                                                                        }
+                                                                        fn get_food_stands()
+                                                                            ->
+                                                                                Vec<FoodStand> {
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([FoodStand::new("Larry\'s Pizza".to_string(),
+                                                                                                    "pizza".to_string(), 3),
+                                                                                                FoodStand::new("Taco Shack".to_string(), "taco".to_string(),
+                                                                                                    2),
+                                                                                                FoodStand::new("Dough Boy\'s".to_string(),
+                                                                                                    "fried dough".to_string(), 1)]))
+                                                                            }
+                                                                    }
+                                                                    mod game {
+                                                                        struct Game {
+                                                                            name: String,
+                                                                            tickets: u32,
+                                                                            tries: u32,
+                                                                            prize: String,
+                                                                        }
+                                                                        const DEFAULT_TICKETS_TO_PLAY: u32 = 3;
+                                                                        impl Game {
+                                                                            fn new(name: String, tries: u32, prize: String)
+                                                                                ->
+                                                                                    Game {
+                                                                                    Game{
+                                                                                        name,
+
+                                                                                        tickets: DEFAULT_TICKETS_TO_PLAY,
+
+                                                                                        tries,
+
+                                                                                        prize,}
+                                                                                }
+                                                                        }
+                                                                        fn get_games()
+                                                                            ->
+                                                                                Vec<Game> {
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([Game::new("Ring Toss".to_string(),
+                                                                                                    5, "teddy bear".to_string()),
+                                                                                                Game::new("I Got It!".to_string(), 12,
+                                                                                                    "goldfish".to_string()),
+                                                                                                Game::new("Ladder Climb".to_string(), 1,
+                                                                                                    "popcorn bucket".to_string())]))
+                                                                            }
+                                                                    }
+                                                                    mod ride {
+                                                                        struct Ride {
+                                                                            name: String,
+                                                                            upside_down: bool,
+                                                                            tickets: u32,
+                                                                            min_height: u32,
+                                                                        }
+                                                                        impl Ride {
+                                                                            fn new(name: String, upside_down: bool, tickets: u32,
+                                                                                min_height: u32)
+                                                                                ->
+                                                                                    Ride { Ride{ name,  upside_down,  tickets,  min_height,} }
+                                                                        }
+                                                                        fn get_rides()
+                                                                            ->
+                                                                                Vec<Ride> {
+                                                                                <[_]>::into_vec(
+                                                                                    #[rustc_box]
+                                                                                    ::alloc::boxed::Box::new([Ride::new("Tilt-a-Whirl".to_string(),
+                                                                                                    false, 3, 48),
+                                                                                                Ride::new("Scrambler".to_string(), false, 3, 48),
+                                                                                                Ride::new("Ferris Wheel".to_string(), false, 5, 55),
+                                                                                                Ride::new("Zero Gravity".to_string(), true, 5, 60)]))
+                                                                            }
+                                                                    }
+                                                                }

@@ -1,0 +1,979 @@
+// WARNING: This output format is intended for human consumers only
+// and is subject to change without notice. Knock yourself out.
+fn transfer_sol_with_cpi(_1: &[AccountInfo<'_>], _2: u64) -> Result<(), ProgramError> {
+    debug accounts => _1;
+    debug amount => _2;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _3: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _4: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _7: isize;
+    let mut _10: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _11: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _12: isize;
+    let mut _15: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _16: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _17: isize;
+    scope 1 {
+        debug accounts_iter => _3;
+        let _8: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _9: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug payer => _9;
+            let _13: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _14: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug recipient => _14;
+                let _18: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _19: &solana_program::account_info::AccountInfo<'_>;
+                scope 12 {
+                    debug system_program => _19;
+                }
+                scope 13 {
+                    debug residual => _18;
+                    scope 14 {
+                    }
+                }
+                scope 15 {
+                    debug val => _19;
+                    scope 16 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _13;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _14;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _8;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _9;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _4 = core::slice::<impl [AccountInfo<'_>]>::iter(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = &mut _4;
+        _6 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _6) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _7 = discriminant(_5);
+        switchInt(move _7) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _9 = ((_5 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _11 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _8 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _8) -> [return: bb15, unwind continue];
+    }
+
+    bb7: {
+        _10 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _11) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _12 = discriminant(_10);
+        switchInt(move _12) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _14 = ((_10 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _16 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_3) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _13 = move ((_10 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _13) -> [return: bb15, unwind continue];
+    }
+
+    bb11: {
+        _15 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _16) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _19 = ((_15 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb15;
+    }
+
+    bb14: {
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _18) -> [return: bb15, unwind continue];
+    }
+
+    bb15: {
+        return;
+    }
+}
+
+fn transfer_sol_with_program(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: u64) -> Result<(), ProgramError> {
+    debug _program_id => _1;
+    debug accounts => _2;
+    debug amount => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _4: &mut std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _5: std::slice::Iter<'_, solana_program::account_info::AccountInfo<'_>>;
+    let mut _6: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _7: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _8: isize;
+    let mut _11: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, &solana_program::account_info::AccountInfo<'_>>;
+    let mut _12: std::result::Result<&solana_program::account_info::AccountInfo<'_>, solana_program::program_error::ProgramError>;
+    let mut _13: isize;
+    let mut _16: &mut &mut u64;
+    let mut _17: &mut std::cell::RefMut<'_, &mut u64>;
+    let mut _18: std::cell::RefMut<'_, &mut u64>;
+    let mut _19: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, std::cell::RefMut<'_, &mut u64>>;
+    let mut _20: std::result::Result<std::cell::RefMut<'_, &mut u64>, solana_program::program_error::ProgramError>;
+    let mut _21: isize;
+    let mut _24: &mut &mut u64;
+    let mut _25: &mut std::cell::RefMut<'_, &mut u64>;
+    let mut _26: std::cell::RefMut<'_, &mut u64>;
+    let mut _27: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>, std::cell::RefMut<'_, &mut u64>>;
+    let mut _28: std::result::Result<std::cell::RefMut<'_, &mut u64>, solana_program::program_error::ProgramError>;
+    let mut _29: isize;
+    let mut _32: &mut u64;
+    let mut _33: &mut u64;
+    let mut _34: &mut u64;
+    let mut _35: &mut u64;
+    scope 1 {
+        debug accounts_iter => _4;
+        let _9: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+        let _10: &solana_program::account_info::AccountInfo<'_>;
+        scope 2 {
+            debug payer => _10;
+            let _14: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+            let _15: &solana_program::account_info::AccountInfo<'_>;
+            scope 7 {
+                debug recipient => _15;
+                let _22: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _23: std::cell::RefMut<'_, &mut u64>;
+                let _30: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>;
+                let _31: std::cell::RefMut<'_, &mut u64>;
+                scope 12 {
+                    debug residual => _22;
+                    scope 13 {
+                    }
+                }
+                scope 14 {
+                    debug val => _23;
+                    scope 15 {
+                    }
+                }
+                scope 16 {
+                    debug residual => _30;
+                    scope 17 {
+                    }
+                }
+                scope 18 {
+                    debug val => _31;
+                    scope 19 {
+                    }
+                }
+            }
+            scope 8 {
+                debug residual => _14;
+                scope 9 {
+                }
+            }
+            scope 10 {
+                debug val => _15;
+                scope 11 {
+                }
+            }
+        }
+        scope 3 {
+            debug residual => _9;
+            scope 4 {
+            }
+        }
+        scope 5 {
+            debug val => _10;
+            scope 6 {
+            }
+        }
+    }
+
+    bb0: {
+        _5 = core::slice::<impl [AccountInfo<'_>]>::iter(_2) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = &mut _5;
+        _7 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _7) -> [return: bb3, unwind continue];
+    }
+
+    bb3: {
+        _8 = discriminant(_6);
+        switchInt(move _8) -> [0: bb5, 1: bb6, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _10 = ((_6 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _12 = next_account_info::<'_, '_, std::slice::Iter<'_, AccountInfo<'_>>>(_4) -> [return: bb7, unwind continue];
+    }
+
+    bb6: {
+        _9 = move ((_6 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _9) -> [return: bb21, unwind continue];
+    }
+
+    bb7: {
+        _11 = <Result<&AccountInfo<'_>, ProgramError> as Try>::branch(move _12) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _13 = discriminant(_11);
+        switchInt(move _13) -> [0: bb9, 1: bb10, otherwise: bb4];
+    }
+
+    bb9: {
+        _15 = ((_11 as Continue).0: &solana_program::account_info::AccountInfo<'_>);
+        _20 = AccountInfo::<'_>::try_borrow_mut_lamports(_10) -> [return: bb11, unwind continue];
+    }
+
+    bb10: {
+        _14 = move ((_11 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _14) -> [return: bb21, unwind continue];
+    }
+
+    bb11: {
+        _19 = <Result<RefMut<'_, &mut u64>, ProgramError> as Try>::branch(move _20) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _21 = discriminant(_19);
+        switchInt(move _21) -> [0: bb13, 1: bb14, otherwise: bb4];
+    }
+
+    bb13: {
+        _23 = move ((_19 as Continue).0: std::cell::RefMut<'_, &mut u64>);
+        _18 = move _23;
+        _17 = &mut _18;
+        _16 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _17) -> [return: bb15, unwind: bb23];
+    }
+
+    bb14: {
+        _22 = move ((_19 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _22) -> [return: bb21, unwind continue];
+    }
+
+    bb15: {
+        _32 = deref_copy (*_16);
+        _33 = deref_copy (*_16);
+        (*_32) = Sub((*_33), _3);
+        drop(_18) -> [return: bb25, unwind continue];
+    }
+
+    bb16: {
+        _27 = <Result<RefMut<'_, &mut u64>, ProgramError> as Try>::branch(move _28) -> [return: bb17, unwind continue];
+    }
+
+    bb17: {
+        _29 = discriminant(_27);
+        switchInt(move _29) -> [0: bb18, 1: bb19, otherwise: bb4];
+    }
+
+    bb18: {
+        _31 = move ((_27 as Continue).0: std::cell::RefMut<'_, &mut u64>);
+        _26 = move _31;
+        _25 = &mut _26;
+        _24 = <RefMut<'_, &mut u64> as DerefMut>::deref_mut(move _25) -> [return: bb20, unwind: bb22];
+    }
+
+    bb19: {
+        _30 = move ((_27 as Break).0: std::result::Result<std::convert::Infallible, solana_program::program_error::ProgramError>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, ProgramError>>>::from_residual(move _30) -> [return: bb21, unwind continue];
+    }
+
+    bb20: {
+        _34 = deref_copy (*_24);
+        _35 = deref_copy (*_24);
+        (*_34) = Add((*_35), _3);
+        drop(_26) -> [return: bb26, unwind continue];
+    }
+
+    bb21: {
+        return;
+    }
+
+    bb22 (cleanup): {
+        drop(_26) -> [return: bb24, unwind terminate(cleanup)];
+    }
+
+    bb23 (cleanup): {
+        drop(_18) -> [return: bb24, unwind terminate(cleanup)];
+    }
+
+    bb24 (cleanup): {
+        resume;
+    }
+
+    bb25: {
+        _28 = AccountInfo::<'_>::try_borrow_mut_lamports(_15) -> [return: bb16, unwind continue];
+    }
+
+    bb26: {
+        _0 = Result::<(), ProgramError>::Ok(const ());
+        goto -> bb21;
+    }
+}
+
+fn processor::<impl at src/processor.rs:7:10: 7:24>::serialize(_1: &TransferInstruction, _2: &mut W) -> Result<(), std::io::Error> {
+    debug self => _1;
+    debug writer => _2;
+    let mut _0: std::result::Result<(), std::io::Error>;
+    let _3: u8;
+    let mut _4: isize;
+    let mut _5: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _6: std::result::Result<(), std::io::Error>;
+    let mut _7: &[u8];
+    let _8: &[u8; 1];
+    let _9: [u8; 1];
+    let mut _10: u8;
+    let mut _11: isize;
+    let mut _13: isize;
+    let mut _15: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _16: std::result::Result<(), std::io::Error>;
+    let mut _17: isize;
+    let mut _20: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>>;
+    let mut _21: std::result::Result<(), std::io::Error>;
+    let mut _22: isize;
+    scope 1 {
+        debug variant_idx => _3;
+        let _12: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _14: &u64;
+        let _19: &u64;
+        scope 2 {
+            debug residual => _12;
+            scope 3 {
+            }
+        }
+        scope 4 {
+            debug val => const ();
+            scope 5 {
+            }
+        }
+        scope 6 {
+            debug id0 => _14;
+            let _18: std::result::Result<std::convert::Infallible, std::io::Error>;
+            scope 7 {
+                debug residual => _18;
+                scope 8 {
+                }
+            }
+            scope 9 {
+                debug val => const ();
+                scope 10 {
+                }
+            }
+        }
+        scope 11 {
+            debug id0 => _19;
+            let _23: std::result::Result<std::convert::Infallible, std::io::Error>;
+            scope 12 {
+                debug residual => _23;
+                scope 13 {
+                }
+            }
+            scope 14 {
+                debug val => const ();
+                scope 15 {
+                }
+            }
+        }
+    }
+
+    bb0: {
+        _4 = discriminant((*_1));
+        switchInt(move _4) -> [0: bb3, 1: bb2, otherwise: bb1];
+    }
+
+    bb1: {
+        unreachable;
+    }
+
+    bb2: {
+        _3 = const 1_u8;
+        goto -> bb4;
+    }
+
+    bb3: {
+        _3 = const 0_u8;
+        goto -> bb4;
+    }
+
+    bb4: {
+        _10 = _3;
+        _9 = core::num::<impl u8>::to_le_bytes(move _10) -> [return: bb5, unwind continue];
+    }
+
+    bb5: {
+        _8 = &_9;
+        _7 = _8 as &[u8] (PointerCoercion(Unsize));
+        _6 = <W as std::io::Write>::write_all(_2, move _7) -> [return: bb6, unwind continue];
+    }
+
+    bb6: {
+        _5 = <Result<(), std::io::Error> as Try>::branch(move _6) -> [return: bb7, unwind continue];
+    }
+
+    bb7: {
+        _11 = discriminant(_5);
+        switchInt(move _11) -> [0: bb8, 1: bb9, otherwise: bb1];
+    }
+
+    bb8: {
+        _13 = discriminant((*_1));
+        switchInt(move _13) -> [0: bb11, 1: bb10, otherwise: bb1];
+    }
+
+    bb9: {
+        _12 = move ((_5 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb19, unwind continue];
+    }
+
+    bb10: {
+        _19 = &(((*_1) as ProgramTransfer).0: u64);
+        _21 = <u64 as BorshSerialize>::serialize::<W>(_19, _2) -> [return: bb15, unwind continue];
+    }
+
+    bb11: {
+        _14 = &(((*_1) as CpiTransfer).0: u64);
+        _16 = <u64 as BorshSerialize>::serialize::<W>(_14, _2) -> [return: bb12, unwind continue];
+    }
+
+    bb12: {
+        _15 = <Result<(), std::io::Error> as Try>::branch(move _16) -> [return: bb13, unwind continue];
+    }
+
+    bb13: {
+        _17 = discriminant(_15);
+        switchInt(move _17) -> [0: bb18, 1: bb14, otherwise: bb1];
+    }
+
+    bb14: {
+        _18 = move ((_15 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _18) -> [return: bb19, unwind continue];
+    }
+
+    bb15: {
+        _20 = <Result<(), std::io::Error> as Try>::branch(move _21) -> [return: bb16, unwind continue];
+    }
+
+    bb16: {
+        _22 = discriminant(_20);
+        switchInt(move _22) -> [0: bb18, 1: bb17, otherwise: bb1];
+    }
+
+    bb17: {
+        _23 = move ((_20 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _23) -> [return: bb19, unwind continue];
+    }
+
+    bb18: {
+        _0 = Result::<(), std::io::Error>::Ok(const ());
+        goto -> bb19;
+    }
+
+    bb19: {
+        return;
+    }
+}
+
+fn processor::<impl at src/processor.rs:7:26: 7:42>::deserialize(_1: &mut &[u8]) -> Result<TransferInstruction, std::io::Error> {
+    debug buf => _1;
+    let mut _0: std::result::Result<processor::TransferInstruction, std::io::Error>;
+    let _2: u8;
+    let mut _3: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u8>;
+    let mut _4: std::result::Result<u8, std::io::Error>;
+    let mut _5: isize;
+    let _6: std::result::Result<std::convert::Infallible, std::io::Error>;
+    let _7: u8;
+    let mut _9: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u64>;
+    let mut _10: std::result::Result<u64, std::io::Error>;
+    let mut _11: isize;
+    let mut _14: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, u64>;
+    let mut _15: std::result::Result<u64, std::io::Error>;
+    let mut _16: isize;
+    let mut _20: std::fmt::Arguments<'_>;
+    let mut _21: &[&str];
+    let mut _22: &[core::fmt::rt::Argument<'_>];
+    let _23: &[core::fmt::rt::Argument<'_>; 1];
+    let _24: [core::fmt::rt::Argument<'_>; 1];
+    let mut _25: core::fmt::rt::Argument<'_>;
+    let _26: &u8;
+    let mut _27: std::io::Error;
+    let mut _28: std::io::ErrorKind;
+    let mut _29: processor::TransferInstruction;
+    scope 1 {
+        debug variant_idx => _2;
+        let _8: processor::TransferInstruction;
+        let _12: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _13: u64;
+        let _17: std::result::Result<std::convert::Infallible, std::io::Error>;
+        let _18: u64;
+        let _19: std::string::String;
+        let mut _30: &[&str; 1];
+        scope 6 {
+            debug return_value => _8;
+        }
+        scope 7 {
+            debug residual => _12;
+            scope 8 {
+            }
+        }
+        scope 9 {
+            debug val => _13;
+            scope 10 {
+            }
+        }
+        scope 11 {
+            debug residual => _17;
+            scope 12 {
+            }
+        }
+        scope 13 {
+            debug val => _18;
+            scope 14 {
+            }
+        }
+        scope 15 {
+            debug msg => _19;
+        }
+        scope 16 {
+            debug res => _19;
+        }
+    }
+    scope 2 {
+        debug residual => _6;
+        scope 3 {
+        }
+    }
+    scope 4 {
+        debug val => _7;
+        scope 5 {
+        }
+    }
+
+    bb0: {
+        _4 = <u8 as BorshDeserialize>::deserialize(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _3 = <Result<u8, std::io::Error> as Try>::branch(move _4) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _5 = discriminant(_3);
+        switchInt(move _5) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _7 = ((_3 as Continue).0: u8);
+        _2 = _7;
+        switchInt(_2) -> [0: bb7, 1: bb12, otherwise: bb6];
+    }
+
+    bb5: {
+        _6 = move ((_3 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<TransferInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _6) -> [return: bb22, unwind continue];
+    }
+
+    bb6: {
+        _30 = const <processor::TransferInstruction as borsh::BorshDeserialize>::deserialize::promoted[0];
+        _21 = _30 as &[&str] (PointerCoercion(Unsize));
+        _26 = &_2;
+        _25 = core::fmt::rt::Argument::<'_>::new_debug::<u8>(_26) -> [return: bb17, unwind continue];
+    }
+
+    bb7: {
+        _10 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        _9 = <Result<u64, std::io::Error> as Try>::branch(move _10) -> [return: bb9, unwind continue];
+    }
+
+    bb9: {
+        _11 = discriminant(_9);
+        switchInt(move _11) -> [0: bb10, 1: bb11, otherwise: bb3];
+    }
+
+    bb10: {
+        _13 = ((_9 as Continue).0: u64);
+        _8 = TransferInstruction::CpiTransfer(_13);
+        goto -> bb21;
+    }
+
+    bb11: {
+        _12 = move ((_9 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<TransferInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _12) -> [return: bb22, unwind continue];
+    }
+
+    bb12: {
+        _15 = <u64 as BorshDeserialize>::deserialize(_1) -> [return: bb13, unwind continue];
+    }
+
+    bb13: {
+        _14 = <Result<u64, std::io::Error> as Try>::branch(move _15) -> [return: bb14, unwind continue];
+    }
+
+    bb14: {
+        _16 = discriminant(_14);
+        switchInt(move _16) -> [0: bb15, 1: bb16, otherwise: bb3];
+    }
+
+    bb15: {
+        _18 = ((_14 as Continue).0: u64);
+        _8 = TransferInstruction::ProgramTransfer(_18);
+        goto -> bb21;
+    }
+
+    bb16: {
+        _17 = move ((_14 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<TransferInstruction, std::io::Error> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _17) -> [return: bb22, unwind continue];
+    }
+
+    bb17: {
+        _24 = [move _25];
+        _23 = &_24;
+        _22 = _23 as &[core::fmt::rt::Argument<'_>] (PointerCoercion(Unsize));
+        _20 = Arguments::<'_>::new_v1(move _21, move _22) -> [return: bb18, unwind continue];
+    }
+
+    bb18: {
+        _19 = format(move _20) -> [return: bb19, unwind continue];
+    }
+
+    bb19: {
+        _28 = InvalidInput;
+        _27 = std::io::Error::new::<String>(move _28, move _19) -> [return: bb20, unwind continue];
+    }
+
+    bb20: {
+        _0 = Result::<TransferInstruction, std::io::Error>::Err(move _27);
+        goto -> bb22;
+    }
+
+    bb21: {
+        _29 = move _8;
+        _0 = Result::<TransferInstruction, std::io::Error>::Ok(move _29);
+        goto -> bb22;
+    }
+
+    bb22: {
+        return;
+    }
+}
+
+const processor::<impl at src/processor.rs:7:26: 7:42>::deserialize::promoted[0]: &[&str; 1] = {
+    let mut _0: &[&str; 1];
+    let mut _1: [&str; 1];
+
+    bb0: {
+        _1 = [const "Unexpected variant index: "];
+        _0 = &_1;
+        return;
+    }
+}
+
+fn processor::<impl at src/processor.rs:7:44: 7:49>::fmt(_1: &TransferInstruction, _2: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    debug self => _1;
+    debug f => _2;
+    let mut _0: std::result::Result<(), std::fmt::Error>;
+    let mut _3: isize;
+    let _4: &u64;
+    let _5: &str;
+    let mut _6: &dyn std::fmt::Debug;
+    let _7: &&u64;
+    let _8: &u64;
+    let _9: &str;
+    let mut _10: &dyn std::fmt::Debug;
+    let _11: &&u64;
+    scope 1 {
+        debug __self_0 => _4;
+    }
+    scope 2 {
+        debug __self_0 => _8;
+    }
+
+    bb0: {
+        _3 = discriminant((*_1));
+        switchInt(move _3) -> [0: bb3, 1: bb2, otherwise: bb1];
+    }
+
+    bb1: {
+        unreachable;
+    }
+
+    bb2: {
+        _8 = &(((*_1) as ProgramTransfer).0: u64);
+        _9 = const "ProgramTransfer";
+        _11 = &_8;
+        _10 = _11 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        _0 = Formatter::<'_>::debug_tuple_field1_finish(_2, _9, move _10) -> [return: bb4, unwind continue];
+    }
+
+    bb3: {
+        _4 = &(((*_1) as CpiTransfer).0: u64);
+        _5 = const "CpiTransfer";
+        _7 = &_4;
+        _6 = _7 as &dyn std::fmt::Debug (PointerCoercion(Unsize));
+        _0 = Formatter::<'_>::debug_tuple_field1_finish(_2, _5, move _6) -> [return: bb4, unwind continue];
+    }
+
+    bb4: {
+        return;
+    }
+}
+
+fn process_instruction(_1: &Pubkey, _2: &[AccountInfo<'_>], _3: &[u8]) -> Result<(), ProgramError> {
+    debug program_id => _1;
+    debug accounts => _2;
+    debug input => _3;
+    let mut _0: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let mut _4: std::ops::ControlFlow<std::result::Result<std::convert::Infallible, std::io::Error>, processor::TransferInstruction>;
+    let mut _5: std::result::Result<processor::TransferInstruction, std::io::Error>;
+    let mut _6: isize;
+    let _7: std::result::Result<std::convert::Infallible, std::io::Error>;
+    let _8: processor::TransferInstruction;
+    let mut _9: isize;
+    scope 1 {
+        debug instruction => _8;
+        let _10: u64;
+        let _11: u64;
+        scope 6 {
+            debug args => _10;
+        }
+        scope 7 {
+            debug args => _11;
+        }
+    }
+    scope 2 {
+        debug residual => _7;
+        scope 3 {
+        }
+    }
+    scope 4 {
+        debug val => _8;
+        scope 5 {
+        }
+    }
+
+    bb0: {
+        _5 = <TransferInstruction as BorshDeserialize>::try_from_slice(_3) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _4 = <Result<TransferInstruction, std::io::Error> as Try>::branch(move _5) -> [return: bb2, unwind continue];
+    }
+
+    bb2: {
+        _6 = discriminant(_4);
+        switchInt(move _6) -> [0: bb4, 1: bb5, otherwise: bb3];
+    }
+
+    bb3: {
+        unreachable;
+    }
+
+    bb4: {
+        _8 = move ((_4 as Continue).0: processor::TransferInstruction);
+        _9 = discriminant(_8);
+        switchInt(move _9) -> [0: bb7, 1: bb6, otherwise: bb3];
+    }
+
+    bb5: {
+        _7 = move ((_4 as Break).0: std::result::Result<std::convert::Infallible, std::io::Error>);
+        _0 = <Result<(), ProgramError> as FromResidual<Result<Infallible, std::io::Error>>>::from_residual(move _7) -> [return: bb8, unwind continue];
+    }
+
+    bb6: {
+        _11 = ((_8 as ProgramTransfer).0: u64);
+        _0 = transfer_sol_with_program(_1, _2, _11) -> [return: bb8, unwind continue];
+    }
+
+    bb7: {
+        _10 = ((_8 as CpiTransfer).0: u64);
+        _0 = transfer_sol_with_cpi(_2, _10) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+}
+
+fn entrypoint(_1: *mut u8) -> u64 {
+    debug input => _1;
+    let mut _0: u64;
+    let _2: &solana_program::pubkey::Pubkey;
+    let _3: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _4: &[u8];
+    let mut _5: (&solana_program::pubkey::Pubkey, std::vec::Vec<solana_program::account_info::AccountInfo<'_>>, &[u8]);
+    let mut _6: std::result::Result<(), solana_program::program_error::ProgramError>;
+    let _7: &&solana_program::pubkey::Pubkey;
+    let _8: &[solana_program::account_info::AccountInfo<'_>];
+    let _9: &std::vec::Vec<solana_program::account_info::AccountInfo<'_>>;
+    let _10: &&[u8];
+    let mut _11: isize;
+    let mut _13: &solana_program::pubkey::Pubkey;
+    let mut _14: &[u8];
+    scope 1 {
+        debug program_id => _2;
+        debug accounts => _3;
+        debug instruction_data => _4;
+        let _12: solana_program::program_error::ProgramError;
+        scope 3 {
+            debug error => _12;
+        }
+    }
+    scope 2 {
+    }
+
+    bb0: {
+        _5 = solana_program::entrypoint::deserialize::<'_>(_1) -> [return: bb1, unwind continue];
+    }
+
+    bb1: {
+        _2 = (_5.0: &solana_program::pubkey::Pubkey);
+        _3 = move (_5.1: std::vec::Vec<solana_program::account_info::AccountInfo<'_>>);
+        _4 = (_5.2: &[u8]);
+        _7 = &_2;
+        _13 = deref_copy (*_7);
+        _9 = &_3;
+        _8 = <Vec<AccountInfo<'_>> as Deref>::deref(_9) -> [return: bb2, unwind: bb10];
+    }
+
+    bb2: {
+        _10 = &_4;
+        _14 = deref_copy (*_10);
+        _6 = process_instruction(_13, _8, _14) -> [return: bb3, unwind: bb10];
+    }
+
+    bb3: {
+        _11 = discriminant(_6);
+        switchInt(move _11) -> [0: bb6, 1: bb5, otherwise: bb4];
+    }
+
+    bb4: {
+        unreachable;
+    }
+
+    bb5: {
+        _12 = move ((_6 as Err).0: solana_program::program_error::ProgramError);
+        _0 = <ProgramError as Into<u64>>::into(move _12) -> [return: bb12, unwind: bb9];
+    }
+
+    bb6: {
+        _0 = const solana_program::entrypoint::SUCCESS;
+        goto -> bb7;
+    }
+
+    bb7: {
+        drop(_3) -> [return: bb8, unwind continue];
+    }
+
+    bb8: {
+        return;
+    }
+
+    bb9 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb10 (cleanup): {
+        drop(_3) -> [return: bb11, unwind terminate(cleanup)];
+    }
+
+    bb11 (cleanup): {
+        resume;
+    }
+
+    bb12: {
+        goto -> bb7;
+    }
+}
+
+fn TransferInstruction::CpiTransfer(_1: u64) -> TransferInstruction {
+    let mut _0: processor::TransferInstruction;
+
+    bb0: {
+        _0 = TransferInstruction::CpiTransfer(move _1);
+        return;
+    }
+}
+
+// MIR FOR CTFE
+fn TransferInstruction::CpiTransfer(_1: u64) -> TransferInstruction {
+    let mut _0: processor::TransferInstruction;
+
+    bb0: {
+        _0 = TransferInstruction::CpiTransfer(move _1);
+        return;
+    }
+}
+
+fn TransferInstruction::ProgramTransfer(_1: u64) -> TransferInstruction {
+    let mut _0: processor::TransferInstruction;
+
+    bb0: {
+        _0 = TransferInstruction::ProgramTransfer(move _1);
+        return;
+    }
+}
+
+// MIR FOR CTFE
+fn TransferInstruction::ProgramTransfer(_1: u64) -> TransferInstruction {
+    let mut _0: processor::TransferInstruction;
+
+    bb0: {
+        _0 = TransferInstruction::ProgramTransfer(move _1);
+        return;
+    }
+}

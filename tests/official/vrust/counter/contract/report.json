@@ -1,0 +1,40 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "counter_solana_native",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528654",
+  "int_cnt": 1,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 2,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "process_increment_counter",
+      "code": "src/lib.rs:53:5: 53:23 \n\tcounter.count += 1",
+      "context": "src/lib.rs:40:1: 58:2 \n\tpub fn process_increment_counter(\n    accounts: &[AccountInfo],\n    _instruction_data: &[u8],\n) -> Result<(), ProgramError> {\n    let account_info_iter = &mut accounts.iter();\n\n    let counter_account = next_account_info(account_info_iter)?;\n    assert!(\n        counter_account.is_writable,\n        \"Counter account must be writable\"\n    );\n\n    let mut counter = Counter::try_from_slice(&counter_account.try_borrow_mut_data()?)?;\n    counter.count += 1;\n    counter.serialize(&mut *counter_account.data.borrow_mut())?;\n\n    msg!(\"Counter state incremented to {:?}\", counter.count);\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn process_instruction(){// src/lib.rs:22:1: 38:2 }\n\t\tfn process_increment_counter(){// src/lib.rs:40:1: 58:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "solana_program::account_info::AccountInfo::<'a>::try_borrow_mut_data",
+      "code": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:112:9: 113:30 \n\tself.data\n            .try_borrow_mut()",
+      "context": "/Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:111:5: 115:6 \n\tpub fn try_borrow_mut_data(&self) -> Result<RefMut<&'a mut [u8]>, ProgramError> {\n        self.data\n            .try_borrow_mut()\n            .map_err(|_| ProgramError::AccountBorrowFailed)\n    }",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn process_instruction(){// src/lib.rs:22:1: 38:2 }\n\t\tfn process_increment_counter(){// src/lib.rs:40:1: 58:2 }\n\t\t\tfn solana_program::account_info::AccountInfo::<'a>::try_borrow_mut_data(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/account_info.rs:111:5: 115:6 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

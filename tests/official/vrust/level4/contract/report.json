@@ -1,0 +1,79 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "level4",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712582274",
+  "int_cnt": 0,
+  "chk_cnt": 2,
+  "typ_cnt": 0,
+  "oth_cnt": 3,
+  "total": 5,
+  "errors": [
+    {
+      "id": "0",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:132:20: 132:38 \n\tmint.data.borrow()",
+      "context": "src/processor.rs:115:1: 156:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"withdraw {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info = next_account_info(account_info_iter)?;\n    let authority_info = next_account_info(account_info_iter)?;\n    let owner_info = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let mint = next_account_info(account_info_iter)?;\n    let spl_token = next_account_info(account_info_iter)?;\n\n    let (wallet_address, _) = get_wallet_address(owner_info.key, program_id);\n    let (authority_address, authority_seed) = get_authority(program_id);\n\n    assert_eq!(wallet_info.key, &wallet_address);\n    assert_eq!(authority_info.key, &authority_address);\n    assert!(owner_info.is_signer, \"owner must sign!\");\n\n    let decimals = mint.data.borrow()[44];\n\n    invoke_signed(\n        &spl_token::instruction::transfer_checked(\n            &spl_token.key,\n            &wallet_info.key,\n            mint.key,\n            destination_info.key,\n            authority_info.key,\n            &[],\n            amount,\n            decimals,\n        )\n        .unwrap(),\n        &[\n            wallet_info.clone(),\n            destination_info.clone(),\n            authority_info.clone(),\n            mint.clone(),\n        ],\n        &[&[&[authority_seed]]],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.7.17/src/entrypoint.rs:46:9: 53:10 }\n\tfn processor::process_instruction(){// src/processor.rs:20:1: 30:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:115:1: 156:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::deposit",
+      "code": "src/processor.rs:90:20: 90:38 \n\tmint.data.borrow()",
+      "context": "src/processor.rs:81:1: 113:2 \n\tfn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"deposit {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info = next_account_info(account_info_iter)?;\n    let source_info = next_account_info(account_info_iter)?;\n    let user_authority_info = next_account_info(account_info_iter)?;\n    let mint = next_account_info(account_info_iter)?;\n    let spl_token = next_account_info(account_info_iter)?;\n\n    let decimals = mint.data.borrow()[44];\n\n    invoke(\n        &spl_token::instruction::transfer_checked(\n            &spl_token.key,\n            &source_info.key,\n            mint.key,\n            wallet_info.key,\n            user_authority_info.key,\n            &[],\n            amount,\n            decimals,\n        )\n        .unwrap(),\n        &[\n            wallet_info.clone(),\n            source_info.clone(),\n            user_authority_info.clone(),\n            mint.clone(),\n        ],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.7.17/src/entrypoint.rs:46:9: 53:10 }\n\tfn processor::process_instruction(){// src/processor.rs:20:1: 30:2 }\n\t\tfn processor::deposit(){// src/processor.rs:81:1: 113:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "2",
+      "category": "CrossProgramInvocation",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs",
+      "context": "src/processor.rs:115:1: 156:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"withdraw {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info = next_account_info(account_info_iter)?;\n    let authority_info = next_account_info(account_info_iter)?;\n    let owner_info = next_account_info(account_info_iter)?;\n    let destination_info = next_account_info(account_info_iter)?;\n    let mint = next_account_info(account_info_iter)?;\n    let spl_token = next_account_info(account_info_iter)?;\n\n    let (wallet_address, _) = get_wallet_address(owner_info.key, program_id);\n    let (authority_address, authority_seed) = get_authority(program_id);\n\n    assert_eq!(wallet_info.key, &wallet_address);\n    assert_eq!(authority_info.key, &authority_address);\n    assert!(owner_info.is_signer, \"owner must sign!\");\n\n    let decimals = mint.data.borrow()[44];\n\n    invoke_signed(\n        &spl_token::instruction::transfer_checked(\n            &spl_token.key,\n            &wallet_info.key,\n            mint.key,\n            destination_info.key,\n            authority_info.key,\n            &[],\n            amount,\n            decimals,\n        )\n        .unwrap(),\n        &[\n            wallet_info.clone(),\n            destination_info.clone(),\n            authority_info.clone(),\n            mint.clone(),\n        ],\n        &[&[&[authority_seed]]],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.7.17/src/entrypoint.rs:46:9: 53:10 }\n\tfn processor::process_instruction(){// src/processor.rs:20:1: 30:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:115:1: 156:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "3",
+      "category": "CrossProgramInvocation",
+      "severity": "Critical",
+      "location": "processor::deposit",
+      "code": "src/processor.rs",
+      "context": "src/processor.rs:81:1: 113:2 \n\tfn deposit(_program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    msg!(\"deposit {}\", amount);\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info = next_account_info(account_info_iter)?;\n    let source_info = next_account_info(account_info_iter)?;\n    let user_authority_info = next_account_info(account_info_iter)?;\n    let mint = next_account_info(account_info_iter)?;\n    let spl_token = next_account_info(account_info_iter)?;\n\n    let decimals = mint.data.borrow()[44];\n\n    invoke(\n        &spl_token::instruction::transfer_checked(\n            &spl_token.key,\n            &source_info.key,\n            mint.key,\n            wallet_info.key,\n            user_authority_info.key,\n            &[],\n            amount,\n            decimals,\n        )\n        .unwrap(),\n        &[\n            wallet_info.clone(),\n            source_info.clone(),\n            user_authority_info.clone(),\n            mint.clone(),\n        ],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.7.17/src/entrypoint.rs:46:9: 53:10 }\n\tfn processor::process_instruction(){// src/processor.rs:20:1: 30:2 }\n\t\tfn processor::deposit(){// src/processor.rs:81:1: 113:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "4",
+      "category": "CrossProgramInvocation",
+      "severity": "Critical",
+      "location": "processor::initialize",
+      "code": "src/processor.rs",
+      "context": "src/processor.rs:32:1: 79:2 \n\tfn initialize(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {\n    msg!(\"init\");\n    let account_info_iter = &mut accounts.iter();\n    let wallet_info = next_account_info(account_info_iter)?;\n    let authority_info = next_account_info(account_info_iter)?;\n    let owner__signer = next_account_info(account_info_iter)?;\n    let mint = next_account_info(account_info_iter)?;\n    let rent_info = next_account_info(account_info_iter)?;\n    let spl_token = next_account_info(account_info_iter)?;\n\n    let (wallet_address, wallet_seed) = get_wallet_address(owner__signer.key, program_id);\n    let (authority_address, _) = get_authority(program_id);\n    let rent = Rent::from_account_info(rent_info)?;\n\n    assert_eq!(wallet_info.key, &wallet_address);\n    assert_eq!(authority_info.key, &authority_address);\n    assert!(owner__signer.is_signer, \"owner must sign!\");\n\n    invoke_signed(\n        &system_instruction::create_account(\n            &owner__signer.key,\n            &wallet_address,\n            rent.minimum_balance(spl_token::state::Account::LEN),\n            spl_token::state::Account::LEN as u64,\n            &spl_token.key,\n        ),\n        &[owner__signer.clone(), wallet_info.clone()],\n        &[&[&owner__signer.key.to_bytes(), &[wallet_seed]]],\n    )?;\n\n    invoke(\n        &spl_token::instruction::initialize_account(\n            &spl_token.key,\n            &wallet_address,\n            mint.key,\n            &authority_address,\n        )\n        .unwrap(),\n        &[\n            authority_info.clone(),\n            wallet_info.clone(),\n            mint.clone(),\n            rent_info.clone(),\n        ],\n    )?;\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.7.17/src/entrypoint.rs:46:9: 53:10 }\n\tfn processor::process_instruction(){// src/processor.rs:20:1: 30:2 }\n\t\tfn processor::initialize(){// src/processor.rs:32:1: 79:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

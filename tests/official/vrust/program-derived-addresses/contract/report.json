@@ -1,0 +1,40 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "program_derived_addresses_program",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528863",
+  "int_cnt": 1,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 2,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "state::page_visits::PageVisits::increment",
+      "code": "src/state/page_visits.rs:22:9: 22:30 \n\tself.page_visits += 1",
+      "context": "src/state/page_visits.rs:21:5: 23:6 \n\tpub fn increment(&mut self) {\n        self.page_visits += 1;\n    }",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:11:1: 25:2 }\n\t\tfn instructions::increment::increment_page_visits(){// src/instructions/increment.rs:9:1: 17:2 }\n\t\t\tfn state::page_visits::PageVisits::increment(){// src/state/page_visits.rs:21:5: 23:6 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "instructions::increment::increment_page_visits",
+      "code": "src/instructions/increment.rs:13:56: 13:89 \n\tpage_visits_account.data.borrow()",
+      "context": "src/instructions/increment.rs:9:1: 17:2 \n\tpub fn increment_page_visits(accounts: &[AccountInfo]) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let page_visits_account = next_account_info(accounts_iter)?;\n\n    let page_visits = &mut PageVisits::try_from_slice(&page_visits_account.data.borrow())?;\n    page_visits.increment();\n    page_visits.serialize(&mut &mut page_visits_account.data.borrow_mut()[..])?;\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:11:1: 25:2 }\n\t\tfn instructions::increment::increment_page_visits(){// src/instructions/increment.rs:9:1: 17:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

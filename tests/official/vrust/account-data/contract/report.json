@@ -1,0 +1,27 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "account_data_program",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712528569",
+  "int_cnt": 0,
+  "chk_cnt": 1,
+  "typ_cnt": 0,
+  "oth_cnt": 0,
+  "total": 1,
+  "errors": [
+    {
+      "id": "0",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "instructions::create::create_address_info",
+      "code": "src/instructions/create.rs:42:38: 42:76 \n\taddress_info_account.data.borrow_mut()",
+      "context": "src/instructions/create.rs:14:1: 44:2 \n\tpub fn create_address_info(\n    program_id: &Pubkey,\n    accounts: &[AccountInfo],\n    address_info: AddressInfo,\n) -> ProgramResult {\n    let accounts_iter = &mut accounts.iter();\n    let address_info_account = next_account_info(accounts_iter)?;\n    let payer = next_account_info(accounts_iter)?;\n    let system_program = next_account_info(accounts_iter)?;\n\n    let account_span = (address_info.try_to_vec()?).len();\n    let lamports_required = (Rent::get()?).minimum_balance(account_span);\n\n    invoke(\n        &system_instruction::create_account(\n            payer.key,\n            address_info_account.key,\n            lamports_required,\n            account_span as u64,\n            program_id,\n        ),\n        &[\n            payer.clone(),\n            address_info_account.clone(),\n            system_program.clone(),\n        ],\n    )?;\n\n    address_info.serialize(&mut &mut address_info_account.data.borrow_mut()[..])?;\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:10:1: 20:2 }\n\t\tfn instructions::create::create_address_info(){// src/instructions/create.rs:14:1: 44:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}

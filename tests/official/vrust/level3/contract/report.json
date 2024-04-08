@@ -1,0 +1,66 @@
+{
+  "id": "VRust",
+  "user": "O2Lab VRust Team",
+  "crate": "level3",
+  "git-loc": "https://github.com/parasol-aser/vrust",
+  "timestamp": "1712582221",
+  "int_cnt": 1,
+  "chk_cnt": 2,
+  "typ_cnt": 1,
+  "oth_cnt": 0,
+  "total": 4,
+  "errors": [
+    {
+      "id": "0",
+      "category": "IntegerFlow",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:156:5: 156:59 \n\t**(*vault_info__owner).lamports.borrow_mut() -= amount",
+      "context": "src/processor.rs:135:1: 163:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let vault_info__owner = next_account_info(account_info_iter)?;\n    let pool_info__owner = next_account_info(account_info_iter)?;\n    let withdraw_authority_info__signer = next_account_info(account_info_iter)?;\n    let mut pool = TipPool::deserialize(&mut &(*pool_info__owner.data).borrow_mut()[..])?;\n\n    assert_eq!(vault_info__owner.owner, program_id);\n    assert_eq!(pool_info__owner.owner, program_id);\n    assert!(\n        withdraw_authority_info__signer.is_signer,\n        \"withdraw authority must sign\"\n    );\n    assert_eq!(pool.vault, *vault_info__owner.key);\n    assert_eq!(*withdraw_authority_info__signer.key, pool.withdraw_authority);\n\n    pool.value = match pool.value.checked_sub(amount) {\n        Some(v) => v,\n        None => return Err(ProgramError::InvalidArgument),\n    };\n\n    **(*vault_info__owner).lamports.borrow_mut() -= amount;\n    **(*withdraw_authority_info__signer).lamports.borrow_mut() += amount;\n\n    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])\n        .unwrap();\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 30:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:135:1: 163:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "1",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::withdraw",
+      "code": "src/processor.rs:140:49: 140:70 \n\tpool_info__owner.data",
+      "context": "src/processor.rs:135:1: 163:2 \n\tfn withdraw(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let vault_info__owner = next_account_info(account_info_iter)?;\n    let pool_info__owner = next_account_info(account_info_iter)?;\n    let withdraw_authority_info__signer = next_account_info(account_info_iter)?;\n    let mut pool = TipPool::deserialize(&mut &(*pool_info__owner.data).borrow_mut()[..])?;\n\n    assert_eq!(vault_info__owner.owner, program_id);\n    assert_eq!(pool_info__owner.owner, program_id);\n    assert!(\n        withdraw_authority_info__signer.is_signer,\n        \"withdraw authority must sign\"\n    );\n    assert_eq!(pool.vault, *vault_info__owner.key);\n    assert_eq!(*withdraw_authority_info__signer.key, pool.withdraw_authority);\n\n    pool.value = match pool.value.checked_sub(amount) {\n        Some(v) => v,\n        None => return Err(ProgramError::InvalidArgument),\n    };\n\n    **(*vault_info__owner).lamports.borrow_mut() -= amount;\n    **(*withdraw_authority_info__signer).lamports.borrow_mut() += amount;\n\n    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])\n        .unwrap();\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 30:2 }\n\t\tfn processor::withdraw(){// src/processor.rs:135:1: 163:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "2",
+      "category": "MissingKeyCheck",
+      "severity": "Critical",
+      "location": "processor::tip",
+      "code": "src/processor.rs:113:49: 113:70 \n\tpool_info__owner.data",
+      "context": "src/processor.rs:108:1: 133:2 \n\tfn tip(program_id: &Pubkey, accounts: &[AccountInfo], amount: u64) -> ProgramResult {\n    let account_info_iter = &mut accounts.iter();\n    let vault_info__owner = next_account_info(account_info_iter)?;\n    let pool_info__owner = next_account_info(account_info_iter)?;\n    let source_info__signer = next_account_info(account_info_iter)?;\n    let mut pool = TipPool::deserialize(&mut &(*pool_info__owner.data).borrow_mut()[..])?;\n\n    assert_eq!(vault_info__owner.owner, program_id);\n    assert_eq!(pool_info__owner.owner, program_id);\n    assert_eq!(pool.vault, *vault_info__owner.key);\n\n    invoke(\n        &system_instruction::transfer(&source_info__signer.key, &vault_info__owner.key, amount),\n        &[vault_info__owner.clone(), source_info__signer.clone()],\n    )?;\n\n    pool.value = match pool.value.checked_add(amount) {\n        Some(v) => v,\n        None => return Err(ProgramError::InvalidArgument),\n    };\n\n    pool.serialize(&mut &mut pool_info__owner.data.borrow_mut()[..])\n        .unwrap();\n\n    Ok(())\n}",
+      "callstack": "fn entrypoint(){// /Users/jeffgugelmann/.cargo/registry/src/github.com-1ecc6299db9ec823/solana-program-1.8.2/src/entrypoint.rs:119:9: 126:10 }\n\tfn processor::process_instruction(){// src/processor.rs:15:1: 30:2 }\n\t\tfn processor::tip(){// src/processor.rs:108:1: 133:2 }\n",
+      "status": "UnResolved",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    },
+    {
+      "id": "3",
+      "category": "TypeConfusion",
+      "severity": "Critical",
+      "location": "processor::tip, processor::withdraw",
+      "code": "src/lib.rs:53:1: 57:2 \n\tpub struct TipPool {\n    pub withdraw_authority: Pubkey,\n    pub value: u64,\n    pub vault: Pubkey,\n}\nsrc/lib.rs:63:1: 68:2 \n\tpub struct Vault {\n    pub creator: Pubkey,\n    pub fee: f64,              //reserved for future use\n    pub fee_recipient: Pubkey, //reserved for future use\n    pub seed: u8,\n}",
+      "context": "",
+      "callstack": "UnResolved",
+      "status": "GitHub Link to be added.",
+      "description": "",
+      "link": "",
+      "alleviation": ""
+    }
+  ]
+}
