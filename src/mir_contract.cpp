@@ -399,23 +399,10 @@ void mir_contract::generate_struct_struct(std::ostream *out, const mir_statement
     *out << "}" << std::endl;
 
     *out << "void serialize_" << struct_name << "(" << struct_name << " x, u8* out) {" << std::endl;
-    unsigned int s_counter = 0;
-    for (const auto& variable : state_statements) {
-        std::string var_name = variable.get_ast_data().at("variable");
-        std::string var_type = variable.get_ast_data().at("variable_type");
-        generate_serialization(out, var_name, var_type, &s_counter);
-    }
     *out << "}" << std::endl;
 
     *out << struct_name << " deserialize_" << struct_name << "(u8* in) {" << std::endl;
-    *out << "\t" << struct_name << " x;" << std::endl;
-    unsigned int d_counter = 0;
-    for (const auto& variable : state_statements) {
-        std::string var_name = variable.get_ast_data().at("variable");
-        std::string var_type = variable.get_ast_data().at("variable_type");
-        generate_deserialization(out, var_name, var_type, &d_counter);
-    }
-    *out << "\treturn x;" << std::endl;
+    *out << "\treturn nondet_" << struct_name << "();" << std::endl;
     *out << "}" << std::endl;
 
     *out << std::endl;

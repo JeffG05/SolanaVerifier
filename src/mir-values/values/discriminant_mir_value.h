@@ -17,7 +17,7 @@ public:
                     return std::make_tuple("(" + value + ".type == _continue ? 0 : (" + value + ".type == _break ? 1 : 2))", true);
                 }
                 if (var_type.starts_with("result<")) {
-                    return std::make_tuple("(" + value + ".is_success ? 0 : 1)", true);
+                    return std::make_tuple("(" + value + ".is_success ? 1 : 0)", true);
                 }
                 return std::make_tuple("enum_discriminant<" + value + ">", true);
             }
