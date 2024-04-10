@@ -124,6 +124,9 @@ void solana_contract::edit_rust_file(const std::filesystem::path &file_path) {
                 updated_line += match[3].str();
             } else if (std::regex_match(line, match, msg_regex)) {
                 updated_line += match[1].str();
+                if (!utils::trim(match[1].str()).empty()) {
+                    updated_line += "{}";
+                }
                 updated_line += match[2].str();
             } else if (std::regex_match(line, match, invoke_regex)) {
                 deleting_to_semi = true;
