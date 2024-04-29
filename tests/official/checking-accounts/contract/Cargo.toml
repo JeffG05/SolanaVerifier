@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 solana-program = "1.10.12"
+proc-macro2 = "=1.0.79"
 
 [lib]
 crate-type = ["cdylib", "lib"]

@@ -11,6 +11,7 @@ solana-program = "1.8.2"
 spl-token = { version = "*", features = ["no-entrypoint"] }
 borsh = "0.9.1"
 borsh-derive = "0.9.1"
+proc-macro2 = "=1.0.79"
 
 [lib]
 crate-type = ["cdylib", "lib"]
